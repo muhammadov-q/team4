@@ -2,19 +2,19 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Loading() {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:py-12">
-      <div className="mb-8 max-w-2xl space-y-3">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-11 w-full max-w-md" />
-        <Skeleton className="h-4 w-80 max-w-full" />
-      </div>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
-        <Skeleton className="h-117 rounded-xl" />
-        <div className="space-y-5 rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-          <Skeleton className="h-5 w-28" />
-          <Skeleton className="h-4 w-56" />
-          <Skeleton className="h-9 w-full rounded-lg" />
-          <Skeleton className="mx-auto size-16 rounded-full" />
+    <main className="mx-auto w-full max-w-[1200px] flex-1 px-6">
+      <section className="-mt-24 flex flex-col items-center gap-5 pt-44 pb-24 lg:pt-52 lg:pb-32">
+        <Skeleton className="h-[clamp(44px,7vw,88px)] w-full max-w-3xl rounded-xl" />
+        <Skeleton className="h-[clamp(44px,7vw,88px)] w-1/2 rounded-xl" />
+        <Skeleton className="mt-4 h-6 w-[36rem] max-w-full" />
+      </section>
+      <div className="grid items-start gap-8 lg:grid-cols-2">
+        <Skeleton className="h-80 rounded-xl" />
+        <div className="space-y-8 rounded-2xl bg-card p-8">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="size-16 rounded-full" />
         </div>
       </div>
     </main>

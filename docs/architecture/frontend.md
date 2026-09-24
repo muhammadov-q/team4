@@ -43,7 +43,7 @@ Taken from servicehub, the team's reference project:
 
 ## Theming
 
-Tokens live in `frontend/src/app/globals.css`: lapis ultramarine for actions, rubric red as the one accent, cool neutrals so page scans stay the warmest thing on screen. Every text pair meets WCAG AA in light and dark mode. Components use tokens only, never raw colours.
+Dark by default with a light mode: Schibsted Grotesk and JetBrains Mono, one lime accent on primary buttons, no borders or shadows on containers. The full rules are in [[architecture/design-system]]. Tokens live in `frontend/src/app/globals.css`, and components use tokens only, never raw colours.
 
 ## Gotchas
 

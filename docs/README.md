@@ -1,6 +1,6 @@
-# Codex Lens docs
+# Team4 docs
 
-This vault holds the **why** behind Codex Lens: decisions, invariants, rules and the connections between parts of the system. Code shows the what; these notes explain the reasons.
+This vault holds the **why** behind Team4: decisions, invariants, rules and the connections between parts of the system. Code shows the what; these notes explain the reasons.
 
 Open the `docs/` folder as a vault in **Obsidian**. Notes link to each other with `[[wikilinks]]`, so the graph view shows how the pieces connect. GitHub renders the same files as plain Markdown.
 

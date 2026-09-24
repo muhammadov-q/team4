@@ -25,5 +25,5 @@ Base model, hyperparameters, seed, hardware, duration.
 Scripts, hands or page conditions where it fails.
 
 ## Intended use
-What it's for in Codex Lens, and what it must not be used for.
+What it's for in Team4, and what it must not be used for.
 ```

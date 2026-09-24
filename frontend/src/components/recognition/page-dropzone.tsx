@@ -3,8 +3,9 @@
 import { ImageUpIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { cn } from 'cn'
-import { Button } from '@/components/ui/button'
 import { IMAGE_ACCEPT } from '@/lib/image-file'
+import { Button } from '@/components/ui/button'
+import { Chip } from '@/components/ui/chip'
 
 export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -27,21 +28,21 @@ export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
         if (file) onFile(file)
       }}
       className={cn(
-        'flex min-h-72 flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed px-6 py-12 text-center transition-colors lg:min-h-105',
-        dragging ? 'border-primary bg-accent' : 'border-border'
+        'flex min-h-80 w-full flex-col justify-between gap-8 rounded-xl bg-muted p-8 outline-2 outline-transparent transition-colors lg:p-10',
+        dragging && 'outline-primary'
       )}
     >
-      <div className="flex size-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
-        <ImageUpIcon className="size-6" />
+      <ImageUpIcon className="size-7 text-foreground" />
+      <div className="space-y-2">
+        <p className="text-2xl font-medium">Drop a page image here</p>
+        <p className="text-muted-foreground">or paste one from your clipboard</p>
       </div>
-      <div className="space-y-1">
-        <p className="font-medium">Drop a page image here</p>
-        <p className="text-sm text-muted-foreground">or paste one from your clipboard</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button onClick={() => inputRef.current?.click()}>Choose image</Button>
+        {['JPG', 'PNG', 'TIFF', 'Up to 50 MB'].map((label) => (
+          <Chip key={label}>{label}</Chip>
+        ))}
       </div>
-      <Button size="lg" onClick={() => inputRef.current?.click()}>
-        Choose image
-      </Button>
-      <p className="text-xs text-muted-foreground">JPG, PNG or TIFF, up to 50 MB</p>
       <input
         ref={inputRef}
         type="file"

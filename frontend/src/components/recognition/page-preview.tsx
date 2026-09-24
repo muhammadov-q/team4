@@ -1,9 +1,9 @@
 'use client'
 
-import { FileImageIcon, RefreshCwIcon, XIcon } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { IMAGE_ACCEPT, formatBytes } from '@/lib/image-file'
+import { Annotation } from '@/components/ui/annotation'
+import { Button } from '@/components/ui/button'
 
 interface PagePreviewProps {
   file: File
@@ -26,41 +26,36 @@ export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
   )
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex min-h-72 items-center justify-center overflow-hidden rounded-lg border bg-muted/50 p-2 lg:min-h-105">
+    <div className="space-y-5">
+      <div className="flex min-h-72 items-center justify-center overflow-hidden rounded-2xl bg-card p-4">
         {unpreviewable === file ? (
-          <div className="flex max-w-xs flex-col items-center gap-2 text-center text-sm text-muted-foreground">
-            <FileImageIcon className="size-8" />
-            <p>
-              This browser can&apos;t preview this image (TIFF usually). The page is still sent as
-              it is.
-            </p>
-          </div>
+          <p className="max-w-xs p-6 text-center text-sm text-muted-foreground">
+            This browser can&apos;t preview this image (TIFF usually). The page is still sent as it
+            is.
+          </p>
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             ref={attachPreview}
             alt={`Preview of ${file.name}`}
             onError={() => setUnpreviewable(file)}
-            className="max-h-[70vh] max-w-full rounded-md object-contain"
+            className="block max-h-[70vh] w-auto max-w-full rounded-md"
           />
         )}
       </div>
 
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium" title={file.name}>
+          <p className="truncate font-medium" title={file.name}>
             {file.name}
           </p>
-          <p className="text-xs text-muted-foreground tabular-nums">{formatBytes(file.size)}</p>
+          <Annotation>{formatBytes(file.size)}</Annotation>
         </div>
         <div className="flex shrink-0 gap-2">
           <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-            <RefreshCwIcon />
             Replace
           </Button>
           <Button variant="ghost" size="sm" onClick={onRemove}>
-            <XIcon />
             Remove
           </Button>
         </div>

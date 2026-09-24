@@ -33,7 +33,7 @@ describe('RecognitionWorkbench', () => {
     await user.click(recognizeButton())
 
     const response = await screen.findByRole('region', { name: 'Model response' })
-    expect(within(response).getByText('250000')).toBeInTheDocument()
+    expect(within(response).getByText('Prediction').nextElementSibling).toHaveTextContent('250000')
     expect(within(response).getByText('mock')).toBeInTheDocument()
     expect(within(response).getByText('Machine output')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledOnce()

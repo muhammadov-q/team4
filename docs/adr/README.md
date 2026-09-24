@@ -5,6 +5,9 @@ Short notes on decisions that are hard to reverse: a framework, a service bounda
 | ADR                                  | Decision                                   | Status   |
 | ------------------------------------ | ------------------------------------------ | -------- |
 | [[adr/0001-web-frontend-stack]]      | Next.js web app with a same-origin proxy and generated API types | accepted |
+| [[adr/0002-monochrome-editorial-design]] | Monochrome editorial design system | superseded |
+| [[adr/0003-utility-design-system]] | Utility design system modelled on v0, app renamed to Team4 | superseded |
+| [[adr/0004-control-room-design-system]] | Dark control-room design with a light mode | accepted |
 
 ## Writing one
 

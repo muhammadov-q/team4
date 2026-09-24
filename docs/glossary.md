@@ -9,7 +9,7 @@ Terms from palaeography, pattern recognition and this codebase. The spec is [[re
 | Folio, recto, verso    | A leaf of a manuscript; `12r` is its front, `12v` its back. One page image is one side.   |
 | Carolingian minuscule  | The Latin book hand of the Saint Gall dataset. See [[ml/README#Datasets]].                |
 | Gothic script          | The Middle High German hand of the Parzival dataset.                                      |
-| Rubric                 | Text written in red ink, usually a heading. The app's accent colour is named after it.   |
+| Rubric                 | Text written in red ink, usually a heading.                                               |
 | Abbreviation expansion | Turning scribal shorthand into full words, e.g. "dñs" to "dominus" (story D3).            |
 | IIIF                   | A standard for serving images and manifests; e-codices publishes manuscripts with it (A2).|
 

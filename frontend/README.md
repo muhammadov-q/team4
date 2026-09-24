@@ -1,4 +1,4 @@
-# Codex Lens frontend
+# Team4 frontend
 
 Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui. Why this stack:
 [ADR 0001](../docs/adr/0001-web-frontend-stack.md).
@@ -65,8 +65,8 @@ e2e/                        Playwright specs
 ## Docker
 
 ```bash
-docker build -t codex-lens-frontend .
-docker run -p 3000:3000 -e API_INTERNAL_URL=http://host.docker.internal:8000 codex-lens-frontend
+docker build -t team4-frontend .
+docker run -p 3000:3000 -e API_INTERNAL_URL=http://host.docker.internal:8000 team4-frontend
 ```
 
 `API_INTERNAL_URL` is read at runtime, so one image works against any backend.

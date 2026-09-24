@@ -1,4 +1,4 @@
-# Codex Lens
+# Team4
 
 A web app for recognizing, analyzing and understanding historical manuscripts. The model
 proposes, the user corrects, and the system learns. Built for the Advanced Software Engineering

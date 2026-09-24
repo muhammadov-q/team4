@@ -1,13 +1,21 @@
 'use client'
 
-import { CircleCheckIcon, CopyIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
+import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
+import { Chip } from '@/components/ui/chip'
 import type { PredictResult } from '@/hooks/use-predict'
 import { formatDuration } from '@/lib/format'
+import { highlightJson, type JsonTokenKind } from '@/lib/highlight-json'
 
 const MOCK_MODEL_VERSION = 'mock'
+
+const TOKEN_CLASS: Record<JsonTokenKind, string> = {
+  key: 'text-sky-700 dark:text-[#66d9ef]',
+  string: 'text-lime-700 dark:text-lime',
+  literal: 'text-pink-600 dark:text-[#f92672]',
+  plain: 'text-muted-foreground',
+}
 
 export function RecognitionResult({ result }: { result: PredictResult }) {
   const { response, durationMs } = result
@@ -24,47 +32,46 @@ export function RecognitionResult({ result }: { result: PredictResult }) {
   }
 
   return (
-    <section aria-label="Model response" className="space-y-4">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-        <CircleCheckIcon className="size-4 text-success" />
-        <span className="font-medium">Response received</span>
-        <span className="text-muted-foreground tabular-nums">in {formatDuration(durationMs)}</span>
-        <Badge variant="outline" className="ml-auto">
-          Machine output
-        </Badge>
+    <section aria-label="Model response" className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="font-medium">
+          Response received <Annotation>{formatDuration(durationMs)}</Annotation>
+        </p>
+        <Chip>Machine output</Chip>
       </div>
 
-      <dl className="divide-y rounded-lg border text-sm">
-        <div className="flex items-center justify-between gap-4 px-3 py-2.5">
+      <dl className="space-y-2">
+        <div className="flex items-center justify-between gap-4 rounded-xl bg-muted px-4 py-3">
           <dt className="text-muted-foreground">Prediction</dt>
-          <dd className="font-mono tabular-nums">{response.prediction}</dd>
+          <dd className="text-2xl font-medium tabular-nums">{response.prediction}</dd>
         </div>
-        <div className="flex items-center justify-between gap-4 px-3 py-2.5">
+        <div className="flex items-center justify-between gap-4 rounded-xl bg-muted px-4 py-3">
           <dt className="text-muted-foreground">Model version</dt>
-          <dd>
-            <Badge variant="secondary" className="font-mono">
-              {response.model_version}
-            </Badge>
-          </dd>
+          <dd className="font-mono text-sm">{response.model_version}</dd>
         </div>
       </dl>
 
       {isMock && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Placeholder output from the mock model. Real transcriptions arrive with the trained
           models.
         </p>
       )}
 
-      <div className="overflow-hidden rounded-lg border">
-        <div className="flex items-center justify-between border-b bg-muted/50 px-3 py-1.5">
-          <span className="text-xs font-medium text-muted-foreground">Raw response</span>
+      <div className="overflow-hidden rounded-2xl bg-background">
+        <div className="flex items-center justify-between px-4 pt-3">
+          <span className="font-mono text-sm text-foreground">response.json</span>
           <Button variant="ghost" size="xs" onClick={copyJson}>
-            <CopyIcon />
             Copy
           </Button>
         </div>
-        <pre className="overflow-x-auto p-3 font-mono text-xs leading-relaxed">{json}</pre>
+        <pre className="overflow-x-auto px-4 pt-2 pb-4 font-mono text-sm leading-relaxed">
+          {highlightJson(json).map((token, i) => (
+            <span key={i} className={TOKEN_CLASS[token.kind]}>
+              {token.text}
+            </span>
+          ))}
+        </pre>
       </div>
     </section>
   )

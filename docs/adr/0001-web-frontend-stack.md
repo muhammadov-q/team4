@@ -7,7 +7,7 @@
 
 ## Context
 
-Codex Lens needs a web app for uploading manuscript pages, viewing them with overlays, correcting
+Team4 needs a web app for uploading manuscript pages, viewing them with overlays, correcting
 transcriptions and showing model metrics (spec sections 4, 7 and 10). It talks to a FastAPI
 backend that is still being built, so the contract between them will change often. The team
 is graded on software quality, so the setup has to be testable, typed and documented from day one.

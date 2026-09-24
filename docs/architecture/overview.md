@@ -1,6 +1,6 @@
 # System overview
 
-A one-page map of Codex Lens. The target architecture comes from [[requirements]] (section 6); this note also says what exists today.
+A one-page map of Team4. The target architecture comes from [[requirements]] (section 6); this note also says what exists today.
 
 ## Services
 

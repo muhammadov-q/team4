@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { usePredict } from '@/hooks/use-predict'
 import { checkImageFile } from '@/lib/image-file'
 import { PageDropzone } from './page-dropzone'
@@ -63,21 +62,19 @@ export function RecognitionWorkbench() {
   useEffect(() => () => abortRef.current?.abort(), [])
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
-      <Card>
-        <CardContent className="space-y-3">
-          {page ? (
-            <PagePreview file={page} onReplace={choosePage} onRemove={removePage} />
-          ) : (
-            <PageDropzone onFile={choosePage} />
-          )}
-          {rejection && (
-            <p role="alert" className="text-sm text-destructive">
-              {rejection}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+    <div id="workbench" className="grid scroll-mt-28 items-start gap-8 lg:grid-cols-2">
+      <div className="space-y-3">
+        {page ? (
+          <PagePreview file={page} onReplace={choosePage} onRemove={removePage} />
+        ) : (
+          <PageDropzone onFile={choosePage} />
+        )}
+        {rejection && (
+          <p role="alert" className="text-sm text-foreground">
+            {rejection}
+          </p>
+        )}
+      </div>
 
       <RecognitionPanel
         hasPage={page !== null}
