@@ -1,0 +1,34 @@
+name: Task or user story
+description: One piece of work with a clear outcome.
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: >-
+        What exists or changes when this is done. For a user story: "As a <user>, I want
+        <goal> so that <benefit>."
+      placeholder: A short paragraph or a few bullets.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem this solves or who it helps. One or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: Definition of Done
+      description: >-
+        Observable checks, starting with the acceptance criteria. Keep the defaults that
+        apply.
+      value: |
+        - [ ]
+        - [ ] Tests written with the code and passing in CI
+        - [ ] Types and lint are clean
+        - [ ] Docs updated where relevant
+    validations:
+      required: true
