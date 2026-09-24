@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Point git at the versioned hooks in .githooks/.
-# core.hooksPath rather than copying into .git/hooks: the hooks stay tracked, so a
-# change to them reaches everyone on the next pull instead of going stale.
 
 set -euo pipefail
 
@@ -11,7 +8,6 @@ cd "$REPO_ROOT"
 chmod +x .githooks/* 2>/dev/null || true
 git config core.hooksPath .githooks
 
-# git ignores a non-executable hook without saying so, which would look enabled.
 for hook in pre-commit pre-push; do
     if [ ! -x ".githooks/$hook" ]; then
         echo "ERROR: .githooks/$hook is not executable, so git will ignore it." >&2

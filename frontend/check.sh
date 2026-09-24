@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Frontend check suite: the same gate runs from the pre-push hook and (later) CI.
-# CHECK_SKIP_INSTALL=1 skips `npm ci` when node_modules is already there.
-
 set -euo pipefail
 
 RED='\033[0;31m'
@@ -31,7 +28,6 @@ fi
 LOG="$(mktemp)"
 trap 'rm -f "$LOG"' EXIT
 
-# Quiet on success; on failure, print the tool's own output so nobody has to re-run it.
 run_step() {
     local label="$1" hint="$2"
     shift 2
@@ -54,7 +50,6 @@ else
     run_step "Install" "npm ci" npm ci --no-audit --no-fund --prefer-offline
 fi
 
-# Non-fatal: the Next tooling tree usually carries a few moderate advisories.
 AUDIT_SUMMARY="${GREEN}✓ Security audit${NC}"
 print_step "Security audit..."
 if npm audit --audit-level=high >/dev/null 2>&1; then
@@ -66,7 +61,6 @@ fi
 
 run_step "Lint" "npm run lint:fix" npm run lint
 run_step "Formatting" "npm run format" npm run format:check
-# tsc is the build-error surface here; the full `next build` runs in the Docker image.
 run_step "Type check" "npm run type-check" npm run type-check
 run_step "Unit tests" "npm test" npm test
 

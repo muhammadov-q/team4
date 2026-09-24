@@ -58,7 +58,6 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
-      // Without this a button nested in a <form> submits it; real submitters pass type="submit".
       {...(asChild ? {} : { type: 'button' as const })}
       {...props}
     />

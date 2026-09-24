@@ -79,7 +79,6 @@ function PendingState({ submittedAt, onCancel }: { submittedAt: number; onCancel
           Cancel
         </Button>
       </div>
-      {/* Mirrors RecognitionResult so the swap to the real response doesn't shift the card. */}
       <div aria-hidden className="space-y-4">
         <Skeleton className="h-4 w-44" />
         <div className="divide-y rounded-lg border">

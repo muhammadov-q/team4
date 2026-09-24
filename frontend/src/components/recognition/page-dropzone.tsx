@@ -18,7 +18,6 @@ export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
       }}
       onDragOver={(event) => event.preventDefault()}
       onDragLeave={(event) => {
-        // dragleave also fires when moving onto a child; only reset when leaving the zone.
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false)
       }}
       onDrop={(event) => {
@@ -52,7 +51,6 @@ export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
         className="sr-only"
         onChange={(event) => {
           const file = event.target.files?.[0]
-          // Clear it so picking the same file again still fires onChange.
           event.target.value = ''
           if (file) onFile(file)
         }}

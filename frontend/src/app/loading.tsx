@@ -1,7 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Mirrors the home page's first paint (title block, page card, recognition card). Shows on
-// cold loads and dev compiles; keep it dependency-free so it renders instantly.
 export default function Loading() {
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:py-12">

@@ -1,6 +1,5 @@
 import { cn } from 'cn'
 
-/** The Codex Lens mark: a lens ring that doubles as a C, with a rubric focal point. */
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn('shrink-0', className)}>

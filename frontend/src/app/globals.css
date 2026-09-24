@@ -45,9 +45,6 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Palette from the manuscript world: lapis ultramarine for action, rubric red (the
- * scribes' heading ink) as the one accent, cool neutrals so page scans stay the
- * warmest thing on screen. Every text pair clears WCAG AA in both themes. */
 :root {
   --background: oklch(0.975 0.004 255);
   --foreground: oklch(0.24 0.03 262);
@@ -69,7 +66,6 @@
   --border: oklch(0.91 0.008 258);
   --input: oklch(0.9 0.01 258);
   --ring: oklch(0.62 0.14 265);
-  /* Must sit below both --background and --card, or skeletons on the page vanish. */
   --skeleton: oklch(0.925 0.008 258);
   --skeleton-sheen: oklch(1 0 0 / 0.75);
   --chart-1: oklch(0.47 0.165 265);
@@ -126,7 +122,6 @@
   }
 }
 
-/* A sweeping sheen rather than a pulse: pulsing the whole block reads as disabled. */
 @keyframes skeleton-sheen {
   100% {
     transform: translateX(100%);

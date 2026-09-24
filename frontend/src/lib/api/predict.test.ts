@@ -5,8 +5,6 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-// Contract with the backend's POST /predict (Backend-initialisation branch): multipart
-// field `image`, JSON reply { prediction, model_version }.
 describe('predictImage', () => {
   it('posts the page as the multipart field `image`', async () => {
     const fetch = vi

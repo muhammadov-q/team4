@@ -1,8 +1,6 @@
 import { apiRequest } from './client'
 import type { paths } from './schema'
 
-// Everything below is derived from the generated schema, so a backend change to the
-// route, the form field or the response shape fails `npm run type-check`.
 type PredictOperation = paths['/predict']['post']
 type PredictForm = NonNullable<PredictOperation['requestBody']>['content']['multipart/form-data']
 

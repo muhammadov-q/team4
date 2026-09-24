@@ -3,6 +3,7 @@
 - Status: accepted
 - Date: 2026-09-23
 - Issue: #7
+- Related: [[architecture/frontend]], [[architecture/api-contract]], [[architecture/testing]]
 
 ## Context
 

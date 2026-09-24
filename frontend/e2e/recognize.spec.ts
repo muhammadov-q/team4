@@ -1,8 +1,5 @@
 import { expect, test } from '@playwright/test'
 
-// Needs the backend on :8000 (see backend/README.md). Playwright starts the frontend.
-
-// A 1x1 PNG: enough for the mock model, which only checks the upload is an image.
 const PAGE_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64'
@@ -42,7 +39,6 @@ test('rejects a file that is not an image without calling the backend', async ({
     buffer: Buffer.from('not a page'),
   })
 
-  // Filtered: Next.js's route announcer is also role="alert".
   await expect(page.getByRole('alert').filter({ hasText: 'notes.txt' })).toHaveText(
     'notes.txt is not a JPG, PNG or TIFF image.'
   )

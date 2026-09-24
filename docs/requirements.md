@@ -257,3 +257,7 @@ Each step is an independent, testable class implementing a common `PipelineStep`
 - Prefer existing, well-maintained libraries over custom implementations, except for the from-scratch baseline model.
 - When a requirement is ambiguous, ask rather than guess, or state the assumption in the PR description.
 - Keep changes small and reviewable, so that each teammate's contribution stays visible.
+
+---
+
+Related notes: [[architecture/overview]], [[ml/README|ML rules]], [[workflow/definition-of-done]], [[glossary]].

@@ -5,7 +5,6 @@ import { SiteHeader } from '@/components/site-header'
 import './globals.css'
 
 const figtree = Figtree({ variable: '--font-figtree', subsets: ['latin'] })
-// Display face for the wordmark and page titles only.
 const garamond = EB_Garamond({ variable: '--font-eb-garamond', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 

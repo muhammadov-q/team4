@@ -45,7 +45,6 @@ export function RecognitionWorkbench() {
     run.mutate({ file: page, signal: controller.signal })
   }
 
-  // Pasting works anywhere on the page, e.g. a crop copied from an IIIF viewer.
   const onPaste = useEffectEvent((event: ClipboardEvent) => {
     const file = Array.from(event.clipboardData?.files ?? []).find((f) =>
       f.type.startsWith('image/')

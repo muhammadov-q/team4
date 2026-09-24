@@ -12,7 +12,7 @@ The full spec is [docs/requirements.md](docs/requirements.md).
 | ----------- | ----------------------------------------------------------------- |
 | `frontend/` | Next.js web app ([README](frontend/README.md))                    |
 | `backend/`  | FastAPI service (on `Backend-initialisation` until it's merged)   |
-| `docs/`     | Spec, architecture decisions (`docs/adr/`)                        |
+| `docs/`     | Obsidian vault: spec, architecture, workflow, ADRs ([start here](docs/README.md)) |
 | `.github/`  | Issue and pull request templates                                  |
 
 ## Working on it

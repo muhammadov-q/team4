@@ -29,7 +29,6 @@ export function RecognitionResult({ result }: { result: PredictResult }) {
         <CircleCheckIcon className="size-4 text-success" />
         <span className="font-medium">Response received</span>
         <span className="text-muted-foreground tabular-nums">in {formatDuration(durationMs)}</span>
-        {/* Machine output is always labelled as such (usability requirement). */}
         <Badge variant="outline" className="ml-auto">
           Machine output
         </Badge>

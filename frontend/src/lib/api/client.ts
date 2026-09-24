@@ -1,7 +1,5 @@
-// Same-origin proxy (src/app/api/[...path]/route.ts); never the backend URL directly.
 export const API_URL = '/api'
 
-/** A failed request with the backend's own message. `status` 0 means no response. */
 export class ApiError extends Error {
   readonly status: number
 
@@ -12,8 +10,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Reads a FastAPI error body. HTTPException puts a string in `detail`; validation
- *  errors put an array of `{msg}` objects there. */
 export function errorMessageFromBody(body: unknown, fallback: string): string {
   const detail = (body as { detail?: unknown } | null)?.detail
   if (typeof detail === 'string' && detail) return detail
@@ -30,20 +26,15 @@ export function errorMessageFromBody(body: unknown, fallback: string): string {
 
 export interface ApiRequestOptions {
   method?: string
-  /** Sent as multipart when it's FormData, JSON otherwise. */
   body?: unknown
-  /** Error message when the backend doesn't send one. */
   fallback?: string
   signal?: AbortSignal
 }
 
-/** The shared request skeleton: throws ApiError on failure, else returns the parsed
- *  JSON (undefined for empty or 204 bodies). `path` is the segment after /api. */
 export async function apiRequest<T>(path: string, opts: ApiRequestOptions = {}): Promise<T> {
   const { method = 'GET', body, fallback = 'Request failed', signal } = opts
   const init: RequestInit = { method, signal }
   if (body instanceof FormData) {
-    // No Content-Type: the browser adds the multipart boundary itself.
     init.body = body
   } else if (body !== undefined) {
     init.headers = { 'Content-Type': 'application/json' }

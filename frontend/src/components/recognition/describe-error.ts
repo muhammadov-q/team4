@@ -1,7 +1,5 @@
 import { ApiError } from '@/lib/api/client'
 
-/** A heading and a next step for a failed recognition request. The backend's own
- *  message stays as the description because it's the most specific thing we have. */
 export function describeRecognitionError(error: unknown): { title: string; message: string } {
   if (!(error instanceof ApiError)) {
     return { title: 'Recognition failed', message: 'Something went wrong. Try again.' }

@@ -13,11 +13,8 @@ interface PagePreviewProps {
 
 export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
-  // Keyed by file, so choosing another page clears it without an effect.
   const [unpreviewable, setUnpreviewable] = useState<File | null>(null)
 
-  // The object URL lives exactly as long as the <img>. A ref callback with cleanup
-  // (React 19) survives Strict Mode's double mount, which an effect over state doesn't.
   const attachPreview = useCallback(
     (img: HTMLImageElement | null) => {
       if (!img) return
@@ -40,7 +37,7 @@ export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
             </p>
           </div>
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element -- blob: previews can't go through next/image
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             ref={attachPreview}
             alt={`Preview of ${file.name}`}

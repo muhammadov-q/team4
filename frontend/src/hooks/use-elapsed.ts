@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-/** Milliseconds since `since` (a Date.now() timestamp), ticking while it's set. */
 export function useElapsed(since: number | null, intervalMs = 100): number {
   const [now, setNow] = useState(0)
 

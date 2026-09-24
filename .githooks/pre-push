@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-# Runs the check script of every area this push touches (<area>/check.sh, the same
-# script CI runs). Pre-push rather than pre-commit: the suites take tens of seconds, and
-# this is the last point where a break is still local. Enable with scripts/install-hooks.sh.
 
 set -uo pipefail
 
-# Areas gated here. One without a check.sh yet is skipped with a note, so the backend
-# and mobile apps join by adding theirs.
-AREAS=(frontend backend mobile)
+AREAS=(frontend backend mobile docs)
 
 ZERO='0000000000000000000000000000000000000000'
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -18,22 +13,18 @@ BOLD=$'\033[1m'; DIM=$'\033[2m'; RED=$'\033[0;91m'; GREEN=$'\033[0;32m'; RESET=$
 changed=""
 saw_ref=0
 while read -r _local_ref local_sha _remote_ref remote_sha; do
-    [ "$local_sha" = "$ZERO" ] && continue  # branch deletion
+    [ "$local_sha" = "$ZERO" ] && continue
     saw_ref=1
 
     if [ "$remote_sha" != "$ZERO" ]; then
         base="$remote_sha"
     else
-        # New branch: measure against the branch it will merge into.
         base="$(git merge-base "$local_sha" origin/main 2>/dev/null)"
     fi
 
-    # cat-file, not just non-empty: the remote sha can be an object we never fetched,
-    # and a failed diff would leave `changed` empty and skip everything.
     if [ -n "$base" ] && git cat-file -e "${base}^{commit}" 2>/dev/null; then
         changed+="$(git diff --name-only "$base" "$local_sha" 2>/dev/null)"$'\n'
     else
-        # No usable base: treat everything as changed. Fail safe, never fail open.
         changed+="$(git ls-tree -r --name-only "$local_sha" 2>/dev/null)"$'\n'
     fi
 done
@@ -58,12 +49,10 @@ fi
 echo "${BOLD}pre-push${RESET} ${DIM}running checks for: ${suites[*]}${RESET}"
 echo "${DIM}(bypass with git push --no-verify)${RESET}"
 
-# A reinstall would dominate the runtime; CI leaves this unset and does install.
 export CHECK_SKIP_INSTALL=1
 
 failed=()
 for suite in "${suites[@]}"; do
-    # From its own directory: the check scripts refuse to run anywhere else.
     if ! ( cd "$suite" && bash check.sh ); then
         failed+=("$suite")
     fi

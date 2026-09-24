@@ -1,13 +1,3 @@
-// Regenerates src/lib/api/schema.ts from the backend's OpenAPI document, so request
-// and response types come from the backend instead of being retyped by hand. When the
-// backend contract changes, regenerate and let `npm run type-check` show what broke.
-//
-//   npm run api:types                          # backend running on :8000
-//   npm run api:types -- path/to/openapi.json  # or a saved schema file
-//   npm run api:check                          # exit 1 when schema.ts is stale
-//
-// Source, in order: the first CLI argument, $API_SCHEMA_URL, the local backend.
-
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'

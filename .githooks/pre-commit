@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Fixes and lints exactly what is being committed in frontend/ (lint-staged: ESLint
-# --fix, then Prettier, on the staged files only). Fast by design; the full suite runs
-# on pre-push. Enable with scripts/install-hooks.sh.
 
 set -euo pipefail
 
@@ -15,7 +12,6 @@ if ! git diff --cached --name-only --diff-filter=ACMR | grep -q '^frontend/'; th
 fi
 
 if [ ! -x frontend/node_modules/.bin/lint-staged ]; then
-    # Not fatal: pre-push installs and runs the full frontend suite anyway.
     echo "${YELLOW}pre-commit: frontend/node_modules is missing, skipping staged-file checks.${RESET}"
     echo "${DIM}Run 'npm install' in frontend/ to enable them.${RESET}"
     exit 0

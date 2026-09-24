@@ -17,7 +17,6 @@ export function ThemeToggle() {
           aria-label="Switch between light and dark theme"
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
         >
-          {/* CSS picks the icon, so the server render never guesses the theme. */}
           <SunIcon className="dark:hidden" />
           <MoonIcon className="hidden dark:block" />
         </Button>
