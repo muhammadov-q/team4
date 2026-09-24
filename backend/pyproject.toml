@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.141.1",
+    "httpx2>=2.13.1",
     "python-multipart>=0.0.32",
     "uvicorn[standard]>=0.53.0",
 ]
@@ -20,11 +21,13 @@ app = "app:main"
 requires = ["uv_build>=0.12.11,<0.13.0"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+module-name = ["app", "ml"]
+
 [dependency-groups]
 dev = [
-    "httpx>=0.28.1",
     "pytest>=9.1.1",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["src/app/tests", "src/ml/tests"]
