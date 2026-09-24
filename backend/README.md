@@ -69,3 +69,15 @@ uv run uvicorn app.main:app --reload
 cd backend/bruno
 bru run --env local
 ```
+
+## API Documentation
+
+After running the server, 
+
+```bash
+# terminal 1
+cd backend
+uv run uvicorn app.main:app --reload
+```
+
+you may find the Swagger documentation at the adress: [http://localhost:8000/docs](http://localhost:8000/docs).
