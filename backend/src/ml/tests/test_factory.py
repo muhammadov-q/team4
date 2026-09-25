@@ -5,6 +5,10 @@ from ml.predictor import AbstractPredictor, DummyPredictor
 
 
 class FakePredictor(AbstractPredictor):
+    @property
+    def model_version(self):
+        return ""
+    
     def predict(self, image: bytes) -> float:
         return 0.0
 

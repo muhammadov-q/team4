@@ -75,5 +75,5 @@ async def predict(
 ) -> PredictResponse:
     return PredictResponse(
         prediction=await run_in_threadpool(predictor.predict, content),
-        model_version=predictor.model,
+        model_version=predictor.model_version,
     )

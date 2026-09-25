@@ -4,8 +4,10 @@ from abc import ABC, abstractmethod
 class AbstractPredictor(ABC):
     """Base class for every model that predicts the content of an image."""
 
-    def __init__(self) -> None:
-        self.model = ""
+    @property
+    @abstractmethod
+    def model_version(self) -> str:
+        """Return the version of the model."""
 
     @abstractmethod
     def predict(self, image: bytes) -> float:
@@ -19,6 +21,10 @@ class DummyPredictor(AbstractPredictor):
         super().__init__()
         self.model = "mock"
         self.dummy = 250_000.0
+
+    @property
+    def model_version(self):
+        return self.model
 
     def predict(self, image: bytes) -> float:
         return self.dummy

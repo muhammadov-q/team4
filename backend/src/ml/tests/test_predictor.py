@@ -4,6 +4,10 @@ from ml.predictor import AbstractPredictor, DummyPredictor
 
 
 class MinimalPredictor(AbstractPredictor):
+    @property
+    def model_version(self):
+        return ""
+
     def predict(self, image: bytes) -> float:
         return 1.0
 
@@ -26,7 +30,7 @@ def test_subclass_without_predict_cannot_be_instantiated():
 
 def test_subclass_inherits_default_attributes():
     predictor = MinimalPredictor()
-    assert predictor.model == ""
+    assert predictor.model_version == ""
 
 
 # --- DummyPredictor ---------------------------------------------------------
@@ -38,7 +42,7 @@ def test_dummy_predictor_is_an_abstract_predictor():
 
 def test_dummy_predictor_attributes():
     predictor = DummyPredictor()
-    assert predictor.model == "mock"
+    assert predictor.model_version == "mock"
     assert predictor.dummy == 250_000.0
 
 
