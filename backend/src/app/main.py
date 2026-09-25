@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel
+from starlette.concurrency import run_in_threadpool
 
 from ml import AbstractPredictor, create_predictor
 
@@ -73,6 +74,6 @@ async def predict(
     content: Annotated[bytes, Depends(capped_image)],
 ) -> PredictResponse:
     return PredictResponse(
-        prediction=predictor.predict(content),
+        prediction=await run_in_threadpool(predictor.predict, content),
         model_version=predictor.model,
     )
