@@ -11,6 +11,7 @@ class AbstractPredictor(ABC):
     def predict(self, image: bytes) -> float:
         """Take the raw image bytes and return a prediction."""
 
+
 class DummyPredictor(AbstractPredictor):
     """Placeholder: ignores the image and always returns the dummy value."""
 

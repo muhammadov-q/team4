@@ -1,6 +1,7 @@
 def upload(client, filename, content, content_type):
     return client.post("/predict", files={"image": (filename, content, content_type)})
 
+
 def test_predict_with_image_returns_mock_values(client):
     response = upload(client, "test.png", b"fake png bytes", "image/png")
     assert response.status_code == 200
