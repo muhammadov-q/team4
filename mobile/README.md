@@ -11,15 +11,6 @@ The camera screen opens the device's built-in camera app when you tap **Take pho
 - **Android:** Android Studio with the Android SDK and an Android emulator or connected device.
 - **iOS:** Xcode with its iOS simulator runtimes, or a connected iOS device. iOS builds require macOS and Xcode.
 
-#### Start the backend
-
-From the repository root, start the FastAPI server in a terminal:
-
-```bash
-cd backend
-uv sync
-uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
 
 #### Run on Android
 

@@ -7,6 +7,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import kotlinx.serialization.SerialName
@@ -43,7 +44,7 @@ class PhotoUploadApi(
         val responseText = response.bodyAsText()
 
         println("Response ${response.status.value}: $responseText")
-        if (response.status.value !in 200..299) {
+        if (response.status != HttpStatusCode.OK) {
             error("Prediction request failed (${response.status.value}): $responseText")
         }
         return json.decodeFromString(responseText)
