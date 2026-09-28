@@ -24,7 +24,7 @@ while read -r _local_ref local_sha _remote_ref remote_sha; do
     if [ "$remote_sha" != "$ZERO" ]; then
         base="$remote_sha"
     else
-        base="$(git merge-base "$local_sha" origin/main 2>/dev/null)"
+        base="$(git merge-base "$local_sha" origin/develop 2>/dev/null)"
     fi
 
     if [ -n "$base" ] && git cat-file -e "${base}^{commit}" 2>/dev/null; then
