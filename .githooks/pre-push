@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Runs before every push. Finds which areas (frontend, backend, mobile, docs)
+# the pushed commits change and runs each one's check.sh, the same checks CI
+# runs (lint, format, type check, tests). Any failure stops the push. An area
+# without a check.sh yet is skipped.
+# Skip once with: git push --no-verify
 
 set -uo pipefail
 

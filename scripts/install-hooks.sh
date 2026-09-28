@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Run once after cloning. Points git at .githooks/ (core.hooksPath) so the
+# shared pre-commit and pre-push hooks run on your machine, then prints what
+# each one does.
+# Undo with: git config --unset core.hooksPath
 
 set -euo pipefail
 

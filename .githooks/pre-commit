@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Runs before every commit. If the commit touches frontend/, lint-staged checks
+# only the staged frontend files: ESLint --fix on JS/TS, then Prettier on JS/TS,
+# JSON, Markdown, CSS and YAML (rules in frontend/.lintstagedrc.json). An error
+# it can't fix stops the commit. Python files aren't checked here yet.
+# Skip once with: git commit --no-verify
 
 set -euo pipefail
 
