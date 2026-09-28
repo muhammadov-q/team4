@@ -12,7 +12,7 @@ describe('/api proxy', () => {
     vi.stubGlobal('fetch', fetch)
 
     const res = await POST(
-      new Request('http://localhost:3000/api/predict?lang=la', {
+      new Request('http://localhost:3000/api/predict?a=1&b=2', {
         method: 'POST',
         headers: { 'content-type': 'application/octet-stream', connection: 'keep-alive' },
         body: 'page-bytes',
@@ -22,7 +22,7 @@ describe('/api proxy', () => {
     expect(res.status).toBe(201)
     await expect(res.json()).resolves.toEqual({ ok: true })
     const [url, init] = fetch.mock.calls[0] as [string, RequestInit]
-    expect(url).toBe('http://localhost:8000/predict?lang=la')
+    expect(url).toBe('http://localhost:8000/predict?a=1&b=2')
     expect(init.method).toBe('POST')
     expect(new TextDecoder().decode(init.body as ArrayBuffer)).toBe('page-bytes')
     const headers = init.headers as Headers
