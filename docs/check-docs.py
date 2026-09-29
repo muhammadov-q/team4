@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
-"""Lint the docs vault for the patterns that rot silently.
-
-Run from anywhere:  python3 docs/check-docs.py
-
-Checks:
-  1. Line-number citations (`foo.py:123`). They drift on the next edit and
-     silently point at the wrong symbol. Name the symbol instead.
-  2. Broken [[wikilinks]]. Resolves relative paths, vault-root paths, and
-     Obsidian's bare-stem shortest-path match.
-  3. Source paths that no longer exist. A rename in one domain leaves docs in
-     every other domain pointing at files that are gone.
-
-Exits non-zero if anything is found, so it can gate a pre-commit hook.
-"""
+"""Lint the docs vault: line-number citations, broken [[wikilinks]] and cited
+source files that no longer exist. Exits non-zero on any hit."""
 
 import re
 import subprocess
@@ -22,17 +10,14 @@ from pathlib import Path
 VAULT = Path(__file__).resolve().parent
 REPO = VAULT.parent
 
-# `path/to/file.py:12` or `:12-34`. Requires a source extension so prose like
-# "10:00" and mermaid `A:::cls` do not trip it.
+# The source extension keeps prose like "10:00" and mermaid `A:::cls` out.
 LINE_REF = re.compile(r"`[^`]*\.(?:py|ts|tsx|js|jsx|sh|sql|yml|yaml):\d+(?:-\d+)?[^`]*`")
 WIKILINK = re.compile(r"\[\[(.+?)\]\]")
-# Obsidian does not render wikilinks inside inline code, so neither do we.
+# Obsidian doesn't render wikilinks inside inline code, so neither do we.
 CODE_SPAN = re.compile(r"`[^`]*`")
 
 INLINE_CODE = re.compile(r"`([^`\n]+)`")
 SOURCE_EXT = (".py", ".ts", ".tsx", ".js", ".jsx", ".sh", ".sql", ".yml", ".yaml", ".tf")
-# Paths we cite on purpose even though git will never resolve them.
-PATH_ALLOWLIST: set[str] = set()
 
 
 def docs() -> list[Path]:
@@ -42,8 +27,6 @@ def docs() -> list[Path]:
 def check_line_refs(files: list[Path]) -> list[str]:
     hits = []
     for path in files:
-        if path.name == "README.md" and path.parent == VAULT:
-            continue  # the conventions doc quotes the anti-pattern on purpose
         rel = path.relative_to(VAULT)
         for n, line in enumerate(path.read_text().splitlines(), 1):
             for m in LINE_REF.finditer(line):
@@ -59,8 +42,7 @@ def check_wikilinks(files: list[Path]) -> list[str]:
         rel = path.relative_to(VAULT)
         for n, line in enumerate(path.read_text().splitlines(), 1):
             for m in WIKILINK.finditer(CODE_SPAN.sub("", line)):
-                # Drop table-escaping backslashes before splitting off the
-                # alias, or `[[a/b\|Label]]` never separates.
+                # Drop table-escaping backslashes, or `[[a/b\|Label]]` resolves to `a/b\`.
                 target = m.group(1).replace("\\", "")
                 base = target.split("|")[0].split("#")[0].strip()
                 if not base:
@@ -82,14 +64,10 @@ def tracked_files() -> set[str]:
 
 
 def check_source_paths(files: list[Path]) -> list[str]:
-    """Flag `path/to/file.py` references whose file no longer exists.
-
-    Docs cite partial paths by convention (`orders/service.py`), so a reference
-    resolves if any tracked file ends with it on a segment boundary.
-    """
+    """A cited path resolves if a tracked file ends with it, so partial paths work."""
     tracked = tracked_files()
     if not tracked:
-        return []  # not a git checkout; skip rather than fail the whole lint
+        return []  # not a git checkout, so skip rather than fail
     hits = []
     for path in files:
         rel = path.relative_to(VAULT)
@@ -98,14 +76,12 @@ def check_source_paths(files: list[Path]) -> list[str]:
                 ref = token.strip()
                 if not ref.endswith(SOURCE_EXT):
                     continue
-                # Globs, placeholders, and elided paths are not real references.
+                # Globs, placeholders and elided paths aren't real references.
                 if any(c in ref for c in " *{}<>[]") or "..." in ref:
                     continue
                 ref = ref.removeprefix("./")  # not lstrip: it eats .github's dot
-                # A bare extension (".tf") is prose about a file type, not a path.
+                # A bare extension like ".tf" is prose, not a path.
                 if ref.startswith(".") and "/" not in ref:
-                    continue
-                if ref in PATH_ALLOWLIST:
                     continue
                 if any(f == ref or f.endswith("/" + ref) for f in tracked):
                     continue

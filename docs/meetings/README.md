@@ -14,8 +14,10 @@ Present: <names>
 ## Demo
 
 ## Done last week
+
 - <name>: <what> (#issue)
 
 ## Next steps
+
 - [ ] <name>: <what> (#issue)
 ```

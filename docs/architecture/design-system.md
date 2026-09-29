@@ -4,14 +4,14 @@ The look of the web app: dark by default with a matching light mode, flat panels
 
 ## Colour
 
-| Role          | Dark      | Light     | Use                                       |
-| ------------- | --------- | --------- | ----------------------------------------- |
-| Canvas        | `#000000` | `#f4f4f4` | Page background.                          |
-| Panel         | `#161616` | `#ffffff` | Cards.                                    |
-| Muted surface | `#1f1f1f` | `#ebebeb` | Inputs, the nav pill, rows inside cards.  |
-| Text          | `#ffffff` | `#0e0e0e` | Headlines and body.                       |
-| Muted text    | `#a3a3a3` | `#5c5c5c` | Descriptions and labels.                  |
-| Lime          | `#e6ff5c` | `#e6ff5c` | Primary buttons and status dots.          |
+| Role          | Dark      | Light     | Use                                      |
+| ------------- | --------- | --------- | ---------------------------------------- |
+| Canvas        | `#000000` | `#f4f4f4` | Page background.                         |
+| Panel         | `#161616` | `#ffffff` | Cards.                                   |
+| Muted surface | `#1f1f1f` | `#ebebeb` | Inputs, the nav pill, rows inside cards. |
+| Text          | `#ffffff` | `#0e0e0e` | Headlines and body.                      |
+| Muted text    | `#a3a3a3` | `#5c5c5c` | Descriptions and labels.                 |
+| Lime          | `#e6ff5c` | `#e6ff5c` | Primary buttons and status dots.         |
 
 Lime is the only accent. Errors use an icon, wording and a muted surface rather than red.
 

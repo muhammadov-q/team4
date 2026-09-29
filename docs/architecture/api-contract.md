@@ -6,13 +6,13 @@ The backend's OpenAPI schema is the contract between the apps. FastAPI generates
 
 Takes one image as the multipart field `image`. The model behind it is a mock.
 
-| Status | Body                                                 | When                                          |
-| ------ | ---------------------------------------------------- | --------------------------------------------- |
-| 200    | `{ "prediction": number, "model_version": string }`  | The image was accepted.                       |
-| 400    | `{ "detail": "Empty file" }`                         | The file has no bytes.                        |
-| 413    | `{ "detail": "File too large. Max size is 30 MB." }` | The file is over 30 MB.                       |
-| 415    | `{ "detail": "File must be an image" }`              | The content type isn't `image/*`.             |
-| 422    | `{ "detail": [{ "msg": ..., "loc": ... }] }`         | FastAPI validation, e.g. the field is missing. |
+| Status | Body                                                 | When                                              |
+| ------ | ---------------------------------------------------- | ------------------------------------------------- |
+| 200    | `{ "prediction": number, "model_version": string }`  | The image was accepted.                           |
+| 400    | `{ "detail": "Empty file" }`                         | The file has no bytes.                            |
+| 413    | `{ "detail": "File too large. Max size is 30 MB." }` | The file is over 30 MB.                           |
+| 415    | `{ "detail": "File must be an image" }`              | The content type isn't `image/*`.                 |
+| 422    | `{ "detail": [{ "msg": ..., "loc": ... }] }`         | FastAPI validation, e.g. the field is missing.    |
 | 502    | `{ "detail": "..." }`                                | From the frontend proxy when the backend is down. |
 
 ## Keeping the frontend in sync

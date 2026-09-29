@@ -21,13 +21,13 @@ sequenceDiagram
 
 ## Code layout
 
-| Where                                  | What                                                           |
-| -------------------------------------- | -------------------------------------------------------------- |
-| `frontend/src/lib/api/client.ts`       | `apiRequest` and `ApiError`, the only way to call the backend. |
+| Where                                  | What                                                            |
+| -------------------------------------- | --------------------------------------------------------------- |
+| `frontend/src/lib/api/client.ts`       | `apiRequest` and `ApiError`, the only way to call the backend.  |
 | `frontend/src/lib/api/predict.ts`      | One module per endpoint group, typed from the generated schema. |
-| `frontend/src/hooks/use-predict.ts`    | TanStack Query mutation. All server state goes through hooks.  |
-| `frontend/src/components/recognition/` | The upload and recognition flow.                               |
-| `frontend/src/components/ui/`          | shadcn primitives plus `LoadingOrb` and `Skeleton`.            |
+| `frontend/src/hooks/use-predict.ts`    | TanStack Query mutation. All server state goes through hooks.   |
+| `frontend/src/components/recognition/` | The upload and recognition flow.                                |
+| `frontend/src/components/ui/`          | shadcn primitives plus `LoadingOrb` and `Skeleton`.             |
 
 ## Loaders
 

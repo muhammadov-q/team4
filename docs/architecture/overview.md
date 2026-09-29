@@ -11,11 +11,11 @@ flowchart LR
 
 ## Stack
 
-| Part    | Stack                                                                    | More                                                        |
-| ------- | ------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| Part    | Stack                                                                       | More                                                       |
+| ------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Web app | Next.js 16, React 19, TypeScript, TanStack Query, Tailwind CSS 4, shadcn/ui | [[architecture/frontend]], [[adr/0001-web-frontend-stack]] |
-| Backend | Python 3.13, FastAPI, uv                                                 | `backend/README.md`, [[architecture/api-contract]]          |
-| Tests   | Vitest, Playwright, pytest, Bruno                                        | [[architecture/testing]]                                    |
-| CI      | GitHub Actions                                                           | [[workflow/git-workflow]]                                   |
+| Backend | Python 3.13, FastAPI, uv                                                    | `backend/README.md`, [[architecture/api-contract]]         |
+| Tests   | Vitest, Playwright, pytest, Bruno                                           | [[architecture/testing]]                                   |
+| CI      | GitHub Actions                                                              | [[workflow/git-workflow]]                                  |
 
 A mobile app is in progress in #13. There's no database, file storage or real model yet; each gets a section here when it lands.

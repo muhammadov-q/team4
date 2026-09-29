@@ -4,11 +4,11 @@ From a fresh clone to a running app.
 
 ## You need
 
-| Tool                  | Version                          | For                         |
-| --------------------- | -------------------------------- | --------------------------- |
-| git and the `gh` CLI  | any recent                       | code, issues, pull requests |
-| Node.js               | 24 (`.nvmrc`)                    | the web app                 |
-| Python and `uv`       | 3.13 (`backend/.python-version`) | the backend                 |
+| Tool                 | Version                          | For                         |
+| -------------------- | -------------------------------- | --------------------------- |
+| git and the `gh` CLI | any recent                       | code, issues, pull requests |
+| Node.js              | 24 (`.nvmrc`)                    | the web app                 |
+| Python and `uv`      | 3.13 (`backend/.python-version`) | the backend                 |
 
 ## First run
 

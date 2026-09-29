@@ -4,14 +4,14 @@ Notes on how Team4 is built and how we work. Open `docs/` as a vault in Obsidian
 
 The notes only describe what exists or what the team has agreed on. Add to them in the PR that changes the thing they describe.
 
-| Folder                                | What goes here                                        |
-| ------------------------------------- | ----------------------------------------------------- |
-| [[architecture/README\|architecture]] | Stack, how the parts connect, patterns, tests.        |
-| [[workflow/README\|workflow]]         | Issues, branches, pull requests, Definition of Done.  |
-| [[ml/README\|ml]]                     | Tasks, datasets and evaluation, once we pick them.    |
-| [[models/README\|models]]             | One model card per model we use.                      |
-| [[adr/README\|adr]]                   | Decisions that are hard to undo.                      |
-| [[meetings/README\|meetings]]         | Notes from the weekly meetings.                       |
+| Folder                                | What goes here                                       |
+| ------------------------------------- | ---------------------------------------------------- |
+| [[architecture/README\|architecture]] | Stack, how the parts connect, patterns, tests.       |
+| [[workflow/README\|workflow]]         | Issues, branches, pull requests, Definition of Done. |
+| [[ml/README\|ml]]                     | Tasks, datasets and evaluation, once we pick them.   |
+| [[models/README\|models]]             | One model card per model we use.                     |
+| [[adr/README\|adr]]                   | Decisions that are hard to undo.                     |
+| [[meetings/README\|meetings]]         | Notes from the weekly meetings.                      |
 
 New here? Start with [[onboarding]]. What the course asks for is in [[requirements]].
 
