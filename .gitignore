@@ -137,3 +137,13 @@ AGENTS.md
 .context/
 .obsidian
 .trash/
+
+# Kotlin Multiplatform and Android Studio
+.gradle/
+.kotlin/
+.idea/
+local.properties
+*.iml
+
+# Xcode
+xcuserdata/
