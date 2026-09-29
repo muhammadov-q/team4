@@ -1,0 +1,44 @@
+# Runs each area's check.sh, the same gate the pre-push hook runs. Like the
+# hook, an area without a check.sh yet is skipped, so backend and mobile join
+# by adding one (plus their toolchain setup here).
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        if: hashFiles('frontend/check.sh') != ''
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Lint, format, type check, unit tests
+        if: hashFiles('frontend/check.sh') != ''
+        working-directory: frontend
+        run: bash check.sh
+
+  docs:
+    name: Docs checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Broken links, line numbers, stale paths
+        if: hashFiles('docs/check.sh') != ''
+        working-directory: docs
+        run: bash check.sh
