@@ -1,6 +1,8 @@
 # Meetings
 
-One note per meeting, named by date: `2026-09-23.md`. Link the issues and notes a meeting touches, so the graph shows what each meeting changed. Team effort is graded, and these notes are part of the evidence.
+One note per weekly meeting, named by date: `2026-09-23.md`.
+
+The course meeting takes 15 minutes: a 5-minute demo of the current app, 5 minutes where each member says what they did last week, and 5 minutes on next steps. Each member has to attend at least 8 of the 10 ([[requirements]]).
 
 ## Template
 
@@ -9,9 +11,11 @@ One note per meeting, named by date: `2026-09-23.md`. Link the issues and notes 
 
 Present: <names>
 
-## Decisions
-- <decision>, see [[adr/README]] if it needs a record
+## Demo
 
-## Action items
-- [ ] <who>: <what> (#issue)
+## Done last week
+- <name>: <what> (#issue)
+
+## Next steps
+- [ ] <name>: <what> (#issue)
 ```

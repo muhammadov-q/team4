@@ -1,29 +1,21 @@
 # Model cards
 
-One card per deployed model, named after the model (`trocr-saint-gall.md`). The rules the cards report against are in [[ml/README]].
+One card per model we use, named after the model. None yet: the backend runs a mock ([[ml/README]]).
 
-No models are deployed yet. The first cards will be the CTC baseline and TrOCR (milestones M2 and M3 in [[requirements]]).
-
-## Card template
+## Template
 
 ```markdown
 # <Model name>
 
-- Task: <segmentation | recognition | classification | keyword spotting>
-- Version: <MLflow run id>, promoted <YYYY-MM-DD>
-
 ## Data
-Datasets, license, split sizes (pages and lines), preprocessing.
+What it was trained on, and the train/validation/test split.
 
 ## Training
-Base model, hyperparameters, seed, hardware, duration.
+Base model, settings, hardware.
 
-## Results (test set only)
-| Metric | This model | Baseline |
+## Results
+Metrics on the test set, next to the baseline.
 
-## Limitations
-Scripts, hands or page conditions where it fails.
-
-## Intended use
-What it's for in Team4, and what it must not be used for.
+## Limits
+Where it fails, and what it must not be used for.
 ```

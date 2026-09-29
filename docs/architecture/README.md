@@ -1,14 +1,14 @@
 # Architecture
 
-Cross-cutting notes on how Team4 is built. Start with the overview.
+How Team4 is built today. Start with the overview.
 
-| Note                                   | What it covers                                                       |
-| -------------------------------------- | -------------------------------------------------------------------- |
-| [[architecture/overview]]              | Services, the recognition pipeline, the data model, what exists today. |
-| [[architecture/frontend]]              | The web app: request path, state, loaders, theming, gotchas.         |
-| [[architecture/design-system]]         | Colour, type, shape and layout rules for the UI.                     |
-| [[architecture/api-contract]]          | Backend endpoints and how the frontend stays in sync with them.      |
-| [[architecture/design-patterns]]       | The patterns the spec grades, and where each one lives.              |
-| [[architecture/testing]]               | Test layers, where tests live, how to run them.                      |
+| Note                             | What it covers                                              |
+| -------------------------------- | ----------------------------------------------------------- |
+| [[architecture/overview]]        | The stack and how the parts connect.                        |
+| [[architecture/frontend]]        | The web app: request path, code layout, loaders.            |
+| [[architecture/api-contract]]    | Backend endpoints and how the frontend types stay in sync.  |
+| [[architecture/design-patterns]] | Patterns in the code, with a class diagram.                 |
+| [[architecture/design-system]]   | Colours, type and surfaces for the UI.                      |
+| [[architecture/testing]]         | What we test, with which tool, and how to run it.           |
 
-Decisions behind this structure are recorded in [[adr/README|the ADRs]].
+The decisions behind these are in [[adr/README|the ADRs]].

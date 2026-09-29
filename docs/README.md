@@ -1,37 +1,25 @@
 # Team4 docs
 
-This vault holds the **why** behind Team4: decisions, invariants, rules and the connections between parts of the system. Code shows the what; these notes explain the reasons.
+Notes on how Team4 is built and how we work. Open `docs/` as a vault in Obsidian for the graph view, or read the files on GitHub.
 
-Open the `docs/` folder as a vault in **Obsidian**. Notes link to each other with `[[wikilinks]]`, so the graph view shows how the pieces connect. GitHub renders the same files as plain Markdown.
+The notes only describe what exists or what the team has agreed on. Add to them in the PR that changes the thing they describe.
 
-## How it's organized
+| Folder                                | What goes here                                        |
+| ------------------------------------- | ----------------------------------------------------- |
+| [[architecture/README\|architecture]] | Stack, how the parts connect, patterns, tests.        |
+| [[workflow/README\|workflow]]         | Issues, branches, pull requests, Definition of Done.  |
+| [[ml/README\|ml]]                     | Tasks, datasets and evaluation, once we pick them.    |
+| [[models/README\|models]]             | One model card per model we use.                      |
+| [[adr/README\|adr]]                   | Decisions that are hard to undo.                      |
+| [[meetings/README\|meetings]]         | Notes from the weekly meetings.                       |
 
-| Folder                                  | What lives here                                                        |
-| --------------------------------------- | ---------------------------------------------------------------------- |
-| [[architecture/README\|architecture]]   | System map, frontend, API contract, design patterns, testing.          |
-| [[workflow/README\|workflow]]           | Issues, branches, commits, pull requests, Definition of Done.          |
-| [[ml/README\|ml]]                       | Tasks, datasets, splits and the rules that keep evaluation honest.     |
-| [[models/README\|models]]               | One model card per deployed model.                                     |
-| [[adr/README\|adr]]                     | Architecture decision records.                                         |
-| [[meetings/README\|meetings]]           | Meeting notes, one file per meeting.                                   |
+New here? Start with [[onboarding]]. What the course asks for is in [[requirements]].
 
-## Entry points
+## Conventions
 
-- **New to the team?** [[onboarding]], then [[glossary]].
-- **What are we building?** [[requirements]], the full spec.
-- **How does it fit together?** [[architecture/overview]].
-- **How do we work?** [[workflow/git-workflow]] and [[workflow/issues]].
-- **Why is it built this way?** [[adr/README|Decision records]].
+- One note per topic, named `lowercase-kebab.md`. Each folder's index is its `README.md`.
+- Link notes with `[[wikilinks]]` from the vault root, like `[[architecture/overview]]`. Only link notes that exist.
+- Put source files in inline code and name the function or class, not a line number.
+- Draw diagrams in Mermaid. GitHub and Obsidian both render it.
 
-## Writing conventions
-
-- **One note per stable concept**, not per PR. PRs describe changes; notes describe what stays true.
-- **File names are `lowercase-kebab.md`.** Each folder's index is `README.md`, so GitHub shows it when someone opens the folder. To hide the README nodes in Obsidian's graph, add `-path:README` to the graph's Files filter.
-- **Link with `[[wikilinks]]`** using vault-root paths (`[[architecture/overview]]`). Only link to notes that exist; write planned notes as plain text so the lint stays green.
-- **Source files go in inline code**, not links: `frontend/src/lib/api/predict.ts`. Name the symbol, never a line number; line numbers drift on the next edit.
-- **Don't hardcode counts** that rot ("56 tests"). Point at the command that tells the truth instead.
-- **Mermaid for diagrams.** Obsidian and GitHub both render it.
-- **Date anything external** (library versions, dataset terms, URLs) with "as of YYYY-MM".
-- **No emojis.** Headings, tables and diagrams instead.
-
-Run `python3 docs/check-docs.py` after editing. It fails on broken wikilinks, line-number citations and source paths that no longer exist. The pre-push hook runs it whenever `docs/` changes.
+Run `python3 docs/check-docs.py` after editing. It fails on broken wikilinks, line-number citations and source files that no longer exist. The pre-push hook and CI run it too.

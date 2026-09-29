@@ -1,21 +1,31 @@
 # Design patterns
 
-The spec grades design patterns, so we use them on purpose and write down where. The list comes from [[requirements]] (section 6.3). Each row says where the pattern lives, or will live.
+Patterns that are in the code today. When a new one lands, add a row with the file and the symbol.
 
-| Pattern                         | Where                                                                                      | Story        |
-| ------------------------------- | ------------------------------------------------------------------------------------------ | ------------ |
-| Strategy                        | `Recognizer` interface with `TrOCRRecognizer` and `CTCRecognizer` (planned, backend).      | B2           |
-| Pipeline / Chain of Responsibility | `PipelineStep` chain run by the worker ([[architecture/overview#Recognition pipeline]]). | B1-B5        |
-| Adapter                         | Ultralytics, Kraken and Hugging Face behind our own interfaces (planned). On the frontend, `LoadingOrb` adapts `thinking-orbs`, and the `/api` proxy adapts the backend to one origin. | B1, B2 |
-| Repository                      | All database access in repository classes; routes never touch the ORM (planned).          | all          |
-| Factory                         | Picks a recognizer from the script class or config (planned).                              | B5           |
-| Observer                        | Job status pushed to the frontend over SSE or WebSocket (planned).                         | B4           |
+| Pattern              | Where                                                            | Why                                                                                                                              |
+| -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Factory              | `create_predictor` in `backend/src/ml/factory.py`                | Builds the predictor named by its argument or by the `ML_PREDICTOR` environment variable, so switching models doesn't touch the route. |
+| Strategy             | `AbstractPredictor` in `backend/src/ml/predictor.py`             | Every model has the same `predict` and `model_version`, so `/predict` works with any of them. `DummyPredictor` is the only one today. |
+| Dependency injection | `get_predictor` and `capped_image` in `backend/src/app/main.py`  | FastAPI `Depends` hands the route its predictor and the checked image bytes, so the route doesn't build them itself.             |
+| Adapter              | `LoadingOrb` in `frontend/src/components/ui/loading-orb.tsx`     | The only import of `thinking-orbs`, so the animation library can be swapped in one place.                                        |
 
-## Principles we hold to
+## Predictor classes
 
-- **SOLID.** Small interfaces, dependencies pointing inward.
-- **Dependency injection** through FastAPI `Depends`, so tests swap real models for fakes.
-- **Configuration from the environment** through pydantic-settings, with a committed `.env.example`.
-- **Thin edges.** Routes and UI components delegate; services hold the logic. On the frontend, `frontend/src/lib/api/` and `frontend/src/hooks/` play that role.
-
-When a pattern lands in code, replace "planned" with the real file and symbol.
+```mermaid
+classDiagram
+    class AbstractPredictor {
+        <<abstract>>
+        +str model_version
+        +predict(bytes image) float
+    }
+    class DummyPredictor {
+        +str model_version
+        +predict(bytes image) float
+    }
+    class factory {
+        <<module>>
+        +create_predictor(name) AbstractPredictor
+    }
+    AbstractPredictor <|-- DummyPredictor
+    factory ..> AbstractPredictor : creates
+```
