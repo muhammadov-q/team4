@@ -1,15 +1,19 @@
+from pathlib import Path
+
 import cv2
 import joblib
 import numpy as np
 
 from ml.predictor import AbstractPredictor
 
+MODEL_PATH = Path(__file__).resolve().parent / "models" / "knn_mnist.joblib"
+
 
 class KnnPredictor(AbstractPredictor):
     def __init__(self) -> None:
         super().__init__()
         self.model_name = "KNN-100126"
-        self.model = joblib.load("./models/knn_mnist.joblib")
+        self.model = joblib.load(MODEL_PATH)
 
     def load_image_in_grayscale(self, image: bytes, target_width=1000):
         """
