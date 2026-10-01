@@ -44,9 +44,11 @@ On nixos, you may found it on the packages.
 
 ## Run the API
 
+!! It is needed to run it using the knn predictor.
+
 ```bash
 cd backend
-uv run uvicorn app.main:app --reload
+ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```
 
 ## Run the tests
