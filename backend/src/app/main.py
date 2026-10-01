@@ -48,8 +48,21 @@ def get_predictor() -> AbstractPredictor:
     return predictor
 
 
+class BoxResponse(BaseModel):
+    x: int
+    y: int
+    w: int
+    h: int
+
+
+class DigitResponse(BaseModel):
+    digit: int
+    probabilities: dict[int, float]
+    box: BoxResponse
+
+
 class PredictResponse(BaseModel):
-    prediction: float
+    predictions: list[DigitResponse]
     model_version: str
 
 
@@ -73,7 +86,19 @@ async def predict(
     predictor: Annotated[AbstractPredictor, Depends(get_predictor)],
     content: Annotated[bytes, Depends(capped_image)],
 ) -> PredictResponse:
+    try:
+        results = await run_in_threadpool(predictor.predict, content)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
     return PredictResponse(
-        prediction=await run_in_threadpool(predictor.predict, content),
+        predictions=[
+            DigitResponse(
+                digit=d.digit,
+                probabilities=d.probabilities,
+                box=BoxResponse(x=d.box[0], y=d.box[1], w=d.box[2], h=d.box[3]),
+            )
+            for d in results
+        ],
         model_version=predictor.model_version,
     )

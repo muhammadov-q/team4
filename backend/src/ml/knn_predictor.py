@@ -4,7 +4,7 @@ import cv2
 import joblib
 import numpy as np
 
-from ml.predictor import AbstractPredictor
+from ml.predictor import AbstractPredictor, DigitResult
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "knn_mnist.joblib"
 
@@ -116,7 +116,7 @@ class KnnPredictor(AbstractPredictor):
 
         return samples
 
-    def predict_digit(digit, model):
+    def predict_digit(self, digit, model):
         """
         digit: 28x28 uint8 image, white digit on black background
         Returns (prediction, {digit: probability})
@@ -131,7 +131,7 @@ class KnnPredictor(AbstractPredictor):
     def model_version(self):
         return self.model_name
 
-    def predict(self, image: bytes) -> float:
+    def predict(self, image: bytes) -> list[DigitResult]:
         grayscale = self.load_image_in_grayscale(image)
         blurred = self.add_blur_on_image(grayscale)
         binary = self.binarize(blurred)
@@ -143,4 +143,5 @@ class KnnPredictor(AbstractPredictor):
         results = []
         for digit, box in samples:
             pred, probs = self.predict_digit(digit, self.model)
-            results.append((pred, probs, box))
+            results.append(DigitResult(digit=pred, probabilities=probs, box=box))
+        return results

@@ -1,9 +1,11 @@
 import os
 
+from ml.knn_predictor import KnnPredictor
 from ml.predictor import AbstractPredictor, DummyPredictor
 
 PREDICTORS: dict[str, type[AbstractPredictor]] = {
     "dummy": DummyPredictor,
+    "knn": KnnPredictor,
 }
 
 
