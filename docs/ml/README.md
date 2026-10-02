@@ -1,4 +1,7 @@
 # Machine learning
+The first version of the backend runs a mock predictor, `DummyPredictor`, that ignore the image and returns a fixed value following the current Predictor output. 
+
+For now, we have a `KnnPredictor`. It consist of a pipeline finding artifacts on a picture that may be a digit. Then it preprocess the artifact to have a 28x28 sample to compare using a KNN and then predict the digit. More details can be found on the [dedicated model page](models/KNN).
 
 Nothing decided yet. The backend runs a mock predictor, `DummyPredictor`, that ignores the image and returns a fixed value, so the app works end to end before a real model is in ([[architecture/design-patterns]]).
 

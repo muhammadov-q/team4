@@ -1,5 +1,7 @@
 # KNN
-This model is a simple k-NN (6-NN) from the library scickit-learn. It have been train on an augmented dataset coming from scikit-learn to. It achieve an acceptable accuracy of around 97%.
+This model is a k-NN (6-NN) from the scikit-learn library. It have been train on an augmented dataset coming from scikit-learn to. It achieve an acceptable accuracy of around 97%.
+
+It contain a preprocessing pipeline to extract the digit position and features and then compare them with the MNIST augmented dataset.
 
 You can found detailed information on the exploration notebook [./backend/src/ml/notebooks/KNN-exploration.ipynb](./backend/src/ml/notebooks/KNN-exploration.ipynb).
 
