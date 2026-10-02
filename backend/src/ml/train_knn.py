@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import cv2
 import joblib
@@ -11,8 +12,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Normalizer
 
-MODELS_DIRECTORY = "./models"
+MODELS_DIRECTORY = Path(__file__).resolve().parent / "models"
 MODEL_NAME = "knn_mnist.joblib"
+
+MODELS_DIRECTORY.mkdir(parents=True, exist_ok=True)
+
 
 # Load the dataset
 mnist = fetch_openml("mnist_784", as_frame=False)
@@ -76,8 +80,4 @@ print(classification_report(y_test,result))
 
 
 # Export the model
-if not os.path.exists(MODELS_DIRECTORY):
-    os.makedirs(MODELS_DIRECTORY)
-
-joblib.dump(knn, os.path.join(MODELS_DIRECTORY, MODEL_NAME), compress=3)
-print(sklearn.__version__)
+joblib.dump(knn, MODELS_DIRECTORY / MODEL_NAME, compress=3)
