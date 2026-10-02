@@ -1,6 +1,6 @@
 import pytest
-
 from ml.factory import PREDICTORS, create_predictor
+from ml.knn_predictor import MODEL_PATH
 from ml.predictor import AbstractPredictor, DigitResult, DummyPredictor
 
 
@@ -55,6 +55,9 @@ def test_each_call_returns_a_new_instance():
 
 @pytest.mark.parametrize("name", sorted(PREDICTORS))
 def test_every_registered_predictor_follows_the_contract(name, digit_image):
+    if name == "knn" and not MODEL_PATH.exists():
+        pytest.skip("KNN model not trained (run train_knn.py)")
+
     predictor = create_predictor(name)
     assert isinstance(predictor, AbstractPredictor)
     assert isinstance(predictor.model_version, str)
