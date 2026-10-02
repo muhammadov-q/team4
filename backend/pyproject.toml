@@ -32,7 +32,14 @@ module-name = ["app", "ml"]
 dev = [
     "ipykernel>=7.4.0",
     "pytest>=9.1.1",
+    "ruff>=0.16.10",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["src/app/tests", "src/ml/tests"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]  # pycodestyle, pyflakes, import sorting, bugbear, pyupgrade

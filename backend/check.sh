@@ -90,6 +90,8 @@ if ! command -v npx >/dev/null 2>&1; then
     exit 1
 fi
 
+run_step "Lint" "uv run ruff check --fix" uv run ruff check
+run_step "Formatting" "uv run ruff format" uv run ruff format --check
 run_step "Unit tests" "uv run pytest" uv run pytest
 
 start_server
@@ -97,6 +99,7 @@ run_step "API tests (Bruno)" "cd $BRUNO_DIR && npx @usebruno/cli run --env local
     bash -c "cd '$BRUNO_DIR' && npx --yes @usebruno/cli run --env local"
 
 print_header "ALL CHECKS PASSED ✓"
+echo -e "${GREEN}✓ Lint + format (ruff)${NC}"
 echo -e "${GREEN}✓ Unit tests (pytest)${NC}"
 echo -e "${GREEN}✓ API tests (Bruno)${NC}"
 echo ""
