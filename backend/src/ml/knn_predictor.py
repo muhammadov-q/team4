@@ -17,7 +17,8 @@ class KnnPredictor(AbstractPredictor):
 
     def load_image_in_grayscale(self, image: bytes, target_width=1000):
         """
-        Decode an image from raw bytes, convert it to grayscale and resize it to a fixed width
+        Decode an image in raw bytes and return the grayscale version.
+        It also scale to a fixed size.
         """
         buffer = np.frombuffer(image, dtype=np.uint8)
         img = cv2.imdecode(buffer, cv2.IMREAD_GRAYSCALE)
@@ -124,7 +125,9 @@ class KnnPredictor(AbstractPredictor):
         x = digit.reshape(1, -1).astype(np.float32)
         probs = model.predict_proba(x)[0]
         pred = int(model.classes_[np.argmax(probs)])
-        probabilities = {int(c): float(p) for c, p in zip(model.classes_, probs)}
+        probabilities = {
+            int(c): float(p) for c, p in zip(model.classes_, probs, strict=False)
+        }
         return pred, probabilities
 
     @property

@@ -89,7 +89,7 @@ async def predict(
     try:
         results = await run_in_threadpool(predictor.predict, content)
     except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e)) from e
 
     return PredictResponse(
         predictions=[
