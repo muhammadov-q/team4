@@ -8,22 +8,27 @@ import { Button } from '@/components/ui/button'
 interface PagePreviewProps {
   file: File
   onReplace: (file: File) => void
+  onCrop: () => void
   onRemove: () => void
 }
 
-export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
+export function PagePreview({ file, onReplace, onCrop, onRemove }: PagePreviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [unpreviewable, setUnpreviewable] = useState<File | null>(null)
 
   const attachPreview = useCallback(
     (img: HTMLImageElement | null) => {
       if (!img) return
+
       const url = URL.createObjectURL(file)
       img.src = url
+
       return () => URL.revokeObjectURL(url)
     },
     [file]
   )
+
+  const canCrop = file.type !== 'image/tiff' && unpreviewable !== file
 
   return (
     <div className="space-y-5">
@@ -51,15 +56,27 @@ export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
           </p>
           <Annotation>{formatBytes(file.size)}</Annotation>
         </div>
+
         <div className="flex shrink-0 gap-2">
           <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
             Replace
           </Button>
+
+          <Button variant="outline" size="sm" onClick={onCrop} disabled={!canCrop}>
+            Crop
+          </Button>
+
           <Button variant="ghost" size="sm" onClick={onRemove}>
             Remove
           </Button>
         </div>
       </div>
+
+      {!canCrop && (
+        <p className="text-sm text-muted-foreground">
+          This image cannot be cropped because it cannot be previewed in the browser.{' '}
+        </p>
+      )}
 
       <input
         ref={inputRef}
@@ -71,7 +88,10 @@ export function PagePreview({ file, onReplace, onRemove }: PagePreviewProps) {
         onChange={(event) => {
           const next = event.target.files?.[0]
           event.target.value = ''
-          if (next) onReplace(next)
+
+          if (next) {
+            onReplace(next)
+          }
         }}
       />
     </div>

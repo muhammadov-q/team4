@@ -62,6 +62,14 @@ src/lib/                    plain helpers (file checks, formatting)
 e2e/                        Playwright specs
 ```
 
+## Image cropping
+
+The web frontend supports free-form cropping for previewable JPG and PNG images before recognition.
+
+After applying a crop, the cropped image replaces the current preview and is sent through the existing `/predict` flow.
+
+TIFF images can still be submitted for recognition, but browser-side cropping is not supported because most browsers cannot preview TIFF images.
+
 ## Docker
 
 ```bash
