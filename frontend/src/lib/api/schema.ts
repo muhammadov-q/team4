@@ -27,6 +27,27 @@ export interface components {
             /** Image */
             image: string;
         };
+        /** BoxResponse */
+        BoxResponse: {
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** W */
+            w: number;
+            /** H */
+            h: number;
+        };
+        /** DigitResponse */
+        DigitResponse: {
+            /** Digit */
+            digit: number;
+            /** Probabilities */
+            probabilities: {
+                [key: string]: number;
+            };
+            box: components["schemas"]["BoxResponse"];
+        };
         /** ErrorResponse */
         ErrorResponse: {
             /** Detail */
@@ -39,8 +60,8 @@ export interface components {
         };
         /** PredictResponse */
         PredictResponse: {
-            /** Prediction */
-            prediction: number;
+            /** Predictions */
+            predictions: components["schemas"]["DigitResponse"][];
             /** Model Version */
             model_version: string;
         };
