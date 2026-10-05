@@ -29,7 +29,7 @@ class KnnPredictor(AbstractPredictor):
 
         scale = target_width / img.shape[1]
         interp = cv2.INTER_AREA if scale < 1 else cv2.INTER_CUBIC
-        return cv2.resize(img, None, fx=scale, fy=scale, interpolation=interp)
+        return cv2.resize(img, None, fx=scale, fy=scale, interpolation=interp), scale
 
     def add_blur_on_image(self, img):
         return cv2.GaussianBlur(img, (9, 9), 0)
@@ -134,8 +134,18 @@ class KnnPredictor(AbstractPredictor):
     def model_version(self):
         return self.model_name
 
+    def to_original_coordinates(self, box, scale):
+        """Map a box (x, y, w, h) from the resized image back to the uploaded image."""
+        x, y, w, h = box
+        return (
+            round(x / scale),
+            round(y / scale),
+            round(w / scale),
+            round(h / scale),
+        )
+
     def predict(self, image: bytes) -> list[DigitResult]:
-        grayscale = self.load_image_in_grayscale(image)
+        grayscale, scale = self.load_image_in_grayscale(image)
         blurred = self.add_blur_on_image(grayscale)
         binary = self.binarize(blurred)
         dilated = self.dilate(binary)
@@ -146,5 +156,11 @@ class KnnPredictor(AbstractPredictor):
         results = []
         for digit, box in samples:
             pred, probs = self.predict_digit(digit, self.model)
-            results.append(DigitResult(digit=pred, probabilities=probs, box=box))
+            results.append(
+                DigitResult(
+                    digit=pred,
+                    probabilities=probs,
+                    box=self.to_original_coordinates(box, scale),
+                )
+            )
         return results
