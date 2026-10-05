@@ -45,9 +45,6 @@ class KnnPredictor(AbstractPredictor):
     def find_contours(self, img):
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        if not contours:
-            raise ValueError("No numbers on the image.")
-
         return contours
 
     def find_bounding_boxes(self, contours, min_area=200):

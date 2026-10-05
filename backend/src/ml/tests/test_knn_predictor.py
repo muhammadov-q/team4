@@ -83,15 +83,18 @@ def test_undecodable_image_raises(predictor, image):
         predictor.predict(image)
 
 
-def test_blank_image_raises_no_numbers(predictor):
+def test_blank_image_returns_no_predictions(predictor, model):
     blank = encode_png(np.full((100, 100), 255, dtype=np.uint8))
-    with pytest.raises(ValueError, match="No numbers"):
-        predictor.predict(blank)
+    assert predictor.predict(blank) == []
+    assert model.calls == []  # the model is never asked
 
 
-def test_find_contours_on_empty_image_raises(predictor):
-    with pytest.raises(ValueError, match="No numbers"):
-        predictor.find_contours(np.zeros((50, 50), dtype=np.uint8))
+def test_find_contours_on_empty_image_returns_nothing(predictor):
+    assert len(predictor.find_contours(np.zeros((50, 50), dtype=np.uint8))) == 0
+
+
+def test_find_bounding_boxes_without_contours_returns_empty_list(predictor):
+    assert predictor.find_bounding_boxes(()) == []
 
 
 # --- load_image_in_grayscale ------------------------------------------------
