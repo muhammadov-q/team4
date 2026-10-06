@@ -3,6 +3,7 @@ import { JetBrains_Mono, Schibsted_Grotesk } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import { SiteHeader } from '@/components/site-header'
 import './globals.css'
+import 'react-image-crop/dist/ReactCrop.css'
 
 const ui = Schibsted_Grotesk({ variable: '--font-ui', subsets: ['latin'] })
 const jetbrainsMono = JetBrains_Mono({ variable: '--font-jetbrains-mono', subsets: ['latin'] })

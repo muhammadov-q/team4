@@ -4,6 +4,28 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@/test/render'
 import { RecognitionWorkbench } from './recognition-workbench'
 
+vi.mock('./image-cropper', () => ({
+  ImageCropper: ({
+    onApply,
+    onCancel,
+  }: {
+    onApply: (file: File) => void
+    onCancel: () => void
+  }) => (
+    <div>
+      <button
+        onClick={() =>
+          onApply(new File(['cropped-bytes'], 'folio-1r-cropped.png', { type: 'image/png' }))
+        }
+      >
+        Apply crop
+      </button>
+
+      <button onClick={onCancel}>Cancel crop</button>
+    </div>
+  ),
+}))
+
 afterEach(() => {
   vi.unstubAllGlobals()
 })
@@ -133,6 +155,52 @@ describe('RecognitionWorkbench', () => {
 
     expect(screen.queryByRole('region', { name: 'Model response' })).not.toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Preview of folio-1v.png' })).toBeInTheDocument()
+  })
+
+  it('opens the crop flow and returns to the preview when cancelled', async () => {
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+
+    expect(screen.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Crop' }))
+
+    expect(screen.getByRole('button', { name: 'Cancel crop' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel crop' }))
+
+    expect(screen.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeInTheDocument()
+  })
+
+  it('sends the cropped image to the backend after applying a crop', async () => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({ prediction: 7, model_version: 'mock' }))
+
+    vi.stubGlobal('fetch', fetch)
+
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+
+    await user.click(screen.getByRole('button', { name: 'Crop' }))
+    await user.click(screen.getByRole('button', { name: 'Apply crop' }))
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Preview of folio-1r-cropped.png',
+      })
+    ).toBeInTheDocument()
+
+    await user.click(recognizeButton())
+
+    expect(fetch).toHaveBeenCalledOnce()
+
+    const requestInit = fetch.mock.calls[0][1] as RequestInit
+    const body = requestInit.body as FormData
+    const uploadedImage = body.get('image')
+
+    expect(uploadedImage).toBeInstanceOf(File)
+    expect((uploadedImage as File).name).toBe('folio-1r-cropped.png')
   })
 
   it('takes a page pasted from the clipboard', () => {
