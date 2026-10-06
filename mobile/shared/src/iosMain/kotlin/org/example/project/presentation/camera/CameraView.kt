@@ -113,7 +113,7 @@ private class CameraPickerView(
         this.picker = null
 
         if (photo == null || photo.isEmpty()) {
-            onCaptureError("The selected photo contained no image data.")
+            onCaptureError("The photo contained no image data.")
         } else {
             onPhotoCaptured(photo)
         }
@@ -122,6 +122,6 @@ private class CameraPickerView(
     override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
         picker.dismissViewControllerAnimated(true, completion = null)
         this.picker = null
-        onCaptureError("Photo capture was cancelled.")
+        onCaptureError("Photo operation was cancelled.")
     }
 }

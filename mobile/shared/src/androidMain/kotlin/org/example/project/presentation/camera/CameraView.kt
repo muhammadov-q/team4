@@ -1,6 +1,8 @@
 package org.example.project.presentation.camera
 
 import android.content.ActivityNotFoundException
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 
@@ -32,16 +35,28 @@ actual fun CameraView(
         ActivityResultContracts.GetContent(),
     ) { uri ->
         if (uri == null) {
-            onCaptureError("Photo selection was cancelled.")
+            onCaptureError("Photo operation was cancelled.")
             return@rememberLauncherForActivityResult
         }
         scope.launch {
             try {
                 val photo = withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                        ?: throw IOException("Could not read the selected photo.")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                val bitmap = BitmapFactory.decodeStream(input)
+                    ?: throw IOException("The selected file is not a supported image.")
+                try {
+                    ByteArrayOutputStream().use { output ->
+                        check(bitmap.compress(Bitmap.CompressFormat.JPEG, 95, output)) {
+                            "Could not convert the selected photo to JPEG."
+                        }
+                        output.toByteArray()
+                    }
+                } finally {
+                    bitmap.recycle()
                 }
-                if (photo.isEmpty()) onCaptureError("The selected photo contained no data.")
+            } ?: throw IOException("Could not read the selected photo.")
+        }
+                if (photo.isEmpty()) onCaptureError("The photo contained no image data.")
                 else onPhotoCaptured(photo)
             } catch (exception: IOException) {
                 onCaptureError(exception.message ?: "Could not read the selected photo.")
@@ -58,7 +73,7 @@ actual fun CameraView(
 
         if (!success) {
             photoFile.delete()
-            onCaptureError("Photo capture was cancelled.")
+            onCaptureError("Photo operation was cancelled.")
             return@rememberLauncherForActivityResult
         }
 
@@ -68,7 +83,7 @@ actual fun CameraView(
                     photoFile.inputStream().use { it.readBytes() }
                 }
                 if (photo.isEmpty()) {
-                    onCaptureError("The captured photo contained no image data.")
+                    onCaptureError("The photo contained no image data.")
                 } else {
                     onPhotoCaptured(photo)
                 }
