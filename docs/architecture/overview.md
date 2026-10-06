@@ -6,7 +6,7 @@ What exists today (as of 2026-09): a web app and a backend with one endpoint. Th
 flowchart LR
     Browser --> Frontend["frontend<br/>Next.js"]
     Frontend -->|"/api proxy"| Backend["backend<br/>FastAPI"]
-    Backend --> Predictor["predictor<br/>mock for now"]
+    Backend --> Predictor["predictor<br/>KNN for now"]
 ```
 
 ## Stack

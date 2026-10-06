@@ -16,6 +16,28 @@ body:multipart-form {
 
 assert {
   res.status: eq 200
-  res.body.prediction: eq 250000
   res.body.model_version: eq mock
+  res.body.predictions: isArray
+}
+
+tests {
+  const predictions = res.getBody().predictions;
+
+  test("returns the dummy digits in order", function () {
+    expect(predictions.map((p) => p.digit)).to.eql([2, 5, 0, 0, 0, 0]);
+  });
+
+  test("each prediction has digit, probabilities and box", function () {
+    for (const p of predictions) {
+      expect(p).to.have.all.keys("digit", "probabilities", "box");
+      expect(p.box).to.have.all.keys("x", "y", "w", "h");
+    }
+  });
+
+  test("dummy is fully confident in each digit", function () {
+    for (const p of predictions) {
+      // JSON object keys are strings
+      expect(p.probabilities).to.eql({ [String(p.digit)]: 1.0 });
+    }
+  });
 }

@@ -12,12 +12,18 @@ pkgs.mkShell {
   UV_PYTHON_DOWNLOADS = "never";
   UV_PYTHON_PREFERENCE = "only-system";
 
-  # Lets prebuilt wheels with native code (uvloop, httptools, ...)
-  # find libstdc++ / zlib on NixOS.
-  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-    pkgs.stdenv.cc.cc.lib
-    pkgs.zlib
-  ];
+  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [
+    stdenv.cc.cc.lib
+    zlib
+    # OpenCV (opencv-python) runtime deps
+    glib
+    libGL
+    libxcb
+    libX11
+    libxext
+    libSM
+    libice
+  ]);
 
   shellHook = ''
     uv sync

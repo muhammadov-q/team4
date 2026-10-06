@@ -22,7 +22,7 @@ backend/
 
 Install `uv` on the system the way you prefer. If you use nixos, you may use the `shell.nix` file to setup.
 
-## Install dependencies 
+## Install dependencies
 
 ```bash
 cd backend
@@ -42,11 +42,25 @@ bru --version
 
 On nixos, you may found it on the packages.
 
-## Run the API
+## Train the k-NN
+
+> [!IMPORTANT]
+> You must train the k-nn **before** starting the API with the knn predictor. Skipping this step will result in a `FileNotFoundError`. You only need to do it once (and when you want to retrain the model).
+
+Training take around 20 seconds on a Lenovo IdeaPad Pro 5.
 
 ```bash
 cd backend
-uv run uvicorn app.main:app --reload
+uv run src/ml/train_knn.py
+```
+
+## Run the API
+
+Start the API with the knn predictor (requires the training step above),
+
+```bash
+cd backend
+ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```
 
 ## Run the tests
@@ -63,7 +77,7 @@ uv run pytest
 ```bash
 # terminal 1
 cd backend
-uv run uvicorn app.main:app --reload
+ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 
 # terminal 2
 cd backend/bruno
@@ -72,12 +86,12 @@ bru run --env local
 
 ## API Documentation
 
-After running the server, 
+After running the server,
 
 ```bash
 # terminal 1
 cd backend
-uv run uvicorn app.main:app --reload
+ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```
 
 you may find the Swagger documentation at the adress: [http://localhost:8000/docs](http://localhost:8000/docs).
