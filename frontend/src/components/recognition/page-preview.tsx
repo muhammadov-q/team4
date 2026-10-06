@@ -1,20 +1,25 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
+import type { DigitPrediction, ImageSize } from '@/lib/digits'
 import { IMAGE_ACCEPT, formatBytes } from '@/lib/image-file'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
+import { DigitBoxes } from './digit-boxes'
 
 interface PagePreviewProps {
   file: File
+  predictions?: DigitPrediction[]
   onReplace: (file: File) => void
   onCrop: () => void
   onRemove: () => void
 }
 
-export function PagePreview({ file, onReplace, onCrop, onRemove }: PagePreviewProps) {
+export function PagePreview({ file, predictions, onReplace, onCrop, onRemove }: PagePreviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [unpreviewable, setUnpreviewable] = useState<File | null>(null)
+  const [loaded, setLoaded] = useState<{ file: File; size: ImageSize } | null>(null)
+  const size = loaded?.file === file ? loaded.size : null
 
   const attachPreview = useCallback(
     (img: HTMLImageElement | null) => {
@@ -32,20 +37,32 @@ export function PagePreview({ file, onReplace, onCrop, onRemove }: PagePreviewPr
 
   return (
     <div className="space-y-5">
-      <div className="flex min-h-72 items-center justify-center overflow-hidden rounded-2xl bg-card p-4">
+      <div className="grid min-h-72 place-items-center overflow-hidden rounded-2xl bg-card p-4">
         {unpreviewable === file ? (
           <p className="max-w-xs p-6 text-center text-sm text-muted-foreground">
             This browser can&apos;t preview this image (TIFF usually). The page is still sent as it
             is.
           </p>
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            ref={attachPreview}
-            alt={`Preview of ${file.name}`}
-            onError={() => setUnpreviewable(file)}
-            className="block max-h-[70vh] w-auto max-w-full rounded-md"
-          />
+          <div className="relative max-w-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              ref={attachPreview}
+              alt={`Preview of ${file.name}`}
+              onLoad={(event) =>
+                setLoaded({
+                  file,
+                  size: {
+                    width: event.currentTarget.naturalWidth,
+                    height: event.currentTarget.naturalHeight,
+                  },
+                })
+              }
+              onError={() => setUnpreviewable(file)}
+              className="block max-h-[70vh] w-auto max-w-full rounded-md"
+            />
+            {size && predictions && <DigitBoxes predictions={predictions} image={size} />}
+          </div>
         )}
       </div>
 

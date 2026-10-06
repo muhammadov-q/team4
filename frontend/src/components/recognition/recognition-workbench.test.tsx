@@ -1,4 +1,4 @@
-import { act, screen, within } from '@testing-library/react'
+import { act, fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@/test/render'
@@ -32,6 +32,15 @@ afterEach(() => {
 
 const page = () => new File(['png-bytes'], 'folio-1r.png', { type: 'image/png' })
 
+const mockResponse = (digits: number[]) => ({
+  predictions: digits.map((digit) => ({
+    digit,
+    probabilities: { [digit]: 1 },
+    box: { x: 0, y: 0, w: 0, h: 0 },
+  })),
+  model_version: 'mock',
+})
+
 function setup({ applyAccept = true } = {}) {
   const user = userEvent.setup({ applyAccept })
   renderWithProviders(<RecognitionWorkbench />)
@@ -42,9 +51,7 @@ const recognizeButton = () => screen.getByRole('button', { name: /recognize page
 
 describe('RecognitionWorkbench', () => {
   it('sends the chosen page to the backend and shows the response', async () => {
-    const fetch = vi
-      .fn()
-      .mockResolvedValue(Response.json({ prediction: 250000, model_version: 'mock' }))
+    const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse([2, 5, 0, 0, 0, 0])))
     vi.stubGlobal('fetch', fetch)
     const { user } = setup()
 
@@ -55,11 +62,40 @@ describe('RecognitionWorkbench', () => {
     await user.click(recognizeButton())
 
     const response = await screen.findByRole('region', { name: 'Model response' })
-    expect(within(response).getByText('Prediction').nextElementSibling).toHaveTextContent('250000')
+    expect(within(response).getByText('Digits read').nextElementSibling).toHaveTextContent('250000')
     expect(within(response).getByText('mock')).toBeInTheDocument()
     expect(within(response).getByText('Machine output')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledOnce()
     expect(fetch).toHaveBeenCalledWith('/api/predict', expect.objectContaining({ method: 'POST' }))
+  })
+
+  it('marks the digits it found on the page preview', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          predictions: [
+            { digit: 7, probabilities: { '7': 0.9 }, box: { x: 10, y: 20, w: 30, h: 40 } },
+          ],
+          model_version: 'KNN-100126',
+        })
+      )
+    )
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+    const preview = screen.getByRole('img', { name: 'Preview of folio-1r.png' })
+    Object.defineProperty(preview, 'naturalWidth', { value: 100 })
+    Object.defineProperty(preview, 'naturalHeight', { value: 100 })
+    fireEvent.load(preview)
+    expect(screen.queryAllByTestId('digit-box')).toHaveLength(0)
+
+    await user.click(recognizeButton())
+    await screen.findByRole('region', { name: 'Model response' })
+
+    const [box] = screen.getAllByTestId('digit-box')
+    expect(box).toHaveTextContent('7')
+    expect(box).toHaveStyle({ left: '10%', top: '20%', width: '30%', height: '40%' })
   })
 
   it('rejects a file that is not a page image before it reaches the backend', async () => {
@@ -138,10 +174,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it('clears the previous result when the page is replaced', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(Response.json({ prediction: 1, model_version: 'mock' }))
-    )
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json(mockResponse([1]))))
     const { user } = setup()
 
     await user.upload(screen.getByLabelText('Page image'), page())
@@ -174,7 +207,7 @@ describe('RecognitionWorkbench', () => {
   })
 
   it('sends the cropped image to the backend after applying a crop', async () => {
-    const fetch = vi.fn().mockResolvedValue(Response.json({ prediction: 7, model_version: 'mock' }))
+    const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse([7])))
 
     vi.stubGlobal('fetch', fetch)
 

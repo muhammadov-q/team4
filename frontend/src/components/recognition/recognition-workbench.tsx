@@ -86,7 +86,7 @@ export function RecognitionWorkbench() {
   useEffect(() => () => abortRef.current?.abort(), [])
 
   return (
-    <div id="workbench" className="grid scroll-mt-28 items-start gap-8 lg:grid-cols-2">
+    <div id="workbench" className="grid scroll-mt-28 grid-cols-1 items-start gap-8 lg:grid-cols-2">
       <div className="space-y-3">
         {page ? (
           cropping ? (
@@ -94,6 +94,7 @@ export function RecognitionWorkbench() {
           ) : (
             <PagePreview
               file={page}
+              predictions={run.isSuccess ? run.data.response.predictions : undefined}
               onReplace={choosePage}
               onCrop={() => {
                 stopRun()

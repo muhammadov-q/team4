@@ -7,7 +7,7 @@ const PAGE_PNG = Buffer.from(
 
 test('uploads a page and shows the backend response', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Read a manuscript page' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
 
   await page.getByLabel('Page image').setInputFiles({
     name: 'folio-1r.png',
@@ -23,7 +23,7 @@ test('uploads a page and shows the backend response', async ({ page }) => {
   const response = page.getByRole('region', { name: 'Model response' })
   await expect(response).toBeVisible()
   await expect(response.getByText('Machine output')).toBeVisible()
-  await expect(response.locator('pre')).toContainText('"model_version"')
+  await expect(response.getByText('Digits read')).toBeVisible()
 })
 
 test('rejects a file that is not an image without calling the backend', async ({ page }) => {

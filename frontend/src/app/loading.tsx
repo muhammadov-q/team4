@@ -3,10 +3,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function Loading() {
   return (
     <main className="mx-auto w-full max-w-[1200px] flex-1 px-6">
-      <section className="-mt-24 flex flex-col items-center gap-5 pt-44 pb-24 lg:pt-52 lg:pb-32">
-        <Skeleton className="h-[clamp(44px,7vw,88px)] w-full max-w-3xl rounded-xl" />
-        <Skeleton className="h-[clamp(44px,7vw,88px)] w-1/2 rounded-xl" />
-        <Skeleton className="mt-4 h-6 w-[36rem] max-w-full" />
+      <section className="-mt-24 flex flex-col items-center gap-3 pt-36 pb-12 lg:pt-40 lg:pb-14">
+        <Skeleton className="h-11 w-full max-w-md rounded-xl" />
+        <Skeleton className="h-7 w-[28rem] max-w-full" />
       </section>
       <div className="grid items-start gap-8 lg:grid-cols-2">
         <Skeleton className="h-80 rounded-xl" />

@@ -3,8 +3,10 @@
 Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui. Why this stack:
 [ADR 0001](../docs/adr/0001-web-frontend-stack.md).
 
-Today it covers the Milestone 1 flow (#7): choose, drop or paste a page image, send it to the
-backend's `POST /predict`, and show the response.
+Today it covers: choose, drop or paste a page image, send it to the backend's `POST /predict`,
+and show the digits the model read, with a box over each one on the page.
+
+![Result for a photo of handwritten digits](docs/result-light.png)
 
 ## Getting started
 
