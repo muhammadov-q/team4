@@ -33,6 +33,15 @@ class CameraViewModelTest {
     }
 
     @Test
+    fun selectPhotoRequestEmitsSelectEffect() = runCameraTest {
+        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+
+        viewModel.onEvent(CameraEvent.SelectPhotoRequested)
+
+        assertEquals(CameraEffect.SelectPhoto, viewModel.effects.first())
+    }
+
+    @Test
     fun photoCaptureFailureUpdatesErrorState() = runCameraTest {
         val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
 

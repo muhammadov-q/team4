@@ -1,12 +1,15 @@
 package org.example.project.presentation.camera
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readBytes
+import kotlinx.coroutines.flow.Flow
 import platform.CoreGraphics.CGRectMake
-import platform.Foundation.NSError
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePickerController
@@ -22,22 +25,35 @@ import platform.UIKit.UIViewController
 @OptIn(ExperimentalForeignApi::class)
 actual fun CameraView(
     modifier: Modifier,
-    captureRequestId: Int,
+    cameraEffects: Flow<CameraEffect>,
     onPhotoCaptured: (ByteArray) -> Unit,
     onCaptureError: (String) -> Unit,
 ) {
+    val pickerView = remember { mutableStateOf<CameraPickerView?>(null) }
     UIKitView(
-        factory = { CameraPickerView(onPhotoCaptured, onCaptureError) },
+        factory = {
+            CameraPickerView(onPhotoCaptured, onCaptureError).also {
+                pickerView.value = it
+            }
+        },
         modifier = modifier,
         update = { view ->
             view.onPhotoCaptured = onPhotoCaptured
             view.onCaptureError = onCaptureError
-            if (captureRequestId > view.lastCaptureRequestId) {
-                view.lastCaptureRequestId = captureRequestId
-                view.openCamera()
-            }
         },
     )
+    LaunchedEffect(cameraEffects) {
+        cameraEffects.collect { effect ->
+            when (effect) {
+                CameraEffect.CapturePhoto -> pickerView.value?.openPicker(
+                    UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
+                )
+                CameraEffect.SelectPhoto -> pickerView.value?.openPicker(
+                    UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary,
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -48,17 +64,21 @@ private class CameraPickerView(
     UIImagePickerControllerDelegateProtocol,
     UINavigationControllerDelegateProtocol {
 
-    var lastCaptureRequestId = 0
     private var picker: UIImagePickerController? = null
 
     init {
         backgroundColor = UIColor.blackColor
     }
 
-    fun openCamera() {
-        val cameraSource = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera
-        if (!UIImagePickerController.isSourceTypeAvailable(cameraSource)) {
-            onCaptureError("No camera is available on this device.")
+    fun openPicker(source: UIImagePickerControllerSourceType) {
+        if (!UIImagePickerController.isSourceTypeAvailable(source)) {
+            onCaptureError(
+                if (source == UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera) {
+                    "No camera is available on this device."
+                } else {
+                    "Photo library is not available on this device."
+                },
+            )
             return
         }
 
@@ -75,7 +95,7 @@ private class CameraPickerView(
         }
 
         val cameraPicker = UIImagePickerController()
-        cameraPicker.sourceType = cameraSource
+        cameraPicker.sourceType = source
         cameraPicker.allowsEditing = false
         cameraPicker.delegate = this
         picker = cameraPicker
@@ -93,7 +113,7 @@ private class CameraPickerView(
         this.picker = null
 
         if (photo == null || photo.isEmpty()) {
-            onCaptureError("The captured photo contained no image data.")
+            onCaptureError("The selected photo contained no image data.")
         } else {
             onPhotoCaptured(photo)
         }

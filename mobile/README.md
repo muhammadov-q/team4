@@ -4,7 +4,7 @@ The camera UI uses MVI: `CameraScreen` sends events to `CameraViewModel`, which 
 
 ### Running the apps
 
-The camera screen opens the device's built-in camera app when you tap **Take photo and send**. After you take and confirm a full-resolution photo, the app passes it to the prediction backend. Android reads the photo from a temporary file; iOS converts the picked image to JPEG data.
+The camera screen opens the device's built-in camera app when you tap **Take photo and send**. You can also tap **Choose photo** to select an existing image from the device. After selection or capture, the app passes the photo to the prediction backend. Android reads captured photos from a temporary file and selected photos through the content provider; iOS converts the picked image to JPEG data.
 
 #### Prerequisites
 
@@ -33,7 +33,7 @@ The camera screen opens the device's built-in camera app when you tap **Take pho
    ./gradlew :androidApp:assembleDebug
    ```
 
-The app uses Android's camera app to capture the photo. No in-app camera permission prompt is needed.
+The app uses Android's camera app and system photo picker, so no in-app camera or storage permission prompt is needed.
 
 #### Run on iOS
 

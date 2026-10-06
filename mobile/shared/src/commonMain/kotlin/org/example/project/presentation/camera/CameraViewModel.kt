@@ -32,6 +32,16 @@ class CameraViewModel(
                 }
                 effectChannel.setEffect(CameraEffect.CapturePhoto)
             }
+            CameraEvent.SelectPhotoRequested -> {
+                if (_state.value.isUploading) return
+                _state.setState {
+                    it.copy(
+                        prediction = null,
+                        error = null,
+                    )
+                }
+                effectChannel.setEffect(CameraEffect.SelectPhoto)
+            }
             is CameraEvent.OnPhotoCaptured -> {
                 upload(event.photo)
             }
