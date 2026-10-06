@@ -1,22 +1,19 @@
 package org.example.project.presentation.camera
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,23 +23,14 @@ import org.example.project.domain.model.Prediction
 @Composable
 fun CameraScreen(viewModel: CameraViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var captureRequestId by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(viewModel) {
-        viewModel.effects.collect { effect ->
-            when (effect) {
-                CameraEffect.CapturePhoto -> captureRequestId += 1
-            }
-        }
-    }
-
     CameraScreenContent(
         state = state,
         onCapture = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
+        onSelectPhoto = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
         cameraContent = { modifier ->
             CameraView(
                 modifier = modifier,
-                captureRequestId = captureRequestId,
+                cameraEffects = viewModel.effects,
                 onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoCaptured(photo)) },
                 onCaptureError = { message ->
                     viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed(message))
@@ -56,6 +44,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
 private fun CameraScreenContent(
     state: CameraContract,
     onCapture: () -> Unit,
+    onSelectPhoto: () -> Unit,
     cameraContent: @Composable (Modifier) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
@@ -69,27 +58,36 @@ private fun CameraScreenContent(
             else -> null
         }
 
-        Button(
-            modifier = Modifier
-                .align(Alignment.Center),
-            enabled = !state.isUploading,
-            onClick = onCapture,
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(if (state.isUploading) "Please wait..." else "Take photo and send")
+            Button(
+                enabled = !state.isUploading,
+                onClick = onCapture,
+            ) {
+                Text(if (state.isUploading) "Please wait..." else "Take photo and send")
+            }
+            Button(
+                enabled = !state.isUploading,
+                onClick = onSelectPhoto,
+            ) {
+                Text("Choose photo")
+            }
+
+            status?.let {
+                Text(
+                    text = it,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Black.copy(alpha = 0.65f))
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                )
+            }
         }
 
-        status?.let {
-            Text(
-                text = it,
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(24.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Black.copy(alpha = 0.65f))
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-            )
-        }
     }
 }
 
@@ -102,14 +100,8 @@ private fun CameraScreenPreview() {
                 prediction = Prediction(value = 0.87, modelVersion = "preview"),
             ),
             onCapture = {},
-            cameraContent = { modifier ->
-                Box(
-                    modifier = modifier.background(Color.Black),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("Camera preview", color = Color.White)
-                }
-            },
+            onSelectPhoto = {},
+            cameraContent = { modifier -> }
         )
     }
 }

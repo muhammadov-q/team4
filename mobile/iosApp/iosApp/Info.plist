@@ -6,6 +6,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera is used to take photos that you can upload in the app.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The photo library is used to select photos that you can upload in the app.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

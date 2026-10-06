@@ -10,10 +10,12 @@ data class CameraContract(
 
 sealed interface CameraEvent {
     data object CapturePhotoRequested : CameraEvent
+    data object SelectPhotoRequested : CameraEvent
     class OnPhotoCaptured(val photo: ByteArray) : CameraEvent
     data class OnPhotoCaptureFailed(val message: String) : CameraEvent
 }
 
 sealed interface CameraEffect {
     data object CapturePhoto : CameraEffect
+    data object SelectPhoto : CameraEffect
 }
