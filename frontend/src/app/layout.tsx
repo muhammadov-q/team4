@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { JetBrains_Mono, Schibsted_Grotesk } from 'next/font/google'
 import { Providers } from '@/components/providers'
-import { SiteHeader } from '@/components/site-header'
 import './globals.css'
 import 'react-image-crop/dist/ReactCrop.css'
 
@@ -17,10 +16,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${ui.variable} ${jetbrainsMono.variable}`}>
       <body className="flex min-h-svh flex-col antialiased">
-        <Providers>
-          <SiteHeader />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

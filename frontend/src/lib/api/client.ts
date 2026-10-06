@@ -32,6 +32,18 @@ export interface ApiRequestOptions {
 }
 
 export async function apiRequest<T>(path: string, opts: ApiRequestOptions = {}): Promise<T> {
+  const res = await send(path, opts)
+  if (res.status === 204) return undefined as T
+  const text = await res.text()
+  return (text ? JSON.parse(text) : undefined) as T
+}
+
+export async function apiBlob(path: string, opts: ApiRequestOptions = {}): Promise<Blob> {
+  const res = await send(path, opts)
+  return res.blob()
+}
+
+async function send(path: string, opts: ApiRequestOptions): Promise<Response> {
   const { method = 'GET', body, fallback = 'Request failed', signal } = opts
   const init: RequestInit = { method, signal }
   if (body instanceof FormData) {
@@ -53,7 +65,5 @@ export async function apiRequest<T>(path: string, opts: ApiRequestOptions = {}):
     const errBody = await res.json().catch(() => null)
     throw new ApiError(errorMessageFromBody(errBody, fallback), res.status)
   }
-  if (res.status === 204) return undefined as T
-  const text = await res.text()
-  return (text ? JSON.parse(text) : undefined) as T
+  return res
 }

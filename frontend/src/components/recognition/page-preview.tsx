@@ -1,5 +1,6 @@
 'use client'
 
+import { SmartphoneIcon } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import type { DigitPrediction, ImageSize } from '@/lib/digits'
 import { IMAGE_ACCEPT, formatBytes } from '@/lib/image-file'
@@ -13,9 +14,17 @@ interface PagePreviewProps {
   onReplace: (file: File) => void
   onCrop: () => void
   onRemove: () => void
+  onUsePhone?: () => void
 }
 
-export function PagePreview({ file, predictions, onReplace, onCrop, onRemove }: PagePreviewProps) {
+export function PagePreview({
+  file,
+  predictions,
+  onReplace,
+  onCrop,
+  onRemove,
+  onUsePhone,
+}: PagePreviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [unpreviewable, setUnpreviewable] = useState<File | null>(null)
   const [loaded, setLoaded] = useState<{ file: File; size: ImageSize } | null>(null)
@@ -75,6 +84,17 @@ export function PagePreview({ file, predictions, onReplace, onCrop, onRemove }: 
         </div>
 
         <div className="flex shrink-0 gap-2">
+          {onUsePhone && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="pointer-coarse:hidden"
+              onClick={onUsePhone}
+            >
+              <SmartphoneIcon />
+              Use phone
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
             Replace
           </Button>
