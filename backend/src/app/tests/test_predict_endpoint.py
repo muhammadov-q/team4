@@ -1,4 +1,5 @@
-from app.main import MAX_FILE_SIZE, app, get_predictor
+from app.main import app, get_predictor
+from app.uploads import MAX_FILE_SIZE
 from ml.predictor import AbstractPredictor, DigitResult
 
 

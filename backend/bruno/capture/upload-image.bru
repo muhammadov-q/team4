@@ -1,0 +1,20 @@
+meta {
+  name: Capture - upload image
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/capture-sessions/{{captureSessionId}}/image
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/test.png)
+}
+
+assert {
+  res.status: eq 200
+  res.body.upload_count: eq 1
+}

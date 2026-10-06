@@ -1,0 +1,15 @@
+meta {
+  name: Capture - delete session
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/capture-sessions/{{captureSessionId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}

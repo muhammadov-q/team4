@@ -1,0 +1,21 @@
+meta {
+  name: Capture - create session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/capture-sessions
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 201
+  res.body.upload_count: eq 0
+  res.body.id: isString
+}
+
+script:post-response {
+  bru.setVar("captureSessionId", res.getBody().id);
+}

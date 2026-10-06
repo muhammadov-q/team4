@@ -84,6 +84,12 @@ cd backend/bruno
 bru run --env local
 ```
 
+## Phone capture sessions
+
+`/capture-sessions` lets a phone send photos to the web app (the "Use your phone" QR code). Sessions
+and their last photo are kept in memory, so a restart drops them, and they end 30 minutes after the
+last photo. The code is in `src/app/capture/`.
+
 ## API Documentation
 
 After running the server,
