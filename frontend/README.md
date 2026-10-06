@@ -75,8 +75,6 @@ TIFF images can still be submitted for recognition, but browser-side cropping is
 
 ## Use your phone
 
-![The QR code dialog](docs/phone-dialog-light.png)
-
 "Use your phone" shows a QR code. Scanning it opens `/capture/<id>` on the phone, which takes a
 photo with the phone camera and sends it to the backend. The page on the computer checks every
 1.5 seconds and puts each new photo in place of the current page, until you unlink or the link goes
