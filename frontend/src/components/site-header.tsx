@@ -1,5 +1,5 @@
-import { ArrowRightIcon } from 'lucide-react'
 import Link from 'next/link'
+import { SignOutButton } from '@/components/auth/sign-out-button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 
@@ -32,12 +32,7 @@ export function SiteHeader() {
         </Button>
         <ThemeToggle />
       </nav>
-      <Button asChild>
-        <a href="#workbench">
-          Read a page
-          <ArrowRightIcon />
-        </a>
-      </Button>
+      <SignOutButton />
     </header>
   )
 }

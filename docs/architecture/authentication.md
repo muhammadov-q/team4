@@ -45,4 +45,4 @@ sequenceDiagram
     Router-->>Client: 200 user
 ```
 
-The tables are in [[architecture/database]].
+The tables are in [[architecture/database]]. How the web app signs in and guards its pages is in [[architecture/frontend]].

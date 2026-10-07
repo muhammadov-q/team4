@@ -29,6 +29,16 @@ sequenceDiagram
 | `frontend/src/components/recognition/`   | The upload and recognition flow.                                                       |
 | `frontend/src/components/phone-capture/` | The QR code dialog on the computer and the camera page on the phone (`/capture/[id]`). |
 | `frontend/src/components/ui/`            | shadcn primitives plus `LoadingOrb` and `Skeleton`.                                    |
+| `frontend/src/components/auth/`          | Sign-in and sign-up forms, the sign-out button and the "Signed in as" chip.            |
+| `frontend/src/proxy.ts`                  | Sends visitors without a session cookie to `/sign-in`.                                 |
+
+## Signing in
+
+- `/sign-in` and `/sign-up` post to the backend, which sets the `team4_session` cookie. The rules are in [[architecture/authentication]].
+- `frontend/src/proxy.ts` sends visitors without the cookie to `/sign-in`, and signed-in visitors away from it. It only checks that the cookie is there; the backend checks the session.
+- When a session has ended, `/auth/me` answers 401 and clears the cookie, and `useCurrentUser` in `frontend/src/hooks/use-auth.ts` sends the page to `/sign-in`.
+- `/api/*` and the phone's `/capture/*` page stay open, since the phone never signs in.
+- In the e2e tests, `frontend/e2e/auth.setup.ts` signs up once and the other specs reuse its cookie.
 
 ## Loaders
 
