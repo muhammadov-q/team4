@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.example.project.domain.model.DigitPrediction
+import org.example.project.domain.model.PredictionBox
 import org.example.project.domain.model.Prediction
 
 @Composable
@@ -53,7 +55,10 @@ private fun CameraScreenContent(
         val prediction = state.prediction
         val status = when {
             state.isUploading -> "Sending photo..."
-            prediction != null -> "Prediction: ${prediction.value} (model ${prediction.modelVersion})"
+            prediction != null -> {
+                val digits = prediction.predictions.joinToString(separator = ", ") { it.digit.toString() }
+                "Prediction: ${digits.ifEmpty { "none" }} (model ${prediction.modelVersion})"
+            }
             state.error != null -> state.error
             else -> null
         }
@@ -97,7 +102,16 @@ private fun CameraScreenPreview() {
     MaterialTheme {
         CameraScreenContent(
             state = CameraContract(
-                prediction = Prediction(value = 0.87, modelVersion = "preview"),
+                prediction = Prediction(
+                    predictions = listOf(
+                        DigitPrediction(
+                            digit = 7,
+                            probabilities = mapOf("7" to 0.87),
+                            box = PredictionBox(x = 0.0, y = 0.0, w = 0.0, h = 0.0),
+                        ),
+                    ),
+                    modelVersion = "preview",
+                ),
             ),
             onCapture = {},
             onSelectPhoto = {},

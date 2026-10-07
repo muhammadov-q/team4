@@ -8,7 +8,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.flow.first
+import org.example.project.domain.model.DigitPrediction
 import org.example.project.domain.model.Prediction
+import org.example.project.domain.model.PredictionBox
 import org.example.project.domain.repository.PhotoRepository
 import org.example.project.domain.usecase.UploadPhotoUseCase
 import kotlin.test.Test
@@ -16,8 +19,6 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CameraViewModelTest {
@@ -54,7 +55,16 @@ class CameraViewModelTest {
     @Test
     fun capturedPhotoUploadsAndSetsPrediction() = runCameraTest {
         val photo = byteArrayOf(1, 2, 3)
-        val expected = Prediction(value = 0.87, modelVersion = "test")
+        val expected = Prediction(
+            predictions = listOf(
+                DigitPrediction(
+                    digit = 7,
+                    probabilities = mapOf("7" to 0.87),
+                    box = PredictionBox(x = 1.0, y = 2.0, w = 3.0, h = 4.0),
+                ),
+            ),
+            modelVersion = "test",
+        )
         var uploadedPhoto: ByteArray? = null
         val viewModel = CameraViewModel(
             UploadPhotoUseCase(

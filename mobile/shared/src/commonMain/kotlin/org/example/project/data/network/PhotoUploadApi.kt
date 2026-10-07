@@ -53,7 +53,22 @@ class PhotoUploadApi(
 
 @Serializable
 data class PredictionResponse(
-    val prediction: Double,
+    val predictions: List<DigitResponse>,
     @SerialName("model_version")
     val modelVersion: String,
+)
+
+@Serializable
+data class DigitResponse(
+    val digit: Int,
+    val probabilities: Map<String, Double>,
+    val box: BoxResponse,
+)
+
+@Serializable
+data class BoxResponse(
+    val x: Double,
+    val y: Double,
+    val w: Double,
+    val h: Double,
 )
