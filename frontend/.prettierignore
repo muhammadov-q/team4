@@ -1,3 +1,5 @@
 src/lib/api/schema.ts
 
 package-lock.json
+
+vendor/**/*.js

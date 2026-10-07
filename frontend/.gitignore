@@ -1,4 +1,5 @@
 !/src/lib/
+!/vendor/braces/lib/
 
 /node_modules
 /.pnp
