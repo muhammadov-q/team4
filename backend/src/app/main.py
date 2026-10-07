@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -7,10 +9,18 @@ from starlette.concurrency import run_in_threadpool
 from app.capture.router import capture_session_not_found
 from app.capture.router import router as capture_router
 from app.capture.service import CaptureSessionNotFound
+from app.db import engine, migrate
 from app.uploads import UPLOAD_ERRORS, capped_image
 from ml import AbstractPredictor, create_predictor
 
-app = FastAPI(title="Prediction API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    migrate(engine)
+    yield
+
+
+app = FastAPI(title="Prediction API", version="0.1.0", lifespan=lifespan)
 app.include_router(capture_router)
 app.add_exception_handler(CaptureSessionNotFound, capture_session_not_found)
 

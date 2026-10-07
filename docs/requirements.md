@@ -34,4 +34,4 @@ To be admitted to the written exam, each member needs a reasonable contribution 
 | Class diagrams      | [[architecture/design-patterns]] |
 | Sequence diagrams   | [[architecture/frontend]]        |
 | AI models           | [[models/README]], none yet      |
-| Database            | not built yet                    |
+| Database            | [[architecture/database]]        |

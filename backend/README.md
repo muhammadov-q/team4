@@ -84,6 +84,19 @@ cd backend/bruno
 bru run --env local
 ```
 
+## Database
+
+The backend stores accounts in SQLite at `data/team4.db` (not committed). It creates the file and runs any pending migrations when it starts, so there's no setup step. Set `DATABASE_URL` to use another file; delete `data/` to start over.
+
+After changing a model in `src/app/auth/models.py`, add a migration and read it before committing. The command compares the models with your local database, so start the backend once first:
+
+```bash
+cd backend
+uv run alembic revision --autogenerate -m "describe the change"
+```
+
+More in `docs/architecture/database.md`.
+
 ## Phone capture sessions
 
 `/capture-sessions` lets a phone send photos to the web app (the "Use your phone" QR code). Sessions

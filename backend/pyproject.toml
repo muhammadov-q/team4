@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.20.0",
     "fastapi>=0.141.1",
     "httpx2>=2.13.1",
     "matplotlib>=3.11.2",
@@ -15,6 +16,7 @@ dependencies = [
     "pandas>=3.0.6",
     "python-multipart>=0.0.32",
     "scikit-learn>=1.9.1",
+    "sqlalchemy>=2.1.4",
     "uvicorn[standard]>=0.53.0",
 ]
 
@@ -43,3 +45,18 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]  # pycodestyle, pyflakes, import sorting, bugbear, pyupgrade
+
+[tool.alembic]
+script_location = "%(here)s/src/app/migrations"
+
+[[tool.alembic.post_write_hooks]]
+name = "ruff_check"
+type = "module"
+module = "ruff"
+options = "check --fix REVISION_SCRIPT_FILENAME"
+
+[[tool.alembic.post_write_hooks]]
+name = "ruff_format"
+type = "module"
+module = "ruff"
+options = "format REVISION_SCRIPT_FILENAME"

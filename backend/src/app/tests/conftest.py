@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.db import create_db_engine, create_session_factory, migrate
 from app.main import app, get_predictor
 from ml.predictor import DummyPredictor
 
@@ -11,3 +12,17 @@ def client():
     app.dependency_overrides[get_predictor] = lambda: DummyPredictor()
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def engine(tmp_path):
+    engine = create_db_engine(f"sqlite:///{tmp_path / 'test.db'}")
+    migrate(engine)
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture
+def db(engine):
+    with create_session_factory(engine)() as session:
+        yield session
