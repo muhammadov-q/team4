@@ -1,0 +1,19 @@
+meta {
+  name: Capture - upload not an image
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/capture-sessions/{{captureSessionId}}/image
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/not-an-image.txt)
+}
+
+assert {
+  res.status: eq 415
+}

@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { toast } from 'sonner'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@/test/render'
 import { RecognitionWorkbench } from './recognition-workbench'
@@ -28,6 +29,8 @@ vi.mock('./image-cropper', () => ({
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  vi.useRealTimers()
+  vi.restoreAllMocks()
 })
 
 const page = () => new File(['png-bytes'], 'folio-1r.png', { type: 'image/png' })
@@ -247,5 +250,162 @@ describe('RecognitionWorkbench', () => {
 
     expect(screen.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeInTheDocument()
     expect(paste.defaultPrevented).toBe(true)
+  })
+})
+
+describe('RecognitionWorkbench with a phone', () => {
+  function stubPhoneBackend({
+    uploads = () => 0,
+    create = () => true,
+  }: { uploads?: () => number; create?: () => boolean } = {}) {
+    const fetch = vi.fn(async (url: string, init: RequestInit = {}) => {
+      if (url === '/api/capture-sessions') {
+        return create()
+          ? Response.json({ id: 'abc', upload_count: 0 }, { status: 201 })
+          : Response.json({ detail: 'Not reachable' }, { status: 502 })
+      }
+      if (url === '/api/capture-sessions/abc' && init.method === 'DELETE') {
+        return new Response(null, { status: 204 })
+      }
+      if (url === '/api/capture-sessions/abc') {
+        return Response.json({ id: 'abc', upload_count: uploads() })
+      }
+      if (url === '/api/capture-sessions/abc/image') {
+        return new Response(new Blob(['jpeg'], { type: 'image/jpeg' }), {
+          headers: { 'Content-Type': 'image/jpeg' },
+        })
+      }
+      throw new Error(`Unexpected request ${url}`)
+    })
+    vi.stubGlobal('fetch', fetch)
+    return fetch
+  }
+
+  function setupPhone(lanAddress: string | null = '192.168.1.20') {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    renderWithProviders(<RecognitionWorkbench lanAddress={lanAddress} />)
+    return { user }
+  }
+
+  const poll = () => act(() => vi.advanceTimersByTimeAsync(1500))
+
+  it('shows a QR code, then puts the photo from the phone on the page', async () => {
+    let uploads = 0
+    stubPhoneBackend({ uploads: () => uploads })
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Use your phone' })
+    expect(await within(dialog).findByRole('img', { name: /QR code/ })).toBeInTheDocument()
+    expect(within(dialog).getByText('http://192.168.1.20:3000/capture/abc')).toBeInTheDocument()
+    expect(within(dialog).getByText('Waiting for a photo')).toBeInTheDocument()
+
+    uploads = 1
+    await poll()
+
+    expect(
+      await screen.findByRole('img', { name: 'Preview of Phone photo 1.jpg' })
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Phone linked. New photos replace the page.')).toBeInTheDocument()
+    expect(recognizeButton()).toBeEnabled()
+  })
+
+  it('replaces the page when the phone sends another photo', async () => {
+    let uploads = 1
+    stubPhoneBackend({ uploads: () => uploads })
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    await screen.findByRole('img', { name: 'Preview of Phone photo 1.jpg' })
+
+    uploads = 2
+    await poll()
+
+    expect(
+      await screen.findByRole('img', { name: 'Preview of Phone photo 2.jpg' })
+    ).toBeInTheDocument()
+  })
+
+  it('stops listening when the phone is unlinked', async () => {
+    const fetch = stubPhoneBackend({ uploads: () => 1 })
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    await screen.findByText('Phone linked. New photos replace the page.')
+    await user.click(screen.getByRole('button', { name: 'Unlink' }))
+
+    expect(screen.queryByText(/Phone linked/)).not.toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/capture-sessions/abc',
+      expect.objectContaining({ method: 'DELETE' })
+    )
+    const calls = fetch.mock.calls.length
+    await poll()
+    expect(fetch).toHaveBeenCalledTimes(calls)
+  })
+
+  it('offers a retry when no code can be made', async () => {
+    let reachable = false
+    stubPhoneBackend({ create: () => reachable })
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Use your phone' })
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent("Couldn't make a code")
+
+    reachable = true
+    await user.click(within(dialog).getByRole('button', { name: 'Try again' }))
+    expect(await within(dialog).findByRole('img', { name: /QR code/ })).toBeInTheDocument()
+  })
+
+  it('offers a new code when the old one expired', async () => {
+    const fetch = stubPhoneBackend()
+    fetch.mockImplementationOnce(async () =>
+      Response.json({ id: 'old', upload_count: 0 }, { status: 201 })
+    )
+    fetch.mockImplementationOnce(async () => Response.json({ detail: 'Expired' }, { status: 404 }))
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Use your phone' })
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('This code has expired')
+
+    await user.click(within(dialog).getByRole('button', { name: 'New code' }))
+    expect(
+      await within(dialog).findByText('http://192.168.1.20:3000/capture/abc')
+    ).toBeInTheDocument()
+  })
+
+  it('copies the phone link', async () => {
+    stubPhoneBackend()
+    const { user } = setupPhone()
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    await user.click(await screen.findByRole('button', { name: 'Copy link' }))
+
+    expect(await navigator.clipboard.readText()).toBe('http://192.168.1.20:3000/capture/abc')
+  })
+
+  it('says so instead of failing when the browser blocks copying', async () => {
+    stubPhoneBackend()
+    const { user } = setupPhone()
+    vi.spyOn(navigator, 'clipboard', 'get').mockReturnValue(undefined as unknown as Clipboard)
+    const error = vi.spyOn(toast, 'error')
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+    await user.click(await screen.findByRole('button', { name: 'Copy link' }))
+
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("Couldn't copy the link"))
+  })
+
+  it("explains that a phone can't open localhost when there is no network address", async () => {
+    stubPhoneBackend()
+    const { user } = setupPhone(null)
+
+    await user.click(screen.getByRole('button', { name: 'Use your phone' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("Your phone can't open localhost")
   })
 })

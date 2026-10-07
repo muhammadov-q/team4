@@ -1,13 +1,17 @@
 'use client'
 
-import { ImageUpIcon } from 'lucide-react'
+import { ImageUpIcon, SmartphoneIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { cn } from 'cn'
 import { IMAGE_ACCEPT } from '@/lib/image-file'
 import { Button } from '@/components/ui/button'
-import { Chip } from '@/components/ui/chip'
 
-export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
+interface PageDropzoneProps {
+  onFile: (file: File) => void
+  onUsePhone: () => void
+}
+
+export function PageDropzone({ onFile, onUsePhone }: PageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
 
@@ -27,21 +31,30 @@ export function PageDropzone({ onFile }: { onFile: (file: File) => void }) {
         const file = event.dataTransfer.files[0]
         if (file) onFile(file)
       }}
+      onClick={(event) => {
+        if (!(event.target as HTMLElement).closest('button, input')) inputRef.current?.click()
+      }}
       className={cn(
-        'flex min-h-80 w-full flex-col justify-between gap-8 rounded-xl bg-muted p-8 outline-2 outline-transparent transition-colors lg:p-10',
+        'flex min-h-80 w-full cursor-pointer flex-col justify-between gap-8 rounded-xl bg-muted p-8 outline-2 outline-transparent transition-colors lg:p-10',
         dragging && 'outline-primary'
       )}
     >
       <ImageUpIcon className="size-7 text-foreground" />
       <div className="space-y-2">
-        <p className="text-2xl font-medium">Drop a page image here</p>
+        <p className="text-2xl font-medium">
+          {dragging ? 'Drop to add the page' : 'Drop a page image here'}
+        </p>
         <p className="text-muted-foreground">or paste one from your clipboard</p>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button onClick={() => inputRef.current?.click()}>Choose image</Button>
-        {['JPG', 'PNG', 'TIFF', 'Up to 50 MB'].map((label) => (
-          <Chip key={label}>{label}</Chip>
-        ))}
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => inputRef.current?.click()}>Choose image</Button>
+          <Button variant="outline" className="pointer-coarse:hidden" onClick={onUsePhone}>
+            <SmartphoneIcon />
+            Use your phone
+          </Button>
+        </div>
+        <p className="font-mono text-xs text-muted-foreground">JPG, PNG or TIFF, up to 50 MB</p>
       </div>
       <input
         ref={inputRef}

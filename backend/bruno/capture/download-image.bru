@@ -1,0 +1,21 @@
+meta {
+  name: Capture - download image
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/capture-sessions/{{captureSessionId}}/image
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("returns the photo with its own content type", function () {
+    expect(res.getHeader("content-type")).to.equal("image/png");
+  });
+}

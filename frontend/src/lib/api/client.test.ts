@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, apiRequest, errorMessageFromBody } from './client'
+import { ApiError, apiBlob, apiRequest, errorMessageFromBody } from './client'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -87,5 +87,30 @@ describe('apiRequest', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(abort))
 
     await expect(apiRequest('/predict', { signal: controller.signal })).rejects.toBe(abort)
+  })
+})
+
+describe('apiBlob', () => {
+  it('returns the body as a blob of its content type', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue(new Response('png-bytes', { headers: { 'Content-Type': 'image/png' } }))
+    )
+    const blob = await apiBlob('/capture-sessions/abc/image')
+    expect(blob.type).toBe('image/png')
+    expect(await blob.text()).toBe('png-bytes')
+  })
+
+  it('throws ApiError like apiRequest does', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(Response.json({ detail: 'Expired' }, { status: 404 }))
+    )
+    await expect(apiBlob('/capture-sessions/abc/image')).rejects.toMatchObject({
+      status: 404,
+      message: 'Expired',
+    })
   })
 })

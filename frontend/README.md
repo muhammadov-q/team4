@@ -3,8 +3,8 @@
 Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui. Why this stack:
 [ADR 0001](../docs/adr/0001-web-frontend-stack.md).
 
-Today it covers: choose, drop or paste a page image, send it to the backend's `POST /predict`,
-and show the digits the model read, with a box over each one on the page.
+Today it covers: choose, drop or paste a page image, or take one with your phone, send it to the
+backend's `POST /predict`, and show the digits the model read, with a box over each one on the page.
 
 ![Result for a photo of handwritten digits](docs/result-light.png)
 
@@ -57,6 +57,7 @@ npm run type-check                         # shows every place the change breaks
 ```
 src/app/                    routes (App Router); api/[...path] is the backend proxy
 src/components/recognition/ upload and recognition flow
+src/components/phone-capture/ QR code dialog and the phone camera page
 src/components/ui/          shadcn primitives, LoadingOrb, Skeleton
 src/hooks/                  TanStack Query hooks and small React hooks
 src/lib/api/                API client, generated schema, one module per endpoint group
@@ -71,6 +72,20 @@ The web frontend supports free-form cropping for previewable JPG and PNG images 
 After applying a crop, the cropped image replaces the current preview and is sent through the existing `/predict` flow.
 
 TIFF images can still be submitted for recognition, but browser-side cropping is not supported because most browsers cannot preview TIFF images.
+
+## Use your phone
+
+"Use your phone" shows a QR code. Scanning it opens `/capture/<id>` on the phone, which takes a
+photo with the phone camera and sends it to the backend. The page on the computer checks every
+1.5 seconds and puts each new photo in place of the current page, until you unlink or the link goes
+30 minutes without a photo.
+
+- The phone and the computer need to be on the same Wi-Fi.
+- A phone can't open `localhost`, so when the app is open on `localhost` the QR code uses the
+  computer's network address instead (`src/lib/lan-address.ts`).
+- `next dev` only serves its runtime to localhost, so `next.config.ts` adds the computer's network
+  addresses and the private network ranges to `allowedDevOrigins`. Without it the phone page loads
+  but never becomes interactive.
 
 ## Docker
 

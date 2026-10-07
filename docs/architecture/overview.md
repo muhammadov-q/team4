@@ -18,4 +18,4 @@ flowchart LR
 | Tests   | Vitest, Playwright, pytest, Bruno                                           | [[architecture/testing]]                                   |
 | CI      | GitHub Actions                                                              | [[workflow/git-workflow]]                                  |
 
-A mobile app is in progress in #13. There's no database, file storage or real model yet; each gets a section here when it lands.
+A mobile app is in progress in #13. There's no database or file storage yet; each gets a section here when it lands. Phone capture sessions (a phone sends a photo to the web app through a QR code) live in the backend's memory, so a restart drops them.
