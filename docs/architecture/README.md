@@ -8,6 +8,7 @@ How Team4 is built today. Start with the overview.
 | [[architecture/frontend]]        | The web app: request path, code layout, loaders.           |
 | [[architecture/api-contract]]    | Backend endpoints and how the frontend types stay in sync. |
 | [[architecture/database]]        | Tables, where the database code lives, migrations.         |
+| [[architecture/authentication]]  | Sign up, sign in, sessions and the cookie.                 |
 | [[architecture/design-patterns]] | Patterns in the code, with a class diagram.                |
 | [[architecture/design-system]]   | Colours, type and surfaces for the UI.                     |
 | [[architecture/testing]]         | What we test, with which tool, and how to run it.          |

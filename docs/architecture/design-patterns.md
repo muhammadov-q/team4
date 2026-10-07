@@ -10,6 +10,7 @@ Patterns that are in the code today. When a new one lands, add a row with the fi
 | Repository           | `InMemoryCaptureSessionRepository` in `backend/src/app/capture/repository.py`                | All storage of phone capture sessions goes through it, so `CaptureService` doesn't know where they live.                                     |
 | Repository           | `UserRepository`, `AuthSessionRepository` in `backend/src/app/auth/repository.py`            | All database access goes through them, so services and routes never run a query.                                                             |
 | Service layer        | `CaptureService` in `backend/src/app/capture/service.py`                                     | Holds the session rules (random ids, 30 minute expiry, one photo at a time), so the routes in `backend/src/app/capture/router.py` stay thin. |
+| Service layer        | `AuthService` in `backend/src/app/auth/service.py`                                           | Holds the account rules (email format, password length, session expiry), so the auth routes only map errors to status codes.                 |
 | Adapter              | `LoadingOrb` in `frontend/src/components/ui/loading-orb.tsx`                                 | The only import of `thinking-orbs`, so the animation library can be swapped in one place.                                                    |
 
 ## Predictor classes

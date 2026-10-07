@@ -1,4 +1,5 @@
 import os
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -83,3 +84,9 @@ def migrate(engine: Engine) -> None:
 
 
 engine = create_db_engine(database_url())
+SessionLocal = create_session_factory(engine)
+
+
+def get_db() -> Iterator[Session]:
+    with SessionLocal() as session:
+        yield session

@@ -27,11 +27,11 @@ To be admitted to the written exam, each member needs a reasonable contribution 
 
 ## Where the required docs live
 
-| The brief asks for  | Note                             |
-| ------------------- | -------------------------------- |
-| Technology stack    | [[architecture/overview]]        |
-| System architecture | [[architecture/overview]]        |
-| Class diagrams      | [[architecture/design-patterns]] |
-| Sequence diagrams   | [[architecture/frontend]]        |
-| AI models           | [[models/README]], none yet      |
-| Database            | [[architecture/database]]        |
+| The brief asks for  | Note                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| Technology stack    | [[architecture/overview]]                                  |
+| System architecture | [[architecture/overview]]                                  |
+| Class diagrams      | [[architecture/design-patterns]]                           |
+| Sequence diagrams   | [[architecture/frontend]], [[architecture/authentication]] |
+| AI models           | [[models/README]], none yet                                |
+| Database            | [[architecture/database]]                                  |
