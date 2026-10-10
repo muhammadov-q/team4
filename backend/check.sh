@@ -30,6 +30,7 @@ fi
 
 LOG="$(mktemp)"
 SERVER_LOG="$(mktemp)"
+DB_DIR="$(mktemp -d)"
 SERVER_PID=""
 
 cleanup() {
@@ -37,6 +38,7 @@ cleanup() {
         kill "$SERVER_PID" 2>/dev/null || true
     fi
     rm -f "$LOG" "$SERVER_LOG"
+    rm -rf "$DB_DIR"
 }
 trap cleanup EXIT
 
@@ -55,9 +57,9 @@ run_step() {
 }
 
 start_server() {
-    print_step "Starting API (dummy predictor) on port $PORT..."
-    ML_PREDICTOR=dummy uv run uvicorn app.main:app --app-dir src --port "$PORT" \
-        >"$SERVER_LOG" 2>&1 &
+    print_step "Starting API (dummy predictor, throwaway database) on port $PORT..."
+    DATABASE_URL="sqlite:///$DB_DIR/check.db" ML_PREDICTOR=dummy \
+        uv run uvicorn app.main:app --app-dir src --port "$PORT" >"$SERVER_LOG" 2>&1 &
     SERVER_PID=$!
 
     for _ in $(seq 1 30); do

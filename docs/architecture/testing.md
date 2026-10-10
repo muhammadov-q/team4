@@ -12,6 +12,10 @@ Tests are written with the code, in the same PR ([[workflow/definition-of-done]]
 
 The backend has no `check.sh` yet, so its tests don't run on pre-push or in CI.
 
+## Backend conventions
+
+- Tests that need the database take the `db` fixture from `backend/src/app/tests/conftest.py`: a fresh, migrated SQLite file per test.
+
 ## Frontend conventions
 
 - Query by role and label (`getByRole`, `getByLabelText`), not by class names.
