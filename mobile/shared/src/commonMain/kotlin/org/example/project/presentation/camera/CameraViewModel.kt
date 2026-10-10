@@ -26,6 +26,7 @@ class CameraViewModel(
                 if (_state.value.isUploading) return
                 _state.setState {
                     it.copy(
+                        photo = null,
                         prediction = null,
                         error = null,
                     )
@@ -36,6 +37,7 @@ class CameraViewModel(
                 if (_state.value.isUploading) return
                 _state.setState {
                     it.copy(
+                        photo = null,
                         prediction = null,
                         error = null,
                     )
@@ -43,6 +45,7 @@ class CameraViewModel(
                 effectChannel.setEffect(CameraEffect.SelectPhoto)
             }
             is CameraEvent.OnPhotoCaptured -> {
+                _state.setState { it.copy(photo = event.photo, prediction = null, error = null) }
                 upload(event.photo)
             }
 

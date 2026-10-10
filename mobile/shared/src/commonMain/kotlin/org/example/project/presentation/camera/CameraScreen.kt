@@ -3,20 +3,29 @@ package org.example.project.presentation.camera
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.domain.model.DigitPrediction
 import org.example.project.domain.model.PredictionBox
@@ -49,8 +58,17 @@ private fun CameraScreenContent(
     onSelectPhoto: () -> Unit,
     cameraContent: @Composable (Modifier) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        cameraContent(Modifier.fillMaxSize())
+    Column(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            if (state.photo != null) {
+                AnnotatedPhoto(
+                    photo = state.photo,
+                    prediction = state.prediction,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            cameraContent(Modifier.size(1.dp))
+        }
 
         val prediction = state.prediction
         val status = when {
@@ -64,20 +82,32 @@ private fun CameraScreenContent(
         }
 
         Column(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .background(Color.Black.copy(alpha = 0.9f))
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(
-                enabled = !state.isUploading,
-                onClick = onCapture,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
             ) {
-                Text(if (state.isUploading) "Please wait..." else "Take photo and send")
-            }
-            Button(
-                enabled = !state.isUploading,
-                onClick = onSelectPhoto,
-            ) {
-                Text("Choose photo")
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = !state.isUploading,
+                    onClick = onCapture,
+                ) {
+                    Text(if (state.isUploading) "Please wait..." else "Take photo")
+                }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = !state.isUploading,
+                    onClick = onSelectPhoto,
+                ) {
+                    Text("Choose photo")
+                }
             }
 
             status?.let {
@@ -85,14 +115,32 @@ private fun CameraScreenContent(
                     text = it,
                     color = Color.White,
                     modifier = Modifier
-                        .padding(24.dp)
+                        .padding(top = 12.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.Black.copy(alpha = 0.65f))
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                        .background(Color.DarkGray.copy(alpha = 0.8f))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 )
             }
         }
+    }
+}
 
+@Composable
+private fun AnnotatedPhoto(
+    photo: ByteArray,
+    prediction: Prediction?,
+    modifier: Modifier,
+) {
+    val image = androidx.compose.runtime.remember(photo) { decodePhoto(photo) }
+    if (image == null) return
+
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Image(
+            bitmap = image,
+            contentDescription = "Uploaded photo with predictions",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
