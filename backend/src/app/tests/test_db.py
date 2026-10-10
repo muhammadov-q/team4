@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError, StatementError
 
 from app.auth.models import AuthSession, User
 from app.auth.repository import AuthSessionRepository
-from app.db import Base, UtcDateTime, create_db_engine, migrate
+from app.db import Base, UtcDateTime, create_db_engine, engine, get_db, migrate
 from app.main import app
 
 
@@ -82,3 +82,9 @@ def test_foreign_keys_are_enforced(db):
     )
     with pytest.raises(IntegrityError):
         AuthSessionRepository(db).add(orphan)
+
+
+def test_get_db_hands_out_a_session_on_the_app_database():
+    sessions = get_db()
+    assert next(sessions).get_bind() is engine
+    sessions.close()

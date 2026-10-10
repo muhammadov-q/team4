@@ -70,6 +70,7 @@ ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```bash
 cd backend
 uv run pytest
+uv run pytest --cov --cov-report=term-missing   # with coverage
 ```
 
 ### Bruno (needs the API)
@@ -96,6 +97,10 @@ uv run alembic revision --autogenerate -m "describe the change"
 ```
 
 More in `docs/architecture/database.md`.
+
+## Sign-in
+
+`/auth/sign-up`, `/auth/sign-in`, `/auth/sign-out` and `/auth/me` handle accounts. A signed-in browser holds the `team4_session` cookie. The code is in `src/app/auth/`, the rules in `docs/architecture/authentication.md`.
 
 ## Phone capture sessions
 

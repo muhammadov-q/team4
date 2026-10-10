@@ -6,6 +6,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 
+from app.auth.router import not_signed_in
+from app.auth.router import router as auth_router
+from app.auth.service import NotSignedIn
 from app.capture.router import capture_session_not_found
 from app.capture.router import router as capture_router
 from app.capture.service import CaptureSessionNotFound
@@ -21,8 +24,10 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Prediction API", version="0.1.0", lifespan=lifespan)
+app.include_router(auth_router)
 app.include_router(capture_router)
 app.add_exception_handler(CaptureSessionNotFound, capture_session_not_found)
+app.add_exception_handler(NotSignedIn, not_signed_in)
 
 predictor: AbstractPredictor = create_predictor()
 
