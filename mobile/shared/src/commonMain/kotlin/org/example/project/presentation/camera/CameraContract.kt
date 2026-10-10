@@ -4,6 +4,7 @@ import org.example.project.domain.model.Prediction
 
 data class CameraContract(
     val isUploading: Boolean = false,
+    val photo: ByteArray? = null,
     val prediction: Prediction? = null,
     val error: String? = null,
 )
