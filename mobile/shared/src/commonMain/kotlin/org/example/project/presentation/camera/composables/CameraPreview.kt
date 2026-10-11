@@ -1,16 +1,15 @@
-package org.example.project.presentation.camera
+package org.example.project.presentation.camera.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.Flow
 import io.github.ismoy.imagepickerkmp.extensions.loadBytes
 import io.github.ismoy.imagepickerkmp.picker.ImagePickerResult
 import io.github.ismoy.imagepickerkmp.picker.rememberImagePickerKMP
+import org.example.project.presentation.camera.CameraEffect
 
 @Composable
-fun CameraView(
-    modifier: Modifier,
+fun CameraPreview(
     cameraEffects: Flow<CameraEffect>,
     onPhotoCaptured: (ByteArray) -> Unit,
     onCaptureError: (String) -> Unit,
