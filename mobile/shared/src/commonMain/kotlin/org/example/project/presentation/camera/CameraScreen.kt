@@ -85,7 +85,7 @@ private fun CameraScreenContent(
                     onChooseFromPhotosClicked = onChooseFromPhotosClicked
                 )
         }
-
+        Spacer(Modifier.weight(1f))
     }
 }
 

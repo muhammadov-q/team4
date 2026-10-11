@@ -4,16 +4,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.example.project.navigation.Screen
 import org.example.project.presentation.camera.CameraScreen
+import org.example.project.presentation.camera.CameraViewModel
 import org.example.project.presentation.documents.DocumentsScreen
 import org.example.project.presentation.source.SourceScreen
 
@@ -46,7 +47,9 @@ fun App() {
             modifier = Modifier.padding(paddingValues),
         ) {
             composable(Screen.CameraView.route) {
-                val cameraViewModel = remember { AppContainer.createCameraViewModel() }
+                val cameraViewModel: CameraViewModel = viewModel {
+                    AppContainer.createCameraViewModel()
+                }
                 CameraScreen(cameraViewModel)
             }
             composable(Screen.Docs.route) {

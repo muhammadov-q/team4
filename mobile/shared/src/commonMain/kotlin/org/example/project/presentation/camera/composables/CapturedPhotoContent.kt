@@ -39,7 +39,7 @@ fun CapturedPhotoContent(
 
     Column(modifier = modifier) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(22.dp))
                 .background(Color.White),
