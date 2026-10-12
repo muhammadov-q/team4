@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.imagepickerkmp)
+            implementation(libs.navigation.compose)
         }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)

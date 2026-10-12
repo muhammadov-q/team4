@@ -17,6 +17,7 @@ ktor = "3.3.3"
 kotlinxSerialization = "1.9.0"
 kotlinxCoroutines = "1.10.2"
 imagePickerKmp = "1.1.7"
+navigationCompose = "2.10.0-rc01"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,6 +43,8 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 imagepickerkmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagePickerKmp" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

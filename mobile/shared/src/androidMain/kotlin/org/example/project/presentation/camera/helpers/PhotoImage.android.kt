@@ -1,4 +1,4 @@
-package org.example.project.presentation.camera
+package org.example.project.presentation.camera.helpers
 
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap

@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.domain.usecase.UploadPhotoUseCase
+import org.example.project.presentation.camera.models.CameraScreenState
+import org.example.project.presentation.mappers.mapPredictionToUiModel
 
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
@@ -22,30 +24,19 @@ class CameraViewModel(
 
     fun onEvent(event: CameraEvent) {
         when (event) {
-            CameraEvent.CapturePhotoRequested -> {
-                if (_state.value.isUploading) return
-                _state.setState {
-                    it.copy(
-                        photo = null,
-                        prediction = null,
-                        error = null,
-                    )
-                }
-                effectChannel.setEffect(CameraEffect.CapturePhoto)
-            }
-            CameraEvent.SelectPhotoRequested -> {
-                if (_state.value.isUploading) return
-                _state.setState {
-                    it.copy(
-                        photo = null,
-                        prediction = null,
-                        error = null,
-                    )
-                }
-                effectChannel.setEffect(CameraEffect.SelectPhoto)
-            }
+            is CameraEvent.CapturePhotoRequested -> effectChannel.setEffect(CameraEffect.CapturePhoto)
+
+            is CameraEvent.SelectPhotoRequested -> effectChannel.setEffect(CameraEffect.SelectPhoto)
+
             is CameraEvent.OnPhotoCaptured -> {
-                _state.setState { it.copy(photo = event.photo, prediction = null, error = null) }
+                _state.setState {
+                    it.copy(
+                        cameraScreenState = CameraScreenState.PhotoCaptured,
+                        photo = event.photo,
+                        prediction = null,
+                        error = null,
+                    )
+                }
                 upload(event.photo)
             }
 
@@ -58,13 +49,14 @@ class CameraViewModel(
     }
 
     private fun upload(photo: ByteArray) {
-        if (_state.value.isUploading) return
         viewModelScope.launch {
-            _state.setState { it.copy(isUploading = true, error = null) }
+            _state.setState { it.copy(error = null) }
             try {
                 val prediction = uploadPhoto(photo)
                 _state.setState {
-                    it.copy(isUploading = false, prediction = prediction)
+                    it.copy(
+                        prediction = mapPredictionToUiModel(prediction),
+                    )
                 }
                 println("Prediction: $prediction")
             } catch (cancellation: CancellationException) {
@@ -72,10 +64,10 @@ class CameraViewModel(
             } catch (exception: Exception) {
                 _state.setState {
                     it.copy(
-                        isUploading = false,
                         error = exception.message ?: "Photo upload failed.",
                     )
                 }
+                println("Error: ${exception.message}")
             }
         }
     }

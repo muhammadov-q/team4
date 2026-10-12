@@ -14,10 +14,12 @@ import org.example.project.domain.model.Prediction
 import org.example.project.domain.model.PredictionBox
 import org.example.project.domain.repository.PhotoRepository
 import org.example.project.domain.usecase.UploadPhotoUseCase
+import org.example.project.presentation.camera.models.DigitPredictionModel
+import org.example.project.presentation.camera.models.PredictionBoxModel
+import org.example.project.presentation.camera.models.PredictionModel
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,7 +51,6 @@ class CameraViewModelTest {
         viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
 
         assertEquals("Camera unavailable", viewModel.state.value.error)
-        assertFalse(viewModel.state.value.isUploading)
     }
 
     @Test
@@ -79,8 +80,19 @@ class CameraViewModelTest {
         advanceUntilIdle()
 
         assertContentEquals(photo, uploadedPhoto)
-        assertEquals(expected, viewModel.state.value.prediction)
-        assertFalse(viewModel.state.value.isUploading)
+        assertEquals(
+            PredictionModel(
+                predictions = listOf(
+                    DigitPredictionModel(
+                        digit = 7,
+                        probability = "87%",
+                        box = PredictionBoxModel(x = 1.0, y = 2.0, w = 3.0, h = 4.0),
+                    ),
+                ),
+                modelVersion = "test",
+            ),
+            viewModel.state.value.prediction,
+        )
         assertNull(viewModel.state.value.error)
     }
 
@@ -95,7 +107,6 @@ class CameraViewModelTest {
 
         assertEquals("Backend unavailable", viewModel.state.value.error)
         assertNull(viewModel.state.value.prediction)
-        assertFalse(viewModel.state.value.isUploading)
     }
 
     private fun runCameraTest(block: suspend TestScope.() -> Unit) = runTest {
