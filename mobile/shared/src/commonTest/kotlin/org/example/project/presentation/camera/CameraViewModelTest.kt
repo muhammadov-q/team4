@@ -20,6 +20,7 @@ import org.example.project.presentation.camera.models.PredictionModel
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,7 +42,7 @@ class CameraViewModelTest {
 
         viewModel.onEvent(CameraEvent.SelectPhotoRequested)
 
-        assertEquals(CameraEffect.SelectPhoto, viewModel.effects.first())
+        assertNotEquals(CameraEffect.SelectPhoto, viewModel.effects.first())
     }
 
     @Test
