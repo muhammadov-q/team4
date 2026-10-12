@@ -1,6 +1,5 @@
-# Runs each area's check.sh, the same gate the pre-push hook runs. Like the
-# hook, an area without a check.sh yet is skipped, so backend and mobile join
-# by adding one (plus their toolchain setup here).
+
+# Runs each area's checks using check.sh where available.
 
 name: CI
 
@@ -49,6 +48,30 @@ jobs:
       - name: Pytest and Bruno API tests
         if: hashFiles('backend/check.sh') != ''
         working-directory: backend
+        run: bash check.sh
+
+  mobile:
+    name: Mobile Android checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-37" "platform-tools"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run mobile checks
         run: bash check.sh
 
   docs:
