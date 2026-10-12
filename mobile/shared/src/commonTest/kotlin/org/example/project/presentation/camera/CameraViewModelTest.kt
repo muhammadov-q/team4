@@ -2,13 +2,13 @@ package org.example.project.presentation.camera
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.flow.first
 import org.example.project.domain.model.DigitPrediction
 import org.example.project.domain.model.Prediction
 import org.example.project.domain.model.PredictionBox
@@ -20,14 +20,14 @@ import org.example.project.presentation.camera.models.PredictionModel
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CameraViewModelTest {
     @Test
     fun captureRequestClearsPriorResultAndEmitsCaptureEffect() = runCameraTest {
-        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+        val viewModel =
+            CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
 
         viewModel.onEvent(CameraEvent.CapturePhotoRequested)
 
@@ -38,16 +38,18 @@ class CameraViewModelTest {
 
     @Test
     fun selectPhotoRequestEmitsSelectEffect() = runCameraTest {
-        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+        val viewModel =
+            CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
 
         viewModel.onEvent(CameraEvent.SelectPhotoRequested)
 
-        assertNotEquals(CameraEffect.SelectPhoto, viewModel.effects.first())
+        assertEquals(CameraEffect.SelectPhoto, viewModel.effects.first())
     }
 
     @Test
     fun photoCaptureFailureUpdatesErrorState() = runCameraTest {
-        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+        val viewModel =
+            CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
 
         viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
 
