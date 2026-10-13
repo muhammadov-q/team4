@@ -55,7 +55,7 @@ describe('SignInForm', () => {
     const user = await fillIn('ada@example.com', 'correct horse')
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
-    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/'))
+    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/dashboard'))
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-in')
     expect(sentBody(fetch)).toEqual({ email: 'ada@example.com', password: 'correct horse' })
   })
@@ -128,7 +128,7 @@ describe('SignUpForm', () => {
     await user.type(screen.getByLabelText('First name'), 'Ada')
     await user.click(screen.getByRole('button', { name: 'Create account' }))
 
-    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/'))
+    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/dashboard'))
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-up')
     expect(sentBody(fetch)).toEqual({
       email: 'ada@example.com',

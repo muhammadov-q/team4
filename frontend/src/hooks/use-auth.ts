@@ -31,7 +31,7 @@ function useStartSession<Input>(start: (input: Input) => Promise<User>) {
     mutationFn: start,
     onSuccess: (user: User) => {
       queryClient.setQueryData(CURRENT_USER_KEY, user)
-      router.replace('/')
+      router.replace('/dashboard')
     },
   })
 }
