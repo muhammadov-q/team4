@@ -6,6 +6,6 @@ setup('sign up', async ({ page }) => {
   await page.getByLabel('Password', { exact: true }).fill('correct horse')
   await page.getByRole('button', { name: 'Create account' }).click()
 
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/dashboard')
   await page.context().storageState({ path: 'e2e/.auth/user.json' })
 })

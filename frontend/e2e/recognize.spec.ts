@@ -6,7 +6,9 @@ const PAGE_PNG = Buffer.from(
 )
 
 test('uploads a page and shows the backend response', async ({ page }) => {
-  await page.goto('/')
+  //await page.goto('/')
+  await page.goto('/dashboard')
+  await expect(page.getByText('Signed in as', { exact: false })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
 
   await page.getByLabel('Page image').setInputFiles({
@@ -31,8 +33,9 @@ test('rejects a file that is not an image without calling the backend', async ({
   page.on('request', (req) => {
     if (req.url().includes('/api/predict')) called = true
   })
-  await page.goto('/')
-
+  //await page.goto('/')
+  await page.goto('/dashboard')
+  await expect(page.getByText('Signed in as', { exact: false })).toBeVisible()
   await page.getByLabel('Page image').setInputFiles({
     name: 'notes.txt',
     mimeType: 'text/plain',

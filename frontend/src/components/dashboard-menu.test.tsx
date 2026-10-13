@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { DashboardMenu } from './dashboard-menu'
 
@@ -11,74 +12,89 @@ vi.mock('@/components/theme-toggle', () => ({
 }))
 
 describe('DashboardMenu', () => {
-  it('shows Team4 while the sidebar is closed', () => {
+  it('starts expanded with the user information visible', () => {
     render(<DashboardMenu />)
 
+    expect(screen.getByText('Signed in as Ena')).toBeVisible()
     expect(screen.getByRole('link', { name: 'Team4' })).toHaveAttribute('href', '/dashboard')
-    expect(screen.getByRole('button', { name: 'Open navigation' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    )
+  })
+
+  it('collapses to icons while keeping navigation accessible', async () => {
+    const user = userEvent.setup()
+    render(<DashboardMenu />)
+
+    await user.click(screen.getByRole('button', { name: 'Collapse navigation' }))
+
+    expect(screen.queryByText('Signed in as Ena')).not.toBeInTheDocument()
+    expect(screen.queryByText('Read')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Read' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveAttribute(
       'aria-expanded',
       'false'
     )
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Expand navigation' }))
+
+    expect(screen.getByText('Signed in as Ena')).toBeVisible()
+    expect(screen.getByText('Read')).toBeVisible()
   })
 
-  it('opens on hover and closes when the pointer leaves', () => {
+  it('does not expand the collapsed sidebar on hover', () => {
     render(<DashboardMenu />)
 
-    const container = screen.getByRole('link', { name: 'Team4' }).parentElement!.parentElement!
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse navigation' }))
 
-    fireEvent.mouseEnter(container)
-    expect(screen.getByRole('navigation')).toBeInTheDocument()
+    fireEvent.mouseEnter(screen.getByRole('complementary'))
+    fireEvent.mouseLeave(screen.getByRole('complementary'))
 
-    fireEvent.mouseLeave(container)
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    )
   })
 
-  it('keeps the menu open after clicking and closes on a second click', () => {
+  it('supports keyboard toggling', async () => {
+    const user = userEvent.setup()
     render(<DashboardMenu />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }))
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveFocus()
 
-    const container = screen.getByRole('link', { name: 'Team4' }).parentElement!.parentElement!
+    await user.keyboard('{Enter}')
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveFocus()
 
-    fireEvent.mouseLeave(container)
-    expect(screen.getByRole('navigation')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Close navigation' }))
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+    await user.keyboard(' ')
+    expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    )
   })
 
-  it('opens with the keyboard and closes with Escape', () => {
+  it('provides navigation links and theme switching', () => {
     render(<DashboardMenu />)
-
-    const button = screen.getByRole('button', { name: 'Open navigation' })
-    button.focus()
-
-    // A native button also receives click when activated by keyboard.
-    fireEvent.click(button)
-    fireEvent.keyDown(button, { key: 'Escape' })
-
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
-    expect(button).toHaveFocus()
-  })
-
-  it('provides the Read, Docs and Source links', () => {
-    render(<DashboardMenu />)
-    fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }))
 
     expect(screen.getByRole('link', { name: 'Read' })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: 'Read' })).toHaveAttribute('aria-current', 'page')
 
-    for (const name of ['Docs', 'Source']) {
+    const links = [
+      ['Docs', 'https://github.com/muhammadov-q/team4/tree/develop/docs'],
+      ['Source', 'https://github.com/muhammadov-q/team4'],
+    ]
+
+    for (const [name, href] of links) {
       const link = screen.getByRole('link', {
-        name: new RegExp(`^${name}\\s*\\(opens in a new tab\\)$`),
+        name: `${name} (opens in a new tab)`,
       })
+
+      expect(link).toHaveAttribute('href', href)
       expect(link).toHaveAttribute('target', '_blank')
       expect(link).toHaveAttribute('rel', 'noopener noreferrer')
     }
 
-    expect(screen.getByRole('button', { name: 'Switch theme' })).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('link', { name: 'Read' }))
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Switch theme' })).toBeVisible()
   })
 })

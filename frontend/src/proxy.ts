@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/sign-in', request.url))
   }
   if (hasSession && onAuthPage) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
   return NextResponse.next()
 }

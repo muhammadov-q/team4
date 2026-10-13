@@ -27,7 +27,7 @@ describe('proxy', () => {
   })
 
   it.each(['/sign-in', '/sign-up'])('sends you home from %s when signed in', (path) => {
-    expect(getRedirectUrl(visit(path, 'token'))).toBe('http://localhost:3000/')
+    expect(getRedirectUrl(visit(path, 'token'))).toBe('http://localhost:3000/dashboard')
   })
 
   it.each([
