@@ -1,4 +1,6 @@
-# Runs each area's checks using check.sh where available.
+# Runs each area's check.sh, the same gate the pre-push hook runs. Like the
+# hook, an area without a check.sh yet is skipped, so backend and mobile join
+# by adding one (plus their toolchain setup here).
 
 name: CI
 
@@ -59,16 +61,16 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
-          distribution: temurin
-          java-version: '17'
+          distribution: zulu
+          java-version: '21'
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
       - name: Install Android SDK
-        run: sdkmanager "platforms;android-36"
+        run: sdkmanager "platforms;android-37.0"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Run all KMP tests
-        run: ./gradlew :shared:allTests --no-daemon
+      - name: Tests and debug build
+        run: bash check.sh
 
   docs:
     name: Docs checks
