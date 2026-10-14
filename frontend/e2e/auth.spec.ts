@@ -20,7 +20,7 @@ test('a new user signs up, signs out and signs back in', async ({ page }) => {
   await expect(page.getByLabel('Password', { exact: true })).toHaveValue(PASSWORD)
   await page.getByRole('button', { name: 'Create account' }).click()
 
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/dashboard')
   await expect(page.getByText('Signed in as Ada Lovelace')).toBeVisible()
 
   await page.getByRole('button', { name: 'Sign out' }).click()
@@ -37,7 +37,7 @@ test('a new user signs up, signs out and signs back in', async ({ page }) => {
 
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/dashboard')
   await expect(page.getByText('Signed in as Ada Lovelace')).toBeVisible()
 })
 
@@ -57,8 +57,22 @@ test('signed-in users skip the sign-in page', async ({ page }) => {
   await page.getByLabel('Email').fill(`e2e-${Date.now()}@example.com`)
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
   await page.getByRole('button', { name: 'Create account' }).click()
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/dashboard')
 
   await page.goto('/sign-in')
-  await expect(page).toHaveURL('/')
+  await expect(page).toHaveURL('/dashboard')
+})
+
+test('the old home page redirects to the dashboard', async ({ page }) => {
+  await page.goto('/sign-up')
+  await page.getByLabel('Email').fill(`e2e-home-${Date.now()}@example.com`)
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
+  await page.getByRole('button', { name: 'Create account' }).click()
+
+  await expect(page).toHaveURL('/dashboard')
+
+  await page.goto('/')
+  await expect(page).toHaveURL('/dashboard')
+  await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Choose image' })).toBeVisible()
 })

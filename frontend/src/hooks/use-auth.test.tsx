@@ -70,7 +70,7 @@ describe.each([
 
     expect(fetch.mock.calls[0][0]).toBe(path)
     expect(queryClient.getQueryData(CURRENT_USER_KEY)).toEqual(ADA)
-    expect(router.replace).toHaveBeenCalledWith('/')
+    expect(router.replace).toHaveBeenCalledWith('/dashboard')
   })
 
   it('stays on the form when the backend says no', async () => {
