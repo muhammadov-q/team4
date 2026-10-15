@@ -3,23 +3,27 @@
 import { useId } from 'react'
 import { Annotation } from '@/components/ui/annotation'
 import { Chip } from '@/components/ui/chip'
-import type { PredictResult } from '@/hooks/use-predict'
+import type { Recognition } from '@/lib/api/recognitions'
 import { confidenceOf, hasBox, readDigits, type DigitPrediction } from '@/lib/digits'
 import { formatDuration, formatPercent } from '@/lib/format'
 
 const MOCK_MODEL_VERSION = 'mock'
 
-export function RecognitionResult({ result }: { result: PredictResult }) {
-  const { response, durationMs } = result
-  const { predictions } = response
+interface RecognitionResultProps {
+  recognition: Recognition
+  durationMs?: number
+}
+
+export function RecognitionResult({ recognition, durationMs }: RecognitionResultProps) {
+  const { predictions, model_version: modelVersion } = recognition
   const digits = readDigits(predictions)
-  const isMock = response.model_version === MOCK_MODEL_VERSION
+  const isMock = modelVersion === MOCK_MODEL_VERSION
 
   return (
     <section aria-label="Model response" className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="font-medium">
-          Result <Annotation>{formatDuration(durationMs)}</Annotation>
+          Result {durationMs !== undefined && <Annotation>{formatDuration(durationMs)}</Annotation>}
         </p>
         <Chip>Machine output</Chip>
       </div>
@@ -45,7 +49,7 @@ export function RecognitionResult({ result }: { result: PredictResult }) {
           <p>The boxes on your page show where each digit was found.</p>
         )}
         <p>
-          Read by <span className="font-mono text-foreground">{response.model_version}</span>
+          Read by <span className="font-mono text-foreground">{modelVersion}</span>
         </p>
         {isMock && (
           <p>
