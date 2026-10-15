@@ -1,0 +1,21 @@
+meta {
+  name: Recognitions - saved page image
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/recognitions/{{recognitionId}}/image
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("returns the page with its own content type", function () {
+    expect(res.getHeader("content-type")).to.equal("image/png");
+  });
+}

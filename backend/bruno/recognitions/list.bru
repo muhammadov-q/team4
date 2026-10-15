@@ -1,0 +1,17 @@
+meta {
+  name: Recognitions - history
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/recognitions
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.length: eq 1
+  res.body[0].id: eq {{recognitionId}}
+}

@@ -111,6 +111,10 @@ More in `docs/architecture/database.md`.
 
 `/auth/sign-up`, `/auth/sign-in`, `/auth/sign-out` and `/auth/me` handle accounts. A signed-in browser holds the `team4_session` cookie. The code is in `src/app/auth/`, the rules in `docs/architecture/authentication.md`.
 
+## Results history
+
+`/recognitions` reads a page like `/predict` and also saves it for the signed-in user, image included. `GET /recognitions` lists your results, newest first; `GET /recognitions/{id}` and `/recognitions/{id}/image` return one. The web app uses these; `/predict` stays open for the mobile app. The code is in `src/app/recognitions/`.
+
 ## Phone capture sessions
 
 `/capture-sessions` lets a phone send photos to the web app (the "Use your phone" QR code). Sessions
