@@ -5,6 +5,7 @@ from alembic.autogenerate.api import AutogenContext
 from sqlalchemy import Connection
 
 import app.auth.models  # noqa: F401  registers the auth tables on Base.metadata
+import app.recognitions.models  # noqa: F401
 from app.db import Base, UtcDateTime, create_db_engine, database_url
 
 
