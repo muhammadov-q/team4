@@ -3,7 +3,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { usePhoneLink } from '@/hooks/use-phone-link'
-import { usePredict } from '@/hooks/use-predict'
+import { useRecognize } from '@/hooks/use-recognitions'
 import { checkImageFile } from '@/lib/image-file'
 import { PhoneLinkBar } from '@/components/phone-capture/phone-link-bar'
 import { PhoneLinkDialog } from '@/components/phone-capture/phone-link-dialog'
@@ -17,7 +17,7 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
   const [rejection, setRejection] = useState<string | null>(null)
   const [cropping, setCropping] = useState(false)
 
-  const run = usePredict()
+  const run = useRecognize()
   const abortRef = useRef<AbortController | null>(null)
 
   function stopRun() {
@@ -112,7 +112,7 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
           ) : (
             <PagePreview
               file={page}
-              predictions={run.isSuccess ? run.data.response.predictions : undefined}
+              predictions={run.isSuccess ? run.data.recognition.predictions : undefined}
               onReplace={choosePage}
               onCrop={() => {
                 stopRun()
