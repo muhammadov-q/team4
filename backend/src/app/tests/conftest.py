@@ -5,7 +5,8 @@ from fastapi.testclient import TestClient
 
 from app.auth.models import User
 from app.db import create_db_engine, create_session_factory, get_db, migrate
-from app.main import app, get_predictor
+from app.main import app
+from app.prediction import get_predictor
 from ml.predictor import DummyPredictor
 
 

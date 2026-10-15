@@ -13,8 +13,12 @@ from app.capture.router import capture_session_not_found
 from app.capture.router import router as capture_router
 from app.capture.service import CaptureSessionNotFound
 from app.db import engine, migrate
+from app.prediction import DigitResponse, get_predictor
+from app.recognitions.router import recognition_not_found
+from app.recognitions.router import router as recognitions_router
+from app.recognitions.service import RecognitionNotFound
 from app.uploads import UPLOAD_ERRORS, capped_image
-from ml import AbstractPredictor, create_predictor
+from ml import AbstractPredictor
 
 
 @asynccontextmanager
@@ -26,27 +30,10 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="Prediction API", version="0.1.0", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(capture_router)
+app.include_router(recognitions_router)
 app.add_exception_handler(CaptureSessionNotFound, capture_session_not_found)
 app.add_exception_handler(NotSignedIn, not_signed_in)
-
-predictor: AbstractPredictor = create_predictor()
-
-
-def get_predictor() -> AbstractPredictor:
-    return predictor
-
-
-class BoxResponse(BaseModel):
-    x: int
-    y: int
-    w: int
-    h: int
-
-
-class DigitResponse(BaseModel):
-    digit: int
-    probabilities: dict[int, float]
-    box: BoxResponse
+app.add_exception_handler(RecognitionNotFound, recognition_not_found)
 
 
 class PredictResponse(BaseModel):
@@ -69,13 +56,6 @@ async def predict(
         raise HTTPException(status_code=422, detail=str(e)) from e
 
     return PredictResponse(
-        predictions=[
-            DigitResponse(
-                digit=d.digit,
-                probabilities=d.probabilities,
-                box=BoxResponse(x=d.box[0], y=d.box[1], w=d.box[2], h=d.box[3]),
-            )
-            for d in results
-        ],
+        predictions=[DigitResponse.of(d) for d in results],
         model_version=predictor.model_version,
     )
