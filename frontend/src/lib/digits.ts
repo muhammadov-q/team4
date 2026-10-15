@@ -1,6 +1,6 @@
-import type { PredictResponse } from '@/lib/api/predict'
+import type { Recognition } from '@/lib/api/recognitions'
 
-export type DigitPrediction = PredictResponse['predictions'][number]
+export type DigitPrediction = Recognition['predictions'][number]
 export type DigitBox = DigitPrediction['box']
 
 export interface ImageSize {

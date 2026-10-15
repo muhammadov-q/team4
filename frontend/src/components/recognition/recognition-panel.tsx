@@ -1,20 +1,21 @@
 'use client'
 
-import { CircleAlertIcon } from 'lucide-react'
+import Link from 'next/link'
+import { ErrorNotice } from '@/components/error-notice'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { LoadingOrb } from '@/components/ui/loading-orb'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useElapsed } from '@/hooks/use-elapsed'
-import type { usePredict } from '@/hooks/use-predict'
+import type { useRecognize } from '@/hooks/use-recognitions'
 import { formatDuration } from '@/lib/format'
 import { describeRecognitionError } from './describe-error'
 import { RecognitionResult } from './recognition-result'
 
 interface RecognitionPanelProps {
   hasPage: boolean
-  run: ReturnType<typeof usePredict>
+  run: ReturnType<typeof useRecognize>
   onRecognize: () => void
   onCancel: () => void
 }
@@ -41,8 +42,21 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
 
       {run.isIdle && <IdleState hasPage={hasPage} />}
       {run.isPending && <PendingState submittedAt={run.submittedAt} onCancel={onCancel} />}
-      {run.isError && <ErrorState error={run.error} />}
-      {run.isSuccess && <RecognitionResult result={run.data} />}
+      {run.isError && <ErrorNotice {...describeRecognitionError(run.error)} />}
+      {run.isSuccess && (
+        <>
+          <RecognitionResult recognition={run.data.recognition} durationMs={run.data.durationMs} />
+          <p className="text-sm text-muted-foreground">
+            Saved to your history.{' '}
+            <Link
+              href={`/dashboard/history/${run.data.recognition.id}`}
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Open it
+            </Link>
+          </p>
+        </>
+      )}
     </Card>
   )
 }
@@ -92,20 +106,6 @@ function PendingState({ submittedAt, onCancel }: { submittedAt: number; onCancel
           ))}
         </div>
         <Skeleton className="h-28 w-full rounded-2xl" />
-      </div>
-    </div>
-  )
-}
-
-function ErrorState({ error }: { error: unknown }) {
-  const { title, message } = describeRecognitionError(error)
-
-  return (
-    <div role="alert" className="flex gap-3 rounded-xl bg-muted p-5">
-      <CircleAlertIcon className="mt-0.5 size-5 shrink-0 text-foreground" />
-      <div className="space-y-1">
-        <p className="font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{message}</p>
       </div>
     </div>
   )

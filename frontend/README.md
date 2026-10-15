@@ -4,7 +4,8 @@ Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui. Wh
 [ADR 0001](../docs/adr/0001-web-frontend-stack.md).
 
 Today it covers: choose, drop or paste a page image, or take one with your phone, send it to the
-backend's `POST /predict`, and show the digits the model read, with a box over each one on the page.
+backend, and show the digits the model read, with a box over each one on the page. Every result is
+saved, and History lists them so you can open one again.
 
 ![Result for a photo of handwritten digits](docs/result-light.png)
 
@@ -69,7 +70,7 @@ e2e/                        Playwright specs
 
 The web frontend supports free-form cropping for previewable JPG and PNG images before recognition.
 
-After applying a crop, the cropped image replaces the current preview and is sent through the existing `/predict` flow.
+After applying a crop, the cropped image replaces the current preview and is sent like any other page.
 
 TIFF images can still be submitted for recognition, but browser-side cropping is not supported because most browsers cannot preview TIFF images.
 

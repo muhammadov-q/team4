@@ -1,15 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { BookOpen, Code, PanelLeftClose, PanelLeftOpen, ScanLine } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { BookOpen, Code, History, PanelLeftClose, PanelLeftOpen, ScanLine } from 'lucide-react'
 import { useState } from 'react'
 import { SignedInAs } from '@/components/auth/signed-in-as'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 const REPO_URL = 'https://github.com/muhammadov-q/team4'
 
+const PAGES = [
+  { href: '/dashboard', label: 'Read', icon: ScanLine, exact: true },
+  { href: '/dashboard/history', label: 'History', icon: History, exact: false },
+] as const
+
 export function DashboardMenu() {
   const [expanded, setExpanded] = useState(true)
+  const pathname = usePathname()
 
   const linkClass = 'flex min-h-12 items-center gap-3 rounded-xl px-3 hover:bg-muted'
 
@@ -53,16 +60,26 @@ export function DashboardMenu() {
         aria-label="Dashboard navigation"
         className="flex flex-col gap-2"
       >
-        <Link
-          href="/dashboard"
-          aria-current="page"
-          aria-label="Read"
-          title={expanded ? undefined : 'Read'}
-          className={`${linkClass} bg-primary font-medium text-primary-foreground hover:bg-primary/90`}
-        >
-          <ScanLine className="size-5 shrink-0" aria-hidden="true" />
-          {expanded && <span>Read</span>}
-        </Link>
+        {PAGES.map(({ href, label, icon: Icon, exact }) => {
+          const current = exact ? pathname === href : pathname.startsWith(href)
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={current ? 'page' : undefined}
+              aria-label={label}
+              title={expanded ? undefined : label}
+              className={
+                current
+                  ? `${linkClass} bg-primary font-medium text-primary-foreground hover:bg-primary/90`
+                  : linkClass
+              }
+            >
+              <Icon className="size-5 shrink-0" aria-hidden="true" />
+              {expanded && <span>{label}</span>}
+            </Link>
+          )
+        })}
 
         <a
           href={`${REPO_URL}/tree/develop/docs`}
