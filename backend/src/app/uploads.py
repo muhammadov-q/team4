@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -15,7 +15,7 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-UPLOAD_ERRORS: dict[int | str, dict] = {
+UPLOAD_ERRORS: dict[int | str, dict[str, Any]] = {
     400: {"model": ErrorResponse, "description": f"Bad request, {ERROR_400}"},
     413: {"model": ErrorResponse, "description": ERROR_413},
     415: {

@@ -34,6 +34,7 @@ module-name = ["app", "ml"]
 [dependency-groups]
 dev = [
     "ipykernel>=7.4.0",
+    "mypy>=2.4.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
     "ruff>=0.16.10",
@@ -51,6 +52,22 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]  # pycodestyle, pyflakes, import sorting, bugbear, pyupgrade
+
+[tool.mypy]
+files = ["src"]
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "joblib.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["app.tests.*", "ml.tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
 
 [tool.alembic]
 script_location = "%(here)s/src/app/migrations"

@@ -46,7 +46,7 @@ jobs:
         if: hashFiles('backend/check.sh') != ''
         with:
           node-version-file: .nvmrc
-      - name: Pytest and Bruno API tests
+      - name: Lint, format, type check, pytest, Bruno API tests
         if: hashFiles('backend/check.sh') != ''
         working-directory: backend
         run: bash check.sh

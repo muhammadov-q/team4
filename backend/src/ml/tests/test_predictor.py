@@ -17,7 +17,7 @@ class MinimalPredictor(AbstractPredictor):
 
 def test_abstract_predictor_cannot_be_instantiated():
     with pytest.raises(TypeError):
-        AbstractPredictor()
+        AbstractPredictor()  # type: ignore[abstract]
 
 
 def test_subclass_without_predict_cannot_be_instantiated():
@@ -27,7 +27,7 @@ def test_subclass_without_predict_cannot_be_instantiated():
             return ""
 
     with pytest.raises(TypeError):
-        Incomplete()
+        Incomplete()  # type: ignore[abstract]
 
 
 def test_subclass_without_model_version_cannot_be_instantiated():
@@ -36,7 +36,7 @@ def test_subclass_without_model_version_cannot_be_instantiated():
             return []
 
     with pytest.raises(TypeError):
-        Incomplete()
+        Incomplete()  # type: ignore[abstract]
 
 
 def test_minimal_subclass_works():

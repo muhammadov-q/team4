@@ -1,21 +1,34 @@
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any, Protocol
 
 import cv2
 import joblib
 import numpy as np
+from cv2.typing import MatLike
+from numpy.typing import NDArray
 
-from ml.predictor import AbstractPredictor, DigitResult
+from ml.predictor import AbstractPredictor, Box, DigitResult
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "knn_mnist.joblib"
+
+
+class DigitClassifier(Protocol):
+    @property
+    def classes_(self) -> NDArray[Any]: ...
+
+    def predict_proba(self, x: NDArray[np.float32], /) -> NDArray[np.float64]: ...
 
 
 class KnnPredictor(AbstractPredictor):
     def __init__(self) -> None:
         super().__init__()
         self.model_name = "KNN-100126"
-        self.model = joblib.load(MODEL_PATH)
+        self.model: DigitClassifier = joblib.load(MODEL_PATH)
 
-    def load_image_in_grayscale(self, image: bytes, target_width=1000):
+    def load_image_in_grayscale(
+        self, image: bytes, target_width: int = 1000
+    ) -> tuple[MatLike, float]:
         """
         Decode an image in raw bytes and return the grayscale version.
         It also scale to a fixed size.
@@ -31,23 +44,25 @@ class KnnPredictor(AbstractPredictor):
         interp = cv2.INTER_AREA if scale < 1 else cv2.INTER_CUBIC
         return cv2.resize(img, None, fx=scale, fy=scale, interpolation=interp), scale
 
-    def add_blur_on_image(self, img):
+    def add_blur_on_image(self, img: MatLike) -> MatLike:
         return cv2.GaussianBlur(img, (9, 9), 0)
 
-    def binarize(self, img):
+    def binarize(self, img: MatLike) -> MatLike:
         _, binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         return binary
 
-    def dilate(self, img):
+    def dilate(self, img: MatLike) -> MatLike:
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
         return cv2.dilate(img, kernel, iterations=2)
 
-    def find_contours(self, img):
+    def find_contours(self, img: MatLike) -> Sequence[MatLike]:
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         return contours
 
-    def find_bounding_boxes(self, contours, min_area=200):
+    def find_bounding_boxes(
+        self, contours: Sequence[MatLike], min_area: float = 200
+    ) -> list[Box]:
         boxes = []
         for c in contours:
             if cv2.contourArea(c) <= min_area:
@@ -61,7 +76,7 @@ class KnnPredictor(AbstractPredictor):
 
         return boxes
 
-    def to_mnist(self, d, stroke=0.0):
+    def to_mnist(self, d: MatLike, stroke: float = 0.0) -> MatLike:
         """
         d:      crop with white ink on black background
         stroke: thickening relative to digit size (0 = none, try 0.03 to 0.08)
@@ -91,7 +106,7 @@ class KnnPredictor(AbstractPredictor):
         )
 
         # 4. Paste in the middle of a 28x28 canvas
-        canvas = np.zeros((28, 28), dtype=np.uint8)
+        canvas: MatLike = np.zeros((28, 28), dtype=np.uint8)
         rh, rw = resized.shape
         y_off, x_off = (28 - rh) // 2, (28 - rw) // 2
         canvas[y_off : y_off + rh, x_off : x_off + rw] = resized
@@ -100,11 +115,13 @@ class KnnPredictor(AbstractPredictor):
         m = cv2.moments(canvas)
         if m["m00"] > 0:
             cx, cy = m["m10"] / m["m00"], m["m01"] / m["m00"]
-            M = np.float32([[1, 0, 14 - cx], [0, 1, 14 - cy]])
+            M = np.array([[1, 0, 14 - cx], [0, 1, 14 - cy]], dtype=np.float32)
             canvas = cv2.warpAffine(canvas, M, (28, 28))
         return canvas
 
-    def extract_digits(self, img, boxes, pad=3):
+    def extract_digits(
+        self, img: MatLike, boxes: Sequence[Box], pad: int = 3
+    ) -> list[tuple[MatLike, Box]]:
         H, W = img.shape
         samples = []
         for x, y, w, h in boxes:
@@ -114,7 +131,9 @@ class KnnPredictor(AbstractPredictor):
 
         return samples
 
-    def predict_digit(self, digit, model):
+    def predict_digit(
+        self, digit: MatLike, model: DigitClassifier
+    ) -> tuple[int, dict[int, float]]:
         """
         digit: 28x28 uint8 image, white digit on black background
         Returns (prediction, {digit: probability})
@@ -128,10 +147,10 @@ class KnnPredictor(AbstractPredictor):
         return pred, probabilities
 
     @property
-    def model_version(self):
+    def model_version(self) -> str:
         return self.model_name
 
-    def to_original_coordinates(self, box, scale):
+    def to_original_coordinates(self, box: Box, scale: float) -> Box:
         """Map a box (x, y, w, h) from the resized image back to the uploaded image."""
         x, y, w, h = box
         return (

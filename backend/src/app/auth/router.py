@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -28,7 +28,7 @@ ERROR_401 = "Sign in to continue."
 ERROR_401_CREDENTIALS = "Wrong email or password."
 ERROR_409 = "An account with this email already exists. Sign in instead."
 
-NOT_SIGNED_IN: dict[int | str, dict] = {
+NOT_SIGNED_IN: dict[int | str, dict[str, Any]] = {
     401: {"model": ErrorResponse, "description": "No session, or it expired"}
 }
 
