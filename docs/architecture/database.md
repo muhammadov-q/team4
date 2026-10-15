@@ -4,11 +4,12 @@ The backend keeps its data in SQLite, in `backend/data/team4.db` (not committed)
 
 ## Tables
 
-The tables hold accounts for sign-in (#31).
+The tables hold accounts for sign-in (#31) and the results history (#46).
 
 ```mermaid
 erDiagram
     users ||--o{ auth_sessions : "signs in with"
+    users ||--o{ recognitions : "reads"
     users {
         int id PK
         string email UK
@@ -23,10 +24,21 @@ erDiagram
         datetime created_at
         datetime expires_at
     }
+    recognitions {
+        int id PK
+        int user_id FK
+        datetime created_at
+        string filename
+        string content_type
+        blob image "deferred"
+        string model_version
+        json predictions
+    }
 ```
 
 - `auth_sessions` stores a hash of each session token, never the token itself, so a copy of the database can't be used to sign in.
-- Deleting a user deletes their sessions (`ON DELETE CASCADE`).
+- Deleting a user deletes their sessions and their results (`ON DELETE CASCADE`).
+- `recognitions` keeps the page image and what the model read. Why the image is in the database: [[adr/0004-page-images-in-sqlite]].
 - Times are stored in UTC.
 
 ## Code
@@ -35,7 +47,9 @@ erDiagram
 | ----------------------- | --------------------------------------------------------------------------------- |
 | Engine and migrate step | `create_db_engine`, `migrate` in `backend/src/app/db.py`                          |
 | Models                  | `User`, `AuthSession` in `backend/src/app/auth/models.py`                         |
+| Models                  | `Recognition` in `backend/src/app/recognitions/models.py`                         |
 | Database access         | `UserRepository`, `AuthSessionRepository` in `backend/src/app/auth/repository.py` |
+| Database access         | `RecognitionRepository` in `backend/src/app/recognitions/repository.py`           |
 | Migrations              | `backend/src/app/migrations/versions/`                                            |
 
 Only repositories run queries. Services and routes get data through them.

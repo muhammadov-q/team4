@@ -1,6 +1,9 @@
+from datetime import UTC, datetime
+
 import pytest
 from fastapi.testclient import TestClient
 
+from app.auth.models import User
 from app.db import create_db_engine, create_session_factory, get_db, migrate
 from app.main import app, get_predictor
 from ml.predictor import DummyPredictor
@@ -33,3 +36,14 @@ def engine(tmp_path):
 def db(engine):
     with create_session_factory(engine)() as session:
         yield session
+
+
+@pytest.fixture
+def make_user(db):
+    def make(email):
+        user = User(email=email, password_hash="x", created_at=datetime.now(UTC))
+        db.add(user)
+        db.commit()
+        return user.id
+
+    return make
