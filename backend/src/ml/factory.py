@@ -11,7 +11,8 @@ PREDICTORS: dict[str, type[AbstractPredictor]] = {
 
 def create_predictor(name: str | None = None) -> AbstractPredictor:
     """Build the predictor chosen by name, or by ML_PREDICTOR env var"""
-    name = name or os.getenv("ML_PREDICTOR", "dummy")
+    if not name:
+        name = os.getenv("ML_PREDICTOR", "dummy")
     try:
         predictor_class = PREDICTORS[name]
     except KeyError:
