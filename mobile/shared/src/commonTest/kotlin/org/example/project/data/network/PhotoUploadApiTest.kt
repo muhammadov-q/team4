@@ -11,7 +11,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.SerializationException
 import org.example.project.domain.model.ApiException
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -91,5 +93,19 @@ class PhotoUploadApiTest {
         val error = assertFailsWith<ApiException> { api.upload(byteArrayOf(1)) }
 
         assertEquals(0, error.status)
+    }
+
+    @Test
+    fun malformedSuccessBodyThrowsSerializationException() = runTest {
+        val api = api { respond("not json", HttpStatusCode.OK, jsonHeaders) }
+
+        assertFailsWith<SerializationException> { api.upload(byteArrayOf(1)) }
+    }
+
+    @Test
+    fun cancellationIsNotConvertedToApiException() = runTest {
+        val api = api { throw CancellationException("cancelled") }
+
+        assertFailsWith<CancellationException> { api.upload(byteArrayOf(1)) }
     }
 }

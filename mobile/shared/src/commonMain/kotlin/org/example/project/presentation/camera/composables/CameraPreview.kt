@@ -11,7 +11,6 @@ import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.error_camera_open
 import scriptlens.shared.generated.resources.error_gallery_open
-import scriptlens.shared.generated.resources.error_photo_cancelled
 import scriptlens.shared.generated.resources.error_photo_no_data
 import scriptlens.shared.generated.resources.error_photo_select
 
@@ -20,10 +19,10 @@ fun CameraPreview(
     cameraEffects: Flow<CameraEffect>,
     onPhotoCaptured: (ByteArray) -> Unit,
     onCaptureError: (String) -> Unit,
+    onCaptureCancelled: () -> Unit,
 ) {
     val cameraOpenError = stringResource(Res.string.error_camera_open)
     val galleryOpenError = stringResource(Res.string.error_gallery_open)
-    val cancelledError = stringResource(Res.string.error_photo_cancelled)
     val noDataError = stringResource(Res.string.error_photo_no_data)
     val selectError = stringResource(Res.string.error_photo_select)
     val picker = rememberImagePickerKMP()
@@ -34,11 +33,11 @@ fun CameraPreview(
             when (effect) {
                 CameraEffect.CapturePhoto -> picker.launchCamera(
                     onError = { onCaptureError(it.message ?: cameraOpenError) },
-                    onDismiss = { onCaptureError(cancelledError) },
+                    onDismiss = onCaptureCancelled,
                 )
                 CameraEffect.SelectPhoto -> picker.launchGallery(
                     onError = { onCaptureError(it.message ?: galleryOpenError) },
-                    onDismiss = { onCaptureError(cancelledError) },
+                    onDismiss = onCaptureCancelled,
                 )
             }
         }

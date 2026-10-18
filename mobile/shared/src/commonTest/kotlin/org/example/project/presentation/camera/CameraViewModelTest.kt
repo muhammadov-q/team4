@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.test.runCurrent
 import org.example.project.common.presentation.ui.UiText
 import org.example.project.domain.model.ApiException
 import org.example.project.domain.model.DigitPrediction
@@ -27,6 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CameraViewModelTest {
@@ -150,24 +153,6 @@ class CameraViewModelTest {
     }
 
     @Test
-    fun retryWithoutPhotoShowsPhotoUnavailableAndDoesNotUpload() = runCameraTest {
-        var uploads = 0
-        val viewModel = CameraViewModel(
-            UploadPhotoUseCase(FakePhotoRepository { uploads++; error("Unexpected upload") }),
-        )
-
-        viewModel.onEvent(CameraEvent.RetryUploadRequested)
-        advanceUntilIdle()
-
-        val screenState = viewModel.state.value.cameraScreenState
-        assertIs<CameraScreenState.Error>(screenState)
-        assertIs<CameraScreenErrorState.PhotoUnavailable>(screenState.error)
-        assertIs<UiText.Resource>(screenState.error.message)
-        assertEquals(0, uploads)
-        assertFalse(viewModel.state.value.isLoading)
-    }
-
-    @Test
     fun retryUploadsTheLastPhotoAgain() = runCameraTest {
         var attempts = 0
         val viewModel = CameraViewModel(
@@ -187,6 +172,79 @@ class CameraViewModelTest {
         assertEquals(2, attempts)
         assertEquals(CameraScreenState.PhotoCaptured, viewModel.state.value.cameraScreenState)
         assertEquals("test", viewModel.state.value.prediction?.modelVersion)
+    }
+
+    @Test
+    fun cancelledCaptureKeepsCurrentState() = runCameraTest {
+        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+
+        viewModel.onEvent(CameraEvent.OnPhotoCaptureCancelled)
+
+        assertEquals(CameraScreenState.NoPhotoCaptured, viewModel.state.value.cameraScreenState)
+    }
+
+    @Test
+    fun photoUnavailableIsNotRetryable() = runCameraTest {
+        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { error("Unexpected upload") }))
+
+        viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
+
+        val screenState = viewModel.state.value.cameraScreenState
+        assertIs<CameraScreenState.Error>(screenState)
+        assertFalse(screenState.error.canRetry)
+    }
+
+    @Test
+    fun retryWithoutPhotoResetsToNoPhotoCaptured() = runCameraTest {
+        var uploads = 0
+        val viewModel = CameraViewModel(
+            UploadPhotoUseCase(FakePhotoRepository { uploads++; error("Unexpected upload") }),
+        )
+        viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
+
+        viewModel.onEvent(CameraEvent.RetryUploadRequested)
+        advanceUntilIdle()
+
+        assertEquals(CameraScreenState.NoPhotoCaptured, viewModel.state.value.cameraScreenState)
+        assertEquals(0, uploads)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun newPhotoCancelsPreviousUploadAndKeepsLatestResult() = runCameraTest {
+        val first = CompletableDeferred<Prediction>()
+        val second = CompletableDeferred<Prediction>()
+        val gates = ArrayDeque(listOf(first, second))
+        val viewModel = CameraViewModel(
+            UploadPhotoUseCase(FakePhotoRepository { gates.removeFirst().await() }),
+        )
+
+        viewModel.onEvent(CameraEvent.OnPhotoCaptured(byteArrayOf(1)))
+        runCurrent()
+        viewModel.onEvent(CameraEvent.OnPhotoCaptured(byteArrayOf(2)))
+        runCurrent()
+        second.complete(Prediction(predictions = emptyList(), modelVersion = "second"))
+        first.complete(Prediction(predictions = emptyList(), modelVersion = "first"))
+        advanceUntilIdle()
+
+        assertEquals("second", viewModel.state.value.prediction?.modelVersion)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun captureFailureWhileUploadingCancelsUpload() = runCameraTest {
+        val gate = CompletableDeferred<Prediction>()
+        val viewModel = CameraViewModel(UploadPhotoUseCase(FakePhotoRepository { gate.await() }))
+
+        viewModel.onEvent(CameraEvent.OnPhotoCaptured(byteArrayOf(1)))
+        runCurrent()
+        viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed("Camera unavailable"))
+        gate.complete(Prediction(predictions = emptyList(), modelVersion = "late"))
+        advanceUntilIdle()
+
+        assertIs<CameraScreenState.Error>(viewModel.state.value.cameraScreenState)
+        assertNull(viewModel.state.value.prediction)
+        assertFalse(viewModel.state.value.isLoading)
     }
 
     private fun runCameraTest(block: suspend TestScope.() -> Unit) = runTest {

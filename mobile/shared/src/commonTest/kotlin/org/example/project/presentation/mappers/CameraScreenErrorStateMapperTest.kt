@@ -2,6 +2,7 @@ package org.example.project.presentation.mappers
 
 import org.example.project.domain.model.ApiException
 import org.example.project.presentation.camera.models.CameraScreenErrorState
+import kotlinx.serialization.SerializationException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,5 +34,10 @@ class CameraScreenErrorStateMapperTest {
     @Test
     fun nonApiExceptionMapsToRecognitionFailed() {
         assertEquals(CameraScreenErrorState.RecognitionFailed, mapUploadErrorToUiModel(IllegalStateException("boom")))
+    }
+
+    @Test
+    fun serializationErrorMapsToRecognitionFailed() {
+        assertEquals(CameraScreenErrorState.RecognitionFailed, mapUploadErrorToUiModel(SerializationException("bad body")))
     }
 }

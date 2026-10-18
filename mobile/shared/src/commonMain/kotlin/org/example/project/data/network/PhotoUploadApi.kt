@@ -25,8 +25,12 @@ class PhotoUploadApi(
         val endpoint = "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
         println("$TAG: POST $endpoint (${photo.size} bytes)")
 
-        val response = try {
-            client.post(endpoint) { setBody(photoBody(photo)) }
+        val status: Int
+        val body: String
+        try {
+            val response = client.post(endpoint) { setBody(photoBody(photo)) }
+            status = response.status.value
+            body = response.bodyAsText()
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (exception: Exception) {
@@ -34,11 +38,11 @@ class PhotoUploadApi(
             throw ApiException(0)
         }
 
-        val body = response.bodyAsText()
-        println("$TAG: response ${response.status.value}: $body")
-        if (response.status != HttpStatusCode.OK) {
-            throw ApiException(response.status.value)
+        println("$TAG: response $status")
+        if (status != HttpStatusCode.OK.value) {
+            throw ApiException(status)
         }
+        // A malformed 200 body throws SerializationException, which the view model maps to RecognitionFailed.
         return json.decodeFromString(body)
     }
 

@@ -58,10 +58,10 @@ sealed class CameraScreenErrorState(
         Res.drawable.ic_image_rejected
     )
 
-    class PhotoUnavailable(message: UiText) : CameraScreenErrorState(
+    data class PhotoUnavailable(val detail: UiText) : CameraScreenErrorState(
         Res.string.error_photo_unavailable_title,
-        message,
-        true,
+        detail,
+        false,
         Res.drawable.ic_image_rejected
     )
 }

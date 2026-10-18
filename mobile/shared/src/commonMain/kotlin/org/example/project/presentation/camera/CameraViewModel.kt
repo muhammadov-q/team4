@@ -3,8 +3,8 @@ package org.example.project.presentation.camera
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -18,8 +18,6 @@ import org.example.project.presentation.camera.models.CameraScreenState
 import org.example.project.presentation.mappers.mapPredictionToUiModel
 import org.example.project.presentation.mappers.mapUploadErrorToUiModel
 import org.example.project.common.presentation.ui.UiText
-import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.error_no_photo_to_retry
 
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
@@ -28,6 +26,7 @@ class CameraViewModel(
     val state = _state.asStateFlow()
     private val effectChannel = Channel<CameraEffect>(Channel.BUFFERED)
     val effects = effectChannel.receiveAsFlow()
+    private var uploadJob: Job? = null
 
     fun onEvent(event: CameraEvent) {
         when (event) {
@@ -47,10 +46,14 @@ class CameraViewModel(
                 upload(event.photo)
             }
 
+            is CameraEvent.OnPhotoCaptureCancelled -> println("$TAG: photo capture cancelled")
+
             is CameraEvent.OnPhotoCaptureFailed -> {
                 println("$TAG: photo capture failed: ${event.message}")
+                uploadJob?.cancel()
                 _state.setState {
                     it.copy(
+                        isLoading = false,
                         cameraScreenState = CameraScreenState.Error(
                             CameraScreenErrorState.PhotoUnavailable(UiText.Plain(event.message))
                         )
@@ -61,26 +64,20 @@ class CameraViewModel(
             is CameraEvent.RetryUploadRequested -> {
                 val photo = _state.value.photo
                 if (photo == null) {
-                    println("$TAG: retry requested without a photo")
-                    _state.setState {
-                        it.copy(
-                            cameraScreenState = CameraScreenState.Error(
-                                CameraScreenErrorState.PhotoUnavailable(UiText.Resource(Res.string.error_no_photo_to_retry))
-                            )
-                        )
-                    }
-                    return
+                    _state.setState { it.copy(cameraScreenState = CameraScreenState.NoPhotoCaptured) }
+                } else {
+                    println("$TAG: retrying upload")
+                    upload(photo)
                 }
-                println("$TAG: retrying upload")
-                upload(photo)
             }
         }
     }
 
     private fun upload(photo: ByteArray) {
+        uploadJob?.cancel()
         _state.setState { it.copy(isLoading = true) }
 
-        viewModelScope.launch {
+        uploadJob = viewModelScope.launch {
 
             try {
                 val prediction = uploadPhoto(photo)

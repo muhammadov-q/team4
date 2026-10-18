@@ -15,6 +15,7 @@ sealed interface CameraEvent {
     data object CapturePhotoRequested : CameraEvent
     data object SelectPhotoRequested : CameraEvent
     class OnPhotoCaptured(val photo: ByteArray) : CameraEvent
+    data object OnPhotoCaptureCancelled : CameraEvent
     data class OnPhotoCaptureFailed(val message: String) : CameraEvent
     data object RetryUploadRequested : CameraEvent
 

@@ -44,6 +44,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
     CameraPreview(
         cameraEffects = viewModel.effects,
         onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoCaptured(photo)) },
+        onCaptureCancelled = { viewModel.onEvent(CameraEvent.OnPhotoCaptureCancelled) },
         onCaptureError = { message ->
             viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed(message))
         }
@@ -58,12 +59,12 @@ private fun CameraScreenContent(
     state: CameraContract,
     onTakePhotoClicked: () -> Unit,
     onChooseFromPhotosClicked: () -> Unit,
-    onRetryClicked: () -> Unit = {},
+    onRetryClicked: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(ScriptLensSpacing.P24)
+            .padding(ScriptLensSpacing.padding_24)
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -91,7 +92,7 @@ private fun CameraScreenContent(
 
             is CameraScreenState.PhotoCaptured ->
                 CapturedPhotoContent(
-                    modifier = Modifier.padding(top = ScriptLensSpacing.P16),
+                    modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
                     photo = state.photo,
                     prediction = state.prediction,
                     onTakeNewPhotoClicked = onTakePhotoClicked,
@@ -145,6 +146,7 @@ private fun CameraScreenPreviewContent(cameraScreenState: CameraScreenState) {
             prediction = prediction,
         ),
         onTakePhotoClicked = {},
-        onChooseFromPhotosClicked = {}
+        onChooseFromPhotosClicked = {},
+        onRetryClicked = {},
     )
 }

@@ -77,7 +77,7 @@ fun PredictionOverlay(
                         },
                     )
                     .background(ScriptLensColors.Accent)
-                    .padding(horizontal = ScriptLensSpacing.P8, vertical = ScriptLensSpacing.P4),
+                    .padding(horizontal = ScriptLensSpacing.padding_8, vertical = ScriptLensSpacing.padding_4),
             )
         }
     }
