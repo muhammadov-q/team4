@@ -20,6 +20,10 @@ import androidx.compose.ui.unit.dp
 import org.example.project.presentation.camera.models.DigitPredictionModel
 import org.example.project.presentation.camera.models.PredictionBoxModel
 import org.example.project.presentation.camera.models.PredictionModel
+import org.jetbrains.compose.resources.stringResource
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.prediction_digits_read
+import scriptlens.shared.generated.resources.prediction_confidence_label
 
 @OptIn(ExperimentalGridApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -36,7 +40,7 @@ fun PredictionSummary(
         ) {
             Text(
                 modifier = Modifier.padding(bottom = 8.dp),
-                text = "Digits read",
+                text = stringResource(Res.string.prediction_digits_read),
                 color = Color.Gray
             )
             Text(
@@ -52,7 +56,7 @@ fun PredictionSummary(
 
             Text(
                 modifier = Modifier.padding(top = 12.dp),
-                text = "How sure the model is",
+                text = stringResource(Res.string.prediction_confidence_label),
                 color = Color.Gray
             )
 

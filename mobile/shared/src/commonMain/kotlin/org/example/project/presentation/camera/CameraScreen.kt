@@ -15,13 +15,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.example.project.presentation.camera.models.DigitPredictionModel
-import org.example.project.presentation.camera.models.PredictionBoxModel
-import org.example.project.presentation.camera.models.PredictionModel
+import org.example.project.common.presentation.ui.loading.OverlayLoadingState
 import org.example.project.presentation.camera.composables.CameraPreview
 import org.example.project.presentation.camera.composables.CapturedPhotoContent
 import org.example.project.presentation.camera.composables.EmptyCameraState
+import org.example.project.presentation.camera.composables.error.ErrorState
 import org.example.project.presentation.camera.models.CameraScreenState
+import org.example.project.presentation.camera.models.DigitPredictionModel
+import org.example.project.presentation.camera.models.PredictionBoxModel
+import org.example.project.presentation.camera.models.PredictionModel
+import org.jetbrains.compose.resources.stringResource
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.camera_title
+import scriptlens.shared.generated.resources.camera_subtitle
 
 @Composable
 fun CameraScreen(viewModel: CameraViewModel) {
@@ -31,6 +37,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
         state = state,
         onTakePhotoClicked = { viewModel.onEvent(CameraEvent.CapturePhotoRequested) },
         onChooseFromPhotosClicked = { viewModel.onEvent(CameraEvent.SelectPhotoRequested) },
+        onRetryClicked = { viewModel.onEvent(CameraEvent.RetryUploadRequested) },
     )
 
     CameraPreview(
@@ -41,13 +48,16 @@ fun CameraScreen(viewModel: CameraViewModel) {
         }
     )
 
+    if (state.isLoading) OverlayLoadingState()
+
 }
 
 @Composable
 private fun CameraScreenContent(
     state: CameraContract,
     onTakePhotoClicked: () -> Unit,
-    onChooseFromPhotosClicked: () -> Unit
+    onChooseFromPhotosClicked: () -> Unit,
+    onRetryClicked: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -57,26 +67,28 @@ private fun CameraScreenContent(
     ) {
 
         Text(
-            text = "Read handwritten digits",
+            text = stringResource(Res.string.camera_title),
             style = MaterialTheme.typography.headlineLargeEmphasized
         )
 
         Text(
-            text = "Photograph a page and the model finds each digit and reads it.",
+            text = stringResource(Res.string.camera_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.Gray
         )
 
         Spacer(Modifier.weight(1f))
 
-        when (state.cameraScreenState) {
-            CameraScreenState.NoPhotoCaptured ->
+
+        val cameraScreenState = state.cameraScreenState
+        when (cameraScreenState) {
+            is CameraScreenState.NoPhotoCaptured ->
                 EmptyCameraState(
                     onTakePhotoClicked = onTakePhotoClicked,
                     onChooseFromPhotosClicked = onChooseFromPhotosClicked
                 )
 
-            CameraScreenState.PhotoCaptured ->
+            is CameraScreenState.PhotoCaptured ->
                 CapturedPhotoContent(
                     modifier = Modifier.padding(top = 16.dp),
                     photo = state.photo,
@@ -84,6 +96,15 @@ private fun CameraScreenContent(
                     onTakeNewPhotoClicked = onTakePhotoClicked,
                     onChooseFromPhotosClicked = onChooseFromPhotosClicked
                 )
+
+            is CameraScreenState.Error ->
+                ErrorState(
+                    errorState = cameraScreenState.error,
+                    onTakeNewPhotoClicked = onTakePhotoClicked,
+                    onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                    onRetryClicked = onRetryClicked
+                )
+
         }
         Spacer(Modifier.weight(1f))
     }
@@ -108,7 +129,7 @@ private fun CameraScreenPhotoCapturedPreview() {
 @Composable
 private fun CameraScreenPreviewContent(cameraScreenState: CameraScreenState) {
     val prediction = PredictionModel(
-        predictions = listOf(7, 8, 3,6,2,6,5,0).map { digit ->
+        predictions = listOf(7, 8, 3, 6, 2, 6, 5, 0).map { digit ->
             DigitPredictionModel(
                 digit = digit,
                 probability = "87%",

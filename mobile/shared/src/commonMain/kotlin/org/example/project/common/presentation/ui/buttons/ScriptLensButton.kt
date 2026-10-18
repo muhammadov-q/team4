@@ -1,6 +1,7 @@
 package org.example.project.common.presentation.ui.buttons
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -16,10 +17,13 @@ fun ScriptLensButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     buttonStyle: ScriptLensButtonStyle = ScriptLensButtonStyle.Primary,
+    buttonSize: ScriptLensButtonSize = ScriptLensButtonSize.Large
 ) {
 
     Button(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = buttonSize.minHeight),
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
@@ -30,7 +34,7 @@ fun ScriptLensButton(
 
     ) {
         Text(
-            modifier = Modifier.padding(vertical = 16.dp),
+            modifier = Modifier.padding(vertical = buttonSize.padding),
             text = text,
             color = buttonStyle.textColor
         )

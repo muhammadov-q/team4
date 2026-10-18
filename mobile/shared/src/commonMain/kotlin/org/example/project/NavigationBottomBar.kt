@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.project.navigation.Screen
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun NavigationBottomBar(
@@ -37,7 +38,7 @@ fun NavigationBottomBar(
                 },
                 label = {
                     Text(
-                        text = screen.title,
+                        text = stringResource(screen.title),
                         color = Color.Gray
                     )
                 },

@@ -25,6 +25,11 @@ import org.example.project.presentation.camera.models.PredictionModel
 import androidx.compose.material3.MaterialTheme
 import org.example.project.presentation.camera.composables.predictions.PredictionSummary
 import org.example.project.presentation.camera.helpers.decodePhoto
+import org.jetbrains.compose.resources.stringResource
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.captured_photo_description
+import scriptlens.shared.generated.resources.action_take_new_photo
+import scriptlens.shared.generated.resources.action_choose_another_photo
 
 @Composable
 fun CapturedPhotoContent(
@@ -55,7 +60,7 @@ fun CapturedPhotoContent(
                 ) {
                     Image(
                         bitmap = imageBitMap,
-                        contentDescription = "Uploaded photo with predictions",
+                        contentDescription = stringResource(Res.string.captured_photo_description),
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier.matchParentSize(),
                     )
@@ -75,14 +80,14 @@ fun CapturedPhotoContent(
 
         ScriptLensButton(
             modifier = Modifier.padding(vertical = 8.dp),
-            text = "Take a new photo",
+            text = stringResource(Res.string.action_take_new_photo),
             onClick = onTakeNewPhotoClicked,
             buttonStyle = ScriptLensButtonStyle.Primary
         )
 
         ScriptLensButton(
             modifier = Modifier.padding(bottom = 4.dp),
-            text = "Choose another photo from photos",
+            text = stringResource(Res.string.action_choose_another_photo),
             onClick = onChooseFromPhotosClicked,
             buttonStyle = ScriptLensButtonStyle.Secondary
         )

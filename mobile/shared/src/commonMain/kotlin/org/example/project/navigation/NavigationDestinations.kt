@@ -5,13 +5,17 @@ import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.ic_camera
 import scriptlens.shared.generated.resources.ic_docs
 import scriptlens.shared.generated.resources.ic_source
+import org.jetbrains.compose.resources.StringResource
+import scriptlens.shared.generated.resources.nav_camera
+import scriptlens.shared.generated.resources.nav_documents
+import scriptlens.shared.generated.resources.nav_source
 
 enum class Screen(
     val route: String,
-    val title: String,
+    val title: StringResource,
     val icon : DrawableResource
 ) {
-    CameraView("camera", "Camera", Res.drawable.ic_camera),
-    Docs("docs", "Documents",Res.drawable.ic_docs),
-    Source("source", "Source",Res.drawable.ic_source),
+    CameraView("camera", Res.string.nav_camera, Res.drawable.ic_camera),
+    Docs("docs", Res.string.nav_documents, Res.drawable.ic_docs),
+    Source("source", Res.string.nav_source, Res.drawable.ic_source),
 }
