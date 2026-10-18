@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensCorners
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun ScriptLensButton(
@@ -25,7 +27,7 @@ fun ScriptLensButton(
             .fillMaxWidth()
             .heightIn(min = buttonSize.minHeight),
         onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(ScriptLensCorners.R12),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
             containerColor = buttonStyle.containerColor,
             contentColor = buttonStyle.textColor
@@ -36,6 +38,7 @@ fun ScriptLensButton(
         Text(
             modifier = Modifier.padding(vertical = buttonSize.padding),
             text = text,
+            style = ScriptLensTypography.Label,
             color = buttonStyle.textColor
         )
     }

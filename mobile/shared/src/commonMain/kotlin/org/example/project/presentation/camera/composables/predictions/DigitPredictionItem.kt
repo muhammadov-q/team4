@@ -10,11 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensCorners
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.presentation.camera.models.DigitPredictionModel
 import org.example.project.presentation.camera.models.PredictionBoxModel
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun DigitPredictionItem(
@@ -23,20 +26,20 @@ fun DigitPredictionItem(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF5F5F5))
-            .padding(12.dp)
+            .clip(RoundedCornerShape(ScriptLensCorners.R12))
+            .background(ScriptLensColors.Background)
+            .padding(ScriptLensSpacing.P12)
             .size(50.dp),
     ) {
         Text(
             text = digitPrediction.digit.toString(),
-            style = MaterialTheme.typography.headlineSmallEmphasized,
-            color = Color.DarkGray
+            style = ScriptLensTypography.Heading,
+            color = ScriptLensColors.Text
         )
         Text(
             text = digitPrediction.probability,
-            style = MaterialTheme.typography.bodyMediumEmphasized,
-            color = Color.LightGray
+            style = ScriptLensTypography.Label,
+            color = ScriptLensColors.Border
         )
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.nav_source
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun SourceScreen() {
@@ -19,6 +20,6 @@ fun SourceScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(stringResource(Res.string.nav_source), style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(Res.string.nav_source), style = ScriptLensTypography.Heading)
     }
 }

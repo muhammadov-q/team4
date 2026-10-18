@@ -13,13 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @Composable
 fun OverlayLoadingState() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0x396A6A6A))
+            .background(ScriptLensColors.Scrim)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -28,7 +29,7 @@ fun OverlayLoadingState() {
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(
-            color = Color(0xFFE6FF66),
+            color = ScriptLensColors.Accent,
         )
     }
 }

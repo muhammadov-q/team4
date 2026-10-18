@@ -13,10 +13,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensCorners
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.buttons.ScriptLensButton
 import org.example.project.common.presentation.ui.buttons.ScriptLensButtonStyle
 import org.example.project.presentation.camera.models.DigitPredictionModel
@@ -30,6 +31,7 @@ import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.captured_photo_description
 import scriptlens.shared.generated.resources.action_take_new_photo
 import scriptlens.shared.generated.resources.action_choose_another_photo
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @Composable
 fun CapturedPhotoContent(
@@ -46,16 +48,16 @@ fun CapturedPhotoContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
-                .background(Color.White),
+                .clip(RoundedCornerShape(ScriptLensCorners.R24))
+                .background(ScriptLensColors.Surface),
             contentAlignment = Alignment.Center
         ) {
             imageBitMap?.let {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
-                        .clip(RoundedCornerShape(22.dp))
+                        .padding(ScriptLensSpacing.P8)
+                        .clip(RoundedCornerShape(ScriptLensCorners.R24))
                         .aspectRatio(imageBitMap.width.toFloat() / imageBitMap.height.toFloat())
                 ) {
                     Image(
@@ -74,19 +76,19 @@ fun CapturedPhotoContent(
         }
 
         PredictionSummary(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = ScriptLensSpacing.P16),
             prediction = prediction
         )
 
         ScriptLensButton(
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = ScriptLensSpacing.P8),
             text = stringResource(Res.string.action_take_new_photo),
             onClick = onTakeNewPhotoClicked,
             buttonStyle = ScriptLensButtonStyle.Primary
         )
 
         ScriptLensButton(
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = ScriptLensSpacing.P4),
             text = stringResource(Res.string.action_choose_another_photo),
             onClick = onChooseFromPhotosClicked,
             buttonStyle = ScriptLensButtonStyle.Secondary

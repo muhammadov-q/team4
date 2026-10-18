@@ -14,9 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensCorners
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.presentation.camera.models.DigitPredictionModel
 import org.example.project.presentation.camera.models.PredictionBoxModel
 import org.example.project.presentation.camera.models.PredictionModel
@@ -24,6 +25,8 @@ import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.prediction_digits_read
 import scriptlens.shared.generated.resources.prediction_confidence_label
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @OptIn(ExperimentalGridApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -35,35 +38,35 @@ fun PredictionSummary(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(Color.White)
-                .padding(16.dp)
+                .background(ScriptLensColors.Surface)
+                .padding(ScriptLensSpacing.P16)
         ) {
             Text(
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(bottom = ScriptLensSpacing.P8),
                 text = stringResource(Res.string.prediction_digits_read),
-                color = Color.Gray
+                color = ScriptLensColors.Subtext
             )
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFEBECEC))
-                    .padding(8.dp),
+                    .clip(RoundedCornerShape(ScriptLensCorners.R16))
+                    .background(ScriptLensColors.Muted)
+                    .padding(ScriptLensSpacing.P8),
                 text = prediction.predictions.joinToString("") { it.digit.toString() },
-                color = Color.DarkGray,
-                style = MaterialTheme.typography.headlineLargeEmphasized
+                color = ScriptLensColors.Text,
+                style = ScriptLensTypography.Title
             )
 
             Text(
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = ScriptLensSpacing.P12),
                 text = stringResource(Res.string.prediction_confidence_label),
-                color = Color.Gray
+                color = ScriptLensColors.Subtext
             )
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.P8),
                 maxItemsInEachRow = 4,
             ) {
                 prediction.predictions.forEach { digitPrediction ->

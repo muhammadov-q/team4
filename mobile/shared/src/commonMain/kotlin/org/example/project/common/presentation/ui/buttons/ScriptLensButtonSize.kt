@@ -2,9 +2,10 @@ package org.example.project.common.presentation.ui.buttons
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 
 enum class ScriptLensButtonSize (val padding: Dp, val minHeight: Dp) {
-    Small(padding = 4.dp, minHeight = 24.dp),
-    Medium(padding = 8.dp, minHeight = 32.dp),
-    Large(padding = 16.dp, minHeight = 40.dp)
+    Small(padding = ScriptLensSpacing.P4, minHeight = 24.dp),
+    Medium(padding = ScriptLensSpacing.P8, minHeight = 32.dp),
+    Large(padding = ScriptLensSpacing.P16, minHeight = 40.dp)
 }

@@ -11,9 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.ui.loading.OverlayLoadingState
 import org.example.project.presentation.camera.composables.CameraPreview
@@ -28,6 +27,8 @@ import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.camera_title
 import scriptlens.shared.generated.resources.camera_subtitle
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun CameraScreen(viewModel: CameraViewModel) {
@@ -62,19 +63,19 @@ private fun CameraScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(ScriptLensSpacing.P24)
             .verticalScroll(rememberScrollState())
     ) {
 
         Text(
             text = stringResource(Res.string.camera_title),
-            style = MaterialTheme.typography.headlineLargeEmphasized
+            style = ScriptLensTypography.Title
         )
 
         Text(
             text = stringResource(Res.string.camera_subtitle),
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.Gray
+            style = ScriptLensTypography.Body,
+            color = ScriptLensColors.Subtext
         )
 
         Spacer(Modifier.weight(1f))
@@ -90,7 +91,7 @@ private fun CameraScreenContent(
 
             is CameraScreenState.PhotoCaptured ->
                 CapturedPhotoContent(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = ScriptLensSpacing.P16),
                     photo = state.photo,
                     prediction = state.prediction,
                     onTakeNewPhotoClicked = onTakePhotoClicked,

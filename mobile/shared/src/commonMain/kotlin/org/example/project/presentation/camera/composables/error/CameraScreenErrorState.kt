@@ -14,9 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensCorners
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.buttons.ScriptLensButton
 import org.example.project.common.presentation.ui.buttons.ScriptLensButtonSize
 import org.example.project.common.presentation.ui.buttons.ScriptLensButtonStyle
@@ -28,6 +29,8 @@ import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.action_retry
 import scriptlens.shared.generated.resources.action_take_new_photo
 import scriptlens.shared.generated.resources.action_choose_another_photo
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun ErrorState(
@@ -40,10 +43,10 @@ fun ErrorState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
-            .background(Color.White)
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+            .clip(RoundedCornerShape(ScriptLensCorners.R24))
+            .background(ScriptLensColors.Surface)
+            .padding(ScriptLensSpacing.P24),
+        verticalArrangement = Arrangement.spacedBy(ScriptLensSpacing.P4),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
@@ -54,18 +57,18 @@ fun ErrorState(
 
         Text(
             text = stringResource(errorState.title),
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.Gray,
+            style = ScriptLensTypography.Subtitle,
+            color = ScriptLensColors.Subtext,
         )
         Text(
             text = errorState.message.asString(),
-            style = MaterialTheme.typography.bodyMedium,
+            style = ScriptLensTypography.Body,
             color = MaterialTheme.colorScheme.onErrorContainer,
         )
 
         if (errorState.canRetry) {
             ScriptLensButton(
-                modifier = Modifier.padding(top = 24.dp),
+                modifier = Modifier.padding(top = ScriptLensSpacing.P24),
                 buttonStyle = ScriptLensButtonStyle.Primary,
                 onClick = onRetryClicked,
                 text = stringResource(Res.string.action_retry),
