@@ -1,7 +1,14 @@
 package org.example.project.presentation.camera
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -10,25 +17,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.common.presentation.ui.loading.OverlayLoadingState
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 import org.example.project.presentation.camera.composables.CameraPreview
 import org.example.project.presentation.camera.composables.CapturedPhotoContent
 import org.example.project.presentation.camera.composables.EmptyCameraState
 import org.example.project.presentation.camera.composables.error.ErrorState
 import org.example.project.presentation.camera.models.CameraScreenState
-import org.example.project.presentation.camera.models.DigitPredictionModel
-import org.example.project.presentation.camera.models.PredictionBoxModel
-import org.example.project.presentation.camera.models.PredictionModel
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
-import scriptlens.shared.generated.resources.camera_title
 import scriptlens.shared.generated.resources.camera_subtitle
-import org.example.project.common.presentation.ui.theme.ScriptLensColors
-import org.example.project.common.presentation.ui.theme.ScriptLensTypography
+import scriptlens.shared.generated.resources.camera_title
 
 @Composable
 fun CameraScreen(viewModel: CameraViewModel) {
@@ -43,14 +49,23 @@ fun CameraScreen(viewModel: CameraViewModel) {
 
     CameraPreview(
         cameraEffects = viewModel.effects,
-        onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoCaptured(photo)) },
+        onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoPicked(photo)) },
         onCaptureCancelled = { viewModel.onEvent(CameraEvent.OnPhotoCaptureCancelled) },
         onCaptureError = { message ->
             viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed(message))
+        },
+        onImagePickerProcessingStarted = {
+            viewModel.onEvent(CameraEvent.OnImagePickerProcessingStarted)
         }
     )
 
-    if (state.isLoading) OverlayLoadingState()
+    AnimatedVisibility(
+        visible = state.isLoading,
+        enter = fadeIn(tween(200)),
+        exit = fadeOut(tween(200)),
+    ) {
+        OverlayLoadingState()
+    }
 
 }
 
@@ -65,7 +80,6 @@ private fun CameraScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(ScriptLensSpacing.padding_24)
-            .verticalScroll(rememberScrollState())
     ) {
 
         Text(
@@ -79,74 +93,62 @@ private fun CameraScreenContent(
             color = ScriptLensColors.Subtext
         )
 
-        Spacer(Modifier.weight(1f))
 
+        AnimatedContent(
+            targetState = state.cameraScreenState::class,
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(150)) },
+            label = "cameraScreenState",
+        ) {
+            val cameraScreenState = state.cameraScreenState
+            Box(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                contentAlignment = if (cameraScreenState is CameraScreenState.PhotoCaptured) {
+                    Alignment.TopCenter
+                } else {
+                    Alignment.Center
+                },
+            ) {
+                when (cameraScreenState) {
+                    is CameraScreenState.NoPhotoCaptured ->
+                        EmptyCameraState(
+                            onTakePhotoClicked = onTakePhotoClicked,
+                            onChooseFromPhotosClicked = onChooseFromPhotosClicked
+                        )
 
-        val cameraScreenState = state.cameraScreenState
-        when (cameraScreenState) {
-            is CameraScreenState.NoPhotoCaptured ->
-                EmptyCameraState(
-                    onTakePhotoClicked = onTakePhotoClicked,
-                    onChooseFromPhotosClicked = onChooseFromPhotosClicked
-                )
+                    is CameraScreenState.PhotoCaptured ->
+                        CapturedPhotoContent(
+                            modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
+                            photo = state.photo,
+                            prediction = state.prediction,
+                            onTakeNewPhotoClicked = onTakePhotoClicked,
+                            onChooseFromPhotosClicked = onChooseFromPhotosClicked
+                        )
 
-            is CameraScreenState.PhotoCaptured ->
-                CapturedPhotoContent(
-                    modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
-                    photo = state.photo,
-                    prediction = state.prediction,
-                    onTakeNewPhotoClicked = onTakePhotoClicked,
-                    onChooseFromPhotosClicked = onChooseFromPhotosClicked
-                )
-
-            is CameraScreenState.Error ->
-                ErrorState(
-                    errorState = cameraScreenState.error,
-                    onTakeNewPhotoClicked = onTakePhotoClicked,
-                    onChooseFromPhotosClicked = onChooseFromPhotosClicked,
-                    onRetryClicked = onRetryClicked
-                )
-
+                    is CameraScreenState.Error ->
+                        ErrorState(
+                            errorState = cameraScreenState.error,
+                            onTakeNewPhotoClicked = onTakePhotoClicked,
+                            onChooseFromPhotosClicked = onChooseFromPhotosClicked,
+                            onRetryClicked = onRetryClicked
+                        )
+                }
+            }
         }
-        Spacer(Modifier.weight(1f))
     }
 }
 
-@Preview(name = "No photo captured", showBackground = true)
+@Preview(showBackground = true)
 @Composable
-private fun CameraScreenNoPhotoPreview() {
+private fun CameraScreenPreview(
+    @PreviewParameter(CameraContractPreviewProvider::class) state: CameraContract,
+) {
     MaterialTheme {
-        CameraScreenPreviewContent(CameraScreenState.NoPhotoCaptured)
+        CameraScreenContent(
+            state = state,
+            onTakePhotoClicked = {},
+            onChooseFromPhotosClicked = {},
+            onRetryClicked = {},
+        )
     }
-}
-
-@Preview(name = "Photo captured", showBackground = true)
-@Composable
-private fun CameraScreenPhotoCapturedPreview() {
-    MaterialTheme {
-        CameraScreenPreviewContent(CameraScreenState.PhotoCaptured)
-    }
-}
-
-@Composable
-private fun CameraScreenPreviewContent(cameraScreenState: CameraScreenState) {
-    val prediction = PredictionModel(
-        predictions = listOf(7, 8, 3, 6, 2, 6, 5, 0).map { digit ->
-            DigitPredictionModel(
-                digit = digit,
-                probability = "87%",
-                box = PredictionBoxModel(x = 0.0, y = 0.0, w = 0.0, h = 0.0),
-            )
-        },
-        modelVersion = "preview",
-    )
-    CameraScreenContent(
-        state = CameraContract(
-            cameraScreenState = cameraScreenState,
-            prediction = prediction,
-        ),
-        onTakePhotoClicked = {},
-        onChooseFromPhotosClicked = {},
-        onRetryClicked = {},
-    )
 }

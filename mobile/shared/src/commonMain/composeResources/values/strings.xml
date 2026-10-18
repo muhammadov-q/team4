@@ -36,5 +36,5 @@
     <string name="error_camera_open">Could not open the camera.</string>
     <string name="error_gallery_open">Could not open the photo library.</string>
     <string name="error_photo_no_data">The photo contained no image data.</string>
-    <string name="error_photo_select">Could not select a photo.</string>
+    <string name="error_photo_select">Could not select a photo. Please choose a different image.</string>
 </resources>

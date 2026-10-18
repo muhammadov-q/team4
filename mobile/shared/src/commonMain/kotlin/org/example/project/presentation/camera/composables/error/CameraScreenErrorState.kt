@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import org.example.project.common.presentation.ui.asString
 import org.example.project.common.presentation.ui.buttons.ScriptLensButton
@@ -59,6 +60,7 @@ fun ErrorState(
             text = stringResource(errorState.title),
             style = ScriptLensTypography.Heading,
             color = ScriptLensColors.Text,
+            textAlign = TextAlign.Center
         )
 
         Text(
@@ -96,13 +98,16 @@ fun ErrorState(
 
 @Preview(showBackground = true)
 @Composable
-private fun ErrorStatePreview() {
+private fun ErrorStatePreview(
+    @PreviewParameter(CameraScreenErrorStatePreviewProvider::class)
+    errorState: CameraScreenErrorState,
+) {
     MaterialTheme {
         ErrorState(
-            errorState = CameraScreenErrorState.ServiceOffline,
+            errorState = errorState,
             onTakeNewPhotoClicked = {},
             onChooseFromPhotosClicked = {},
-            onRetryClicked = {}
+            onRetryClicked = {},
         )
     }
 }

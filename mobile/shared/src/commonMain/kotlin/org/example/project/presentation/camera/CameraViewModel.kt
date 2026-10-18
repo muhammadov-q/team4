@@ -2,22 +2,28 @@ package org.example.project.presentation.camera
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.ismoy.imagepickerkmp.extensions.loadBytes
+import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.example.project.common.presentation.ui.UiText
+import org.example.project.common.presentation.ui.UiText.Plain
 import org.example.project.core.mvi.setEffect
 import org.example.project.core.mvi.setState
 import org.example.project.domain.model.ApiException
 import org.example.project.domain.usecase.UploadPhotoUseCase
-import org.example.project.presentation.camera.models.CameraScreenErrorState
+import org.example.project.presentation.camera.models.CameraScreenErrorState.PhotoUnavailable
 import org.example.project.presentation.camera.models.CameraScreenState
 import org.example.project.presentation.mappers.mapPredictionToUiModel
 import org.example.project.presentation.mappers.mapUploadErrorToUiModel
-import org.example.project.common.presentation.ui.UiText
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.error_photo_no_data
 
 class CameraViewModel(
     private val uploadPhoto: UploadPhotoUseCase,
@@ -26,7 +32,6 @@ class CameraViewModel(
     val state = _state.asStateFlow()
     private val effectChannel = Channel<CameraEffect>(Channel.BUFFERED)
     val effects = effectChannel.receiveAsFlow()
-    private var uploadJob: Job? = null
 
     fun onEvent(event: CameraEvent) {
         when (event) {
@@ -34,51 +39,87 @@ class CameraViewModel(
 
             is CameraEvent.SelectPhotoRequested -> effectChannel.setEffect(CameraEffect.SelectPhoto)
 
-            is CameraEvent.OnPhotoCaptured -> {
-                println("$TAG: photo captured, ${event.photo.size} bytes")
+            is CameraEvent.OnPhotoPicked -> loadAndUploadPhoto(event)
+
+            is CameraEvent.OnPhotoCaptureCancelled -> setLoading(false)
+
+            is CameraEvent.OnPhotoCaptureFailed -> onPhotoCaptureFailed(event.message)
+
+            is CameraEvent.RetryUploadRequested -> retryUpload()
+
+            is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
+        }
+    }
+
+    private fun onPhotoCaptureFailed(message: String) {
+        _state.setState {
+            it.copy(
+                isLoading = false,
+                cameraScreenState =
+                    CameraScreenState.Error(PhotoUnavailable(Plain(message)))
+            )
+
+        }
+    }
+
+    private fun retryUpload() {
+        setLoading(true)
+        val photo = _state.value.photo
+        if (photo == null) {
+            _state.setState {
+                it.copy(
+                    isLoading = false,
+                    cameraScreenState =
+                        CameraScreenState.Error(PhotoUnavailable(UiText.Resource(Res.string.error_photo_no_data)))
+                )
+            }
+        } else {
+            println("$TAG: retrying upload")
+            upload(photo)
+        }
+
+    }
+
+    private fun loadAndUploadPhoto(event: CameraEvent.OnPhotoPicked) {
+       setLoading(true)
+
+        viewModelScope.launch {
+            loadBytes(event.photo)?.takeIf { it.isNotEmpty() }?.let { bytes ->
                 _state.setState {
                     it.copy(
                         cameraScreenState = CameraScreenState.PhotoCaptured,
-                        photo = event.photo,
-                        prediction = null
+                        photo = bytes,
+                        prediction = null,
+                        isLoading = true
                     )
                 }
-                upload(event.photo)
-            }
-
-            is CameraEvent.OnPhotoCaptureCancelled -> println("$TAG: photo capture cancelled")
-
-            is CameraEvent.OnPhotoCaptureFailed -> {
-                println("$TAG: photo capture failed: ${event.message}")
-                uploadJob?.cancel()
-                _state.setState {
-                    it.copy(
-                        isLoading = false,
-                        cameraScreenState = CameraScreenState.Error(
-                            CameraScreenErrorState.PhotoUnavailable(UiText.Plain(event.message))
-                        )
+                upload(bytes)
+            } ?: _state.setState {
+                it.copy(
+                    isLoading = false,
+                    cameraScreenState = CameraScreenState.Error(
+                        PhotoUnavailable(UiText.Resource(Res.string.error_photo_no_data))
                     )
-                }
-            }
-
-            is CameraEvent.RetryUploadRequested -> {
-                val photo = _state.value.photo
-                if (photo == null) {
-                    _state.setState { it.copy(cameraScreenState = CameraScreenState.NoPhotoCaptured) }
-                } else {
-                    println("$TAG: retrying upload")
-                    upload(photo)
-                }
+                )
             }
         }
     }
 
+    private suspend fun loadBytes(photo: PhotoResult?): ByteArray? {
+        val bytes = try {
+            withContext(Dispatchers.Default) { photo?.loadBytes() }
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (exception: Exception) {
+            null
+        }
+        return bytes
+    }
+
     private fun upload(photo: ByteArray) {
-        uploadJob?.cancel()
-        _state.setState { it.copy(isLoading = true) }
+        setLoading(true)
 
-        uploadJob = viewModelScope.launch {
-
+        viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo)
                 _state.setState {
@@ -104,6 +145,10 @@ class CameraViewModel(
                 println("$TAG: upload failed (status=$status): ${exception.message}")
             }
         }
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        _state.setState { it.copy(isLoading = isLoading) }
     }
 
     private companion object {
