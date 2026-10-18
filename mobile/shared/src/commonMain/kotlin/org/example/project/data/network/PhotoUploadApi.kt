@@ -23,7 +23,6 @@ class PhotoUploadApi(
 
     suspend fun upload(photo: ByteArray): PredictionDto {
         val endpoint = "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
-        println("$TAG: POST $endpoint (${photo.size} bytes)")
 
         val status: Int
         val body: String

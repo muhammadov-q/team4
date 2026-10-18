@@ -7,6 +7,7 @@ import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -118,7 +119,6 @@ class CameraViewModel(
 
     private fun upload(photo: ByteArray) {
         setLoading(true)
-
         viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo)

@@ -13,6 +13,17 @@ class CameraScreenErrorStateMapperTest {
     }
 
     @Test
+    fun gatewayAndServiceUnavailableStatusesMapToServiceOffline() {
+        listOf(502, 503, 504).forEach { status ->
+            assertEquals(
+                CameraScreenErrorState.ServiceOffline,
+                mapUploadErrorToUiModel(ApiException(status)),
+                "status $status",
+            )
+        }
+    }
+
+    @Test
     fun tooLargeMapsToImageTooLarge() {
         assertEquals(CameraScreenErrorState.ImageTooLarge, mapUploadErrorToUiModel(ApiException(413)))
     }
@@ -26,7 +37,7 @@ class CameraScreenErrorStateMapperTest {
 
     @Test
     fun otherStatusesMapToRecognitionFailed() {
-        listOf(401, 404, 500, 502, 503).forEach { status ->
+        listOf(401, 404, 500, 501, 505).forEach { status ->
             assertEquals(CameraScreenErrorState.RecognitionFailed, mapUploadErrorToUiModel(ApiException(status)), "status $status")
         }
     }

@@ -33,7 +33,7 @@ fun OverlayLoadingState() {
     }
 }
 
-@Preview(name = "Overlay loading state", showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun OverlayLoadingStatePreview() {
     MaterialTheme {
