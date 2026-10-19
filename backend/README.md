@@ -73,6 +73,15 @@ uv run pytest
 uv run pytest --cov --cov-report=term-missing   # with coverage
 ```
 
+### Type check
+
+```bash
+cd backend
+uv run mypy
+```
+
+mypy runs in strict mode (settings in `pyproject.toml`), so new functions need type annotations. Tests are checked too, but their functions don't need annotations.
+
 ### Bruno (needs the API)
 
 ```bash

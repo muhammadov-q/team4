@@ -84,7 +84,7 @@ print_header "TEAM4 BACKEND CHECKS"
 if [ "${CHECK_SKIP_INSTALL:-0}" = "1" ] && [ -d .venv ]; then
     print_step "Skipping install (CHECK_SKIP_INSTALL=1)"
 else
-    run_step "Install" "uv sync" uv sync --frozen
+    run_step "Install" "uv lock, then uv sync" uv sync --locked
 fi
 
 if ! command -v npx >/dev/null 2>&1; then
@@ -94,6 +94,7 @@ fi
 
 run_step "Lint" "uv run ruff check --fix" uv run ruff check
 run_step "Formatting" "uv run ruff format" uv run ruff format --check
+run_step "Type check" "uv run mypy" uv run mypy
 run_step "Unit tests" "uv run pytest" uv run pytest
 
 start_server
@@ -102,6 +103,7 @@ run_step "API tests (Bruno)" "cd $BRUNO_DIR && npx @usebruno/cli run --env local
 
 print_header "ALL CHECKS PASSED ✓"
 echo -e "${GREEN}✓ Lint + format (ruff)${NC}"
+echo -e "${GREEN}✓ Type check (mypy)${NC}"
 echo -e "${GREEN}✓ Unit tests (pytest)${NC}"
 echo -e "${GREEN}✓ API tests (Bruno)${NC}"
 echo ""

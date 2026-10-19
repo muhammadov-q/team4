@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -13,7 +13,7 @@ ERROR_415 = "Send a JPG, PNG or TIFF photo."
 
 CAPTURE_TYPES = {"image/jpeg", "image/png", "image/tiff"}
 
-NOT_FOUND: dict[int | str, dict] = {
+NOT_FOUND: dict[int | str, dict[str, Any]] = {
     404: {"model": ErrorResponse, "description": "Session expired or unknown"}
 }
 

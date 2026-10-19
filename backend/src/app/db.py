@@ -1,5 +1,6 @@
 import os
-from collections.abc import Iterator
+import sqlite3
+from collections.abc import Generator
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from alembic.config import Config
 from sqlalchemy import DateTime, Engine, MetaData, create_engine, event
 from sqlalchemy.engine.interfaces import Dialect
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import ConnectionPoolEntry
 from sqlalchemy.types import TypeDecorator
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -61,7 +63,9 @@ def create_db_engine(url: str) -> Engine:
     engine = create_engine(url, connect_args={"check_same_thread": False})
 
     @event.listens_for(engine, "connect")
-    def enforce_foreign_keys(dbapi_connection, _record) -> None:
+    def enforce_foreign_keys(
+        dbapi_connection: sqlite3.Connection, _record: ConnectionPoolEntry
+    ) -> None:
         dbapi_connection.execute("PRAGMA foreign_keys = ON")
 
     return engine
@@ -87,6 +91,6 @@ engine = create_db_engine(database_url())
 SessionLocal = create_session_factory(engine)
 
 
-def get_db() -> Iterator[Session]:
+def get_db() -> Generator[Session]:
     with SessionLocal() as session:
         yield session

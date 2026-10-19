@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+Box = tuple[int, int, int, int]  # x, y, w, h
+
 
 @dataclass
 class DigitResult:
     digit: int
     probabilities: dict[int, float]
-    box: tuple[int, int, int, int]  # x, y, w, h
+    box: Box
 
 
 class AbstractPredictor(ABC):
@@ -31,7 +33,7 @@ class DummyPredictor(AbstractPredictor):
         self.dummy = [2, 5, 0, 0, 0, 0]
 
     @property
-    def model_version(self):
+    def model_version(self) -> str:
         return self.model
 
     def predict(self, image: bytes) -> list[DigitResult]:
