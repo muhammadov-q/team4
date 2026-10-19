@@ -7,6 +7,8 @@ export function describeRecognitionError(error: unknown): { title: string; messa
   switch (error.status) {
     case 0:
       return { title: 'No connection', message: error.message }
+    case 401:
+      return { title: 'Signed out', message: error.message }
     case 502:
     case 503:
     case 504:
