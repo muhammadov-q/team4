@@ -11,11 +11,17 @@ actual fun decodePhoto(bytes: ByteArray): ImageBitmap? {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
     BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
 
+    val options = BitmapFactory.Options().apply {
+        inSampleSize = calculateSampleSize(bounds.outWidth, bounds.outHeight)
+    }
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)?.asImageBitmap()
+}
+
+internal fun calculateSampleSize(width: Int, height: Int, maxDisplaySide: Int = MAX_DISPLAY_SIDE): Int {
+    val longSide = maxOf(width, height)
     var sampleSize = 1
-    while (maxOf(bounds.outWidth, bounds.outHeight) / (sampleSize * 2) >= MAX_DISPLAY_SIDE) {
+    while (longSide / sampleSize > maxDisplaySide) {
         sampleSize *= 2
     }
-
-    val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)?.asImageBitmap()
+    return sampleSize
 }

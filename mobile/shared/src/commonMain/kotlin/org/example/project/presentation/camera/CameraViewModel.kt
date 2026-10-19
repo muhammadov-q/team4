@@ -2,17 +2,12 @@ package org.example.project.presentation.camera
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.ismoy.imagepickerkmp.extensions.loadBytes
-import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.example.project.common.presentation.ui.UiText
 import org.example.project.common.presentation.ui.UiText.Plain
 import org.example.project.core.mvi.setEffect
@@ -40,7 +35,7 @@ class CameraViewModel(
 
             is CameraEvent.SelectPhotoRequested -> effectChannel.setEffect(CameraEffect.SelectPhoto)
 
-            is CameraEvent.OnPhotoPicked -> loadAndUploadPhoto(event)
+            is CameraEvent.OnPhotoPicked -> onPhotoPicked(event.photoBytes)
 
             is CameraEvent.OnPhotoCaptureCancelled -> setLoading(false)
 
@@ -81,40 +76,26 @@ class CameraViewModel(
 
     }
 
-    private fun loadAndUploadPhoto(event: CameraEvent.OnPhotoPicked) {
-       setLoading(true)
-
-        viewModelScope.launch {
-            loadBytes(event.photo)?.takeIf { it.isNotEmpty() }?.let { bytes ->
-                _state.setState {
-                    it.copy(
-                        cameraScreenState = CameraScreenState.PhotoCaptured,
-                        photo = bytes,
-                        prediction = null,
-                        isLoading = true
-                    )
-                }
-                upload(bytes)
-            } ?: _state.setState {
+    private fun onPhotoPicked(photoBytes: ByteArray?) {
+        setLoading(true)
+        photoBytes?.takeIf { it.isNotEmpty() }?.let { bytes ->
+            _state.setState {
                 it.copy(
-                    isLoading = false,
-                    cameraScreenState = CameraScreenState.Error(
-                        PhotoUnavailable(UiText.Resource(Res.string.error_photo_no_data))
-                    )
+                    cameraScreenState = CameraScreenState.PhotoCaptured,
+                    photo = bytes,
+                    prediction = null,
+                    isLoading = true
                 )
             }
+            upload(bytes)
+        } ?: _state.setState {
+            it.copy(
+                isLoading = false,
+                cameraScreenState = CameraScreenState.Error(
+                    PhotoUnavailable(UiText.Resource(Res.string.error_photo_no_data))
+                )
+            )
         }
-    }
-
-    private suspend fun loadBytes(photo: PhotoResult?): ByteArray? {
-        val bytes = try {
-            withContext(Dispatchers.Default) { photo?.loadBytes() }
-        } catch (cancellation: CancellationException) {
-            throw cancellation
-        } catch (exception: Exception) {
-            null
-        }
-        return bytes
     }
 
     private fun upload(photo: ByteArray) {

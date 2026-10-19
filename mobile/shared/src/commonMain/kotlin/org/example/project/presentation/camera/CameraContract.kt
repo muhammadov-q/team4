@@ -1,6 +1,5 @@
 package org.example.project.presentation.camera
 
-import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import org.example.project.presentation.camera.models.CameraScreenState
 import org.example.project.presentation.camera.models.PredictionModel
 
@@ -14,7 +13,7 @@ data class CameraContract(
 sealed interface CameraEvent {
     data object CapturePhotoRequested : CameraEvent
     data object SelectPhotoRequested : CameraEvent
-    class OnPhotoPicked(val photo: PhotoResult?) : CameraEvent
+    class OnPhotoPicked(val photoBytes: ByteArray?) : CameraEvent
     data object OnPhotoCaptureCancelled : CameraEvent
     data class OnPhotoCaptureFailed(val message: String) : CameraEvent
     data object RetryUploadRequested : CameraEvent

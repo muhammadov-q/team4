@@ -49,7 +49,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
 
     CameraPreview(
         cameraEffects = viewModel.effects,
-        onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoPicked(photo)) },
+            onPhotoCaptured = { photoBytes -> viewModel.onEvent(CameraEvent.OnPhotoPicked(photoBytes)) },
         onCaptureCancelled = { viewModel.onEvent(CameraEvent.OnPhotoCaptureCancelled) },
         onCaptureError = { message ->
             viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed(message))
@@ -95,12 +95,12 @@ private fun CameraScreenContent(
 
 
         AnimatedContent(
-            targetState = state.cameraScreenState::class,
+            targetState = state.cameraScreenState,
+            contentKey = { it::class },
             modifier = Modifier.weight(1f).fillMaxWidth(),
             transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(150)) },
             label = "cameraScreenState",
-        ) {
-            val cameraScreenState = state.cameraScreenState
+        ) { cameraScreenState ->
             Box(
                 modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                 contentAlignment = if (cameraScreenState is CameraScreenState.PhotoCaptured) {

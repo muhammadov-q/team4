@@ -3,10 +3,10 @@ package org.example.project.presentation.camera.composables
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import io.github.ismoy.imagepickerkmp.picker.ImagePickerResult
-import io.github.ismoy.imagepickerkmp.picker.PhotoResult
 import io.github.ismoy.imagepickerkmp.picker.rememberImagePickerKMP
 import kotlinx.coroutines.flow.Flow
 import org.example.project.presentation.camera.CameraEffect
+import org.example.project.presentation.camera.helpers.loadPhotoBytes
 import org.jetbrains.compose.resources.stringResource
 import scriptlens.shared.generated.resources.Res
 import scriptlens.shared.generated.resources.error_camera_open
@@ -16,7 +16,7 @@ import scriptlens.shared.generated.resources.error_photo_select
 @Composable
 fun CameraPreview(
     cameraEffects: Flow<CameraEffect>,
-    onPhotoCaptured: (PhotoResult?) -> Unit,
+    onPhotoCaptured: (ByteArray?) -> Unit,
     onCaptureError: (String) -> Unit,
     onImagePickerProcessingStarted: () -> Unit,
     onCaptureCancelled: () -> Unit
@@ -47,9 +47,10 @@ fun CameraPreview(
         when (result) {
 
             is ImagePickerResult.Success -> {
-                val photo = result.first
+                onImagePickerProcessingStarted()
+                val photoBytes = loadPhotoBytes(result.first)
                 picker.reset()
-                onPhotoCaptured(photo)
+                onPhotoCaptured(photoBytes)
             }
 
             is ImagePickerResult.Error -> {

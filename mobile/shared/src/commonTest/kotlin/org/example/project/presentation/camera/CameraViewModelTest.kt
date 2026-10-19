@@ -10,12 +10,16 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.UiText
+import org.example.project.domain.model.ApiException
+import org.example.project.domain.model.DigitPrediction
 import org.example.project.domain.model.Prediction
+import org.example.project.domain.model.PredictionBox
 import org.example.project.domain.repository.PhotoRepository
 import org.example.project.domain.usecase.UploadPhotoUseCase
 import org.example.project.presentation.camera.models.CameraScreenErrorState
 import org.example.project.presentation.camera.models.CameraScreenState
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
@@ -84,13 +88,95 @@ class CameraViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.onEvent(CameraEvent.OnPhotoPicked(null))
-        val state = viewModel.state.first { it.cameraScreenState is CameraScreenState.Error }
+        val state = viewModel.state.value
 
         val screenState = state.cameraScreenState
         assertIs<CameraScreenState.Error>(screenState)
         assertIs<CameraScreenErrorState.PhotoUnavailable>(screenState.error)
         assertFalse(state.isLoading)
         assertNull(state.photo)
+    }
+
+    @Test
+    fun pickedEmptyPhotoDataShowsUnavailableError() = runCameraTest {
+        val viewModel = createViewModel()
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf()))
+
+        val screenState = viewModel.state.value.cameraScreenState
+        assertIs<CameraScreenState.Error>(screenState)
+        assertIs<CameraScreenErrorState.PhotoUnavailable>(screenState.error)
+        assertFalse(viewModel.state.value.isLoading)
+    }
+
+    @Test
+    fun successfulUploadDisplaysPredictionAndClearsLoading() = runCameraTest {
+        val photo = byteArrayOf(1, 2, 3)
+        var uploads = 0
+        var uploadedPhoto: ByteArray? = null
+        val prediction = samplePrediction()
+        val viewModel = createViewModel {
+            uploads++
+            uploadedPhoto = it
+            prediction
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals(1, uploads)
+        assertContentEquals(photo, uploadedPhoto)
+        assertContentEquals(photo, state.photo)
+        assertIs<CameraScreenState.PhotoCaptured>(state.cameraScreenState)
+        assertFalse(state.isLoading)
+        assertEquals("v1", state.prediction?.modelVersion)
+        assertEquals(1, state.prediction?.predictions?.size)
+    }
+
+    @Test
+    fun failedUploadDisplaysMappedErrorAndClearsLoading() = runCameraTest {
+        val viewModel = createViewModel {
+            throw ApiException(503)
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(9, 9, 9)))
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        val screenState = state.cameraScreenState
+        assertIs<CameraScreenState.Error>(screenState)
+        assertIs<CameraScreenErrorState.ServiceOffline>(screenState.error)
+        assertFalse(state.isLoading)
+    }
+
+    @Test
+    fun retryAfterFailedUploadReusesPhotoAndCanSucceed() = runCameraTest {
+        val photo = byteArrayOf(7, 7, 7)
+        var attempts = 0
+        val uploadedPhotos = mutableListOf<ByteArray>()
+        val viewModel = createViewModel {
+            attempts++
+            uploadedPhotos += it
+            if (attempts == 1) throw ApiException(503)
+            samplePrediction()
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(photo))
+        advanceUntilIdle()
+        assertIs<CameraScreenState.Error>(viewModel.state.value.cameraScreenState)
+
+        viewModel.onEvent(CameraEvent.RetryUploadRequested)
+        advanceUntilIdle()
+
+        val finalState = viewModel.state.value
+        assertEquals(2, attempts)
+        assertContentEquals(photo, uploadedPhotos[0])
+        assertContentEquals(photo, uploadedPhotos[1])
+        assertContentEquals(photo, finalState.photo)
+        assertIs<CameraScreenState.PhotoCaptured>(finalState.cameraScreenState)
+        assertFalse(finalState.isLoading)
+        assertEquals("v1", finalState.prediction?.modelVersion)
     }
 
     @Test
@@ -112,6 +198,17 @@ class CameraViewModelTest {
         assertEquals(0, uploads)
         assertFalse(viewModel.state.value.isLoading)
     }
+
+    private fun samplePrediction() = Prediction(
+        predictions = listOf(
+            DigitPrediction(
+                digit = 3,
+                probabilities = mapOf("3" to 0.92),
+                box = PredictionBox(x = 80.0, y = 60.0, w = 120.0, h = 180.0)
+            )
+        ),
+        modelVersion = "v1"
+    )
 
     private fun runCameraTest(block: suspend TestScope.() -> Unit) = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
