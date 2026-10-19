@@ -1,0 +1,15 @@
+meta {
+  name: Recognitions - unknown result
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/recognitions/999999
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+}
