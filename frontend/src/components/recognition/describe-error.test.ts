@@ -5,6 +5,7 @@ import { describeRecognitionError } from './describe-error'
 describe('describeRecognitionError', () => {
   it.each([
     [0, 'No connection'],
+    [401, 'Signed out'],
     [502, 'Recognition service offline'],
     [413, 'Image too large'],
     [415, 'Image rejected'],

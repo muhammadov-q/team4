@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DashboardMenu } from './dashboard-menu'
+
+const navigation = vi.hoisted(() => ({ pathname: '/dashboard' }))
+vi.mock('next/navigation', () => ({ usePathname: () => navigation.pathname }))
 
 vi.mock('@/components/auth/signed-in-as', () => ({
   SignedInAs: () => <span>Signed in as Ena</span>,
@@ -10,6 +13,10 @@ vi.mock('@/components/auth/signed-in-as', () => ({
 vi.mock('@/components/theme-toggle', () => ({
   ThemeToggle: () => <button>Switch theme</button>,
 }))
+
+beforeEach(() => {
+  navigation.pathname = '/dashboard'
+})
 
 describe('DashboardMenu', () => {
   it('starts expanded with the user information visible', () => {
@@ -79,6 +86,11 @@ describe('DashboardMenu', () => {
 
     expect(screen.getByRole('link', { name: 'Read' })).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('link', { name: 'Read' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute(
+      'href',
+      '/dashboard/history'
+    )
+    expect(screen.getByRole('link', { name: 'History' })).not.toHaveAttribute('aria-current')
 
     const links = [
       ['Docs', 'https://github.com/muhammadov-q/team4/tree/develop/docs'],
@@ -97,4 +109,15 @@ describe('DashboardMenu', () => {
 
     expect(screen.getByRole('button', { name: 'Switch theme' })).toBeVisible()
   })
+
+  it.each(['/dashboard/history', '/dashboard/history/3'])(
+    'marks History as the page on %s',
+    (path) => {
+      navigation.pathname = path
+      render(<DashboardMenu />)
+
+      expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('link', { name: 'Read' })).not.toHaveAttribute('aria-current')
+    }
+  )
 })

@@ -117,9 +117,12 @@ def test_sign_in_with_an_unknown_email_fails_the_same_way(service):
 
 def test_sign_in_with_an_unknown_email_still_checks_a_password(service, monkeypatch):
     checked = []
-    monkeypatch.setattr(
-        passwords, "verify", lambda password, hash: checked.append(hash) or False
-    )
+
+    def verify(password, hash):
+        checked.append(hash)
+        return False
+
+    monkeypatch.setattr(passwords, "verify", verify)
 
     with pytest.raises(InvalidCredentials):
         service.sign_in("nobody@example.com", PASSWORD)

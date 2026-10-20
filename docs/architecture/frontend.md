@@ -9,9 +9,9 @@ sequenceDiagram
     participant B as Browser
     participant N as Next.js server (/api proxy)
     participant F as FastAPI backend
-    B->>N: POST /api/predict (multipart "image")
-    N->>F: POST /predict (same body)
-    F-->>N: 200 {prediction, model_version}
+    B->>N: POST /api/recognitions (multipart "image", session cookie)
+    N->>F: POST /recognitions (same body and cookie)
+    F-->>N: 201 {id, created_at, filename, model_version, predictions}
     N-->>B: same status, headers and body
 ```
 
@@ -24,9 +24,10 @@ sequenceDiagram
 | Where                                    | What                                                                                   |
 | ---------------------------------------- | -------------------------------------------------------------------------------------- |
 | `frontend/src/lib/api/client.ts`         | `apiRequest` and `ApiError`, the only way to call the backend.                         |
-| `frontend/src/lib/api/predict.ts`        | One module per endpoint group, typed from the generated schema.                        |
-| `frontend/src/hooks/use-predict.ts`      | TanStack Query mutation. All server state goes through hooks.                          |
+| `frontend/src/lib/api/recognitions.ts`   | One module per endpoint group, typed from the generated schema.                        |
+| `frontend/src/hooks/use-recognitions.ts` | TanStack Query hooks. All server state goes through hooks.                             |
 | `frontend/src/components/recognition/`   | The upload and recognition flow.                                                       |
+| `frontend/src/components/history/`       | The results history (`/dashboard/history`) and one saved result.                       |
 | `frontend/src/components/phone-capture/` | The QR code dialog on the computer and the camera page on the phone (`/capture/[id]`). |
 | `frontend/src/components/ui/`            | shadcn primitives plus `LoadingOrb` and `Skeleton`.                                    |
 | `frontend/src/components/auth/`          | Sign-in and sign-up forms, the sign-out button and the "Signed in as" chip.            |

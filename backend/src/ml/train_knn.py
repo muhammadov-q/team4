@@ -1,9 +1,12 @@
 from pathlib import Path
+from typing import Any
 
 import cv2
 import joblib
 import numpy as np
 import sklearn
+from cv2.typing import MatLike
+from numpy.typing import NDArray
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
@@ -28,8 +31,12 @@ rng = np.random.default_rng(42)
 
 
 def random_affine(
-    img, max_angle=15, max_shear=0.3, scale_range=(0.9, 1.1), max_shift=2
-):
+    img: MatLike,
+    max_angle: float = 15,
+    max_shear: float = 0.3,
+    scale_range: tuple[float, float] = (0.9, 1.1),
+    max_shift: float = 2,
+) -> MatLike:
     """Random rotation, scaling, shear and shift around the image center."""
     angle = rng.uniform(-max_angle, max_angle)
     scale = rng.uniform(*scale_range)
@@ -51,7 +58,7 @@ def random_affine(
     )
 
 
-def elastic(img, alpha=34, sigma=4):
+def elastic(img: MatLike, alpha: float = 34, sigma: float = 4) -> MatLike:
     """Elastic deformation (Simard et al., 2003): smooth random displacement field."""
     dx = (
         cv2.GaussianBlur(rng.uniform(-1, 1, (28, 28)).astype(np.float32), (0, 0), sigma)
@@ -65,13 +72,15 @@ def elastic(img, alpha=34, sigma=4):
     return cv2.remap(img, x + dx, y + dy, cv2.INTER_LINEAR, borderValue=0)
 
 
-def augment_dataset(X, y, copies=1, p_elastic=0.5):
+def augment_dataset(
+    X: NDArray[Any], y: NDArray[Any], copies: int = 1, p_elastic: float = 0.5
+) -> tuple[NDArray[Any], NDArray[Any]]:
     """Return the original data plus `copies` distorted versions of every image."""
     X_aug, y_aug = [X], [y]
     for _ in range(copies):
         out = np.empty_like(X, dtype=np.uint8)
         for i, row in enumerate(X):
-            img = row.reshape(28, 28).astype(np.uint8)
+            img: MatLike = row.reshape(28, 28).astype(np.uint8)
             img = random_affine(img)
             if rng.random() < p_elastic:
                 img = elastic(img)

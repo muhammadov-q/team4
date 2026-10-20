@@ -2,6 +2,7 @@ import cv2
 import joblib
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from ml.knn_predictor import MODEL_PATH, KnnPredictor
 from ml.predictor import AbstractPredictor, DigitResult
@@ -13,7 +14,7 @@ class FakeModel:
     def __init__(self, answer: int = 7) -> None:
         self.classes_ = np.array([str(d) for d in range(10)])
         self.answer = answer
-        self.calls = []
+        self.calls: list[NDArray[np.float32]] = []
 
     def predict_proba(self, x):
         self.calls.append(x)
@@ -34,16 +35,13 @@ def predictor(model, monkeypatch):
     return KnnPredictor()
 
 
-pytestmark = pytest.mark.skipif(
-    not MODEL_PATH.exists(), reason="KNN model not trained (run train_knn.py)"
-)
-
-
 def ink_bounding_box(image: bytes) -> tuple[int, int, int, int]:
     """Bounding box of the dark pixels in the original image."""
     img = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_GRAYSCALE)
+    assert img is not None
     ys, xs = np.nonzero(img < 128)
-    return xs.min(), ys.min(), xs.max() - xs.min() + 1, ys.max() - ys.min() + 1
+    x, y = int(xs.min()), int(ys.min())
+    return x, y, int(xs.max()) - x + 1, int(ys.max()) - y + 1
 
 
 def encode_png(img: np.ndarray) -> bytes:
@@ -263,6 +261,7 @@ def test_predict_boxes_are_in_original_image_coordinates(predictor, digit_image)
 
 def test_predict_boxes_fit_inside_the_original_image(predictor, digit_image):
     img = cv2.imdecode(np.frombuffer(digit_image, np.uint8), cv2.IMREAD_GRAYSCALE)
+    assert img is not None
     height, width = img.shape
     for r in predictor.predict(digit_image):
         x, y, w, h = r.box

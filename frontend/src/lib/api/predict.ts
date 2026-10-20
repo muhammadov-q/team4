@@ -4,14 +4,15 @@ import type { paths } from './schema'
 type PredictOperation = paths['/predict']['post']
 type PredictForm = NonNullable<PredictOperation['requestBody']>['content']['multipart/form-data']
 
-export type PredictResponse = PredictOperation['responses'][200]['content']['application/json']
+export type Prediction = PredictOperation['responses'][200]['content']['application/json']
 
 const IMAGE_FIELD: keyof PredictForm = 'image'
 
-export function predictImage(file: File, signal?: AbortSignal): Promise<PredictResponse> {
+export function predictPage(file: File, signal?: AbortSignal): Promise<Prediction> {
   const body = new FormData()
   body.append(IMAGE_FIELD, file)
-  return apiRequest<PredictResponse>('/predict', {
+
+  return apiRequest<Prediction>('/predict', {
     method: 'POST',
     body,
     signal,

@@ -19,7 +19,8 @@ def client():
 def create(client) -> str:
     response = client.post("/capture-sessions")
     assert response.status_code == 201
-    return response.json()["id"]
+    session_id: str = response.json()["id"]
+    return session_id
 
 
 def upload(client, session_id, content=b"jpeg bytes", content_type="image/jpeg"):

@@ -20,4 +20,4 @@ flowchart LR
 | Tests    | Vitest, Playwright, pytest, Bruno                                           | [[architecture/testing]]                                   |
 | CI       | GitHub Actions                                                              | [[workflow/git-workflow]]                                  |
 
-A mobile app is in progress in #13. Accounts live in the database ([[architecture/database]]). There's no file storage yet. Phone capture sessions (a phone sends a photo to the web app through a QR code) live in the backend's memory, so a restart drops them.
+A mobile app is in progress in #13. Accounts live in the database ([[architecture/database]]). Page images from the web app are kept in the database for the results history ([[adr/0004-page-images-in-sqlite]]). Phone capture sessions (a phone sends a photo to the web app through a QR code) live in the backend's memory, so a restart drops them.
