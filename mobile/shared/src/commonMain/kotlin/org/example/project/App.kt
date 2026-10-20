@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -18,11 +17,16 @@ import org.example.project.presentation.camera.CameraScreen
 import org.example.project.presentation.camera.CameraViewModel
 import org.example.project.presentation.documents.DocumentsScreen
 import org.example.project.presentation.source.SourceScreen
+import org.example.project.di.appModule
+import org.koin.compose.KoinApplication
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun App() {
-    ScriptLensTheme {
-        AppContent()
+    KoinApplication(application = { modules(appModule) }) {
+        ScriptLensTheme {
+            AppContent()
+        }
     }
 }
 
@@ -55,9 +59,7 @@ private fun AppContent() {
             modifier = Modifier.padding(paddingValues),
         ) {
             composable(Screen.CameraView.route) {
-                val cameraViewModel: CameraViewModel = viewModel {
-                    AppContainer.createCameraViewModel()
-                }
+                val cameraViewModel: CameraViewModel = koinViewModel()
                 CameraScreen(cameraViewModel)
             }
             composable(Screen.Docs.route) {

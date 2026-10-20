@@ -54,6 +54,9 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.imagepickerkmp)
             implementation(libs.navigation.compose)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.composeViewModel)
         }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)

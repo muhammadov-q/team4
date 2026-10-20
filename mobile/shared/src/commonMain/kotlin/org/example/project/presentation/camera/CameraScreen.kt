@@ -49,7 +49,7 @@ fun CameraScreen(viewModel: CameraViewModel) {
 
     CameraPreview(
         cameraEffects = viewModel.effects,
-            onPhotoCaptured = { photoBytes -> viewModel.onEvent(CameraEvent.OnPhotoPicked(photoBytes)) },
+        onPhotoCaptured = { photo -> viewModel.onEvent(CameraEvent.OnPhotoPicked(photo)) },
         onCaptureCancelled = { viewModel.onEvent(CameraEvent.OnPhotoCaptureCancelled) },
         onCaptureError = { message ->
             viewModel.onEvent(CameraEvent.OnPhotoCaptureFailed(message))
