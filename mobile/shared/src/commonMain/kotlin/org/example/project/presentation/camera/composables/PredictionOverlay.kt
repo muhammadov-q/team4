@@ -11,14 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.presentation.camera.models.PredictionModel
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun PredictionOverlay(
@@ -43,13 +43,13 @@ fun PredictionOverlay(
                 )
 
                 drawRect(
-                    color = Color.Gray,
+                    color = ScriptLensColors.Subtext,
                     topLeft = topLeft,
                     size = boxSize,
                     style = Stroke(width = 3.dp.toPx()),
                 )
                 drawRect(
-                    color = Color(0xFFE6FF66),
+                    color = ScriptLensColors.Accent,
                     topLeft = topLeft,
                     size = boxSize,
                     style = Stroke(width = 2.dp.toPx()),
@@ -63,9 +63,8 @@ fun PredictionOverlay(
         prediction?.predictions?.forEach { digitPrediction ->
             Text(
                 text = digitPrediction.digit.toString(),
-                color = Color.Black,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Normal,
+                color = ScriptLensColors.Text,
+                style = ScriptLensTypography.Caption,
                 modifier = Modifier
                     .offset(
                         x = with(density) {
@@ -77,8 +76,8 @@ fun PredictionOverlay(
                                 .toDp() - 18.dp
                         },
                     )
-                    .background(Color(0xFFE6FF66))
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                    .background(ScriptLensColors.Accent)
+                    .padding(horizontal = ScriptLensSpacing.padding_8, vertical = ScriptLensSpacing.padding_4),
             )
         }
     }

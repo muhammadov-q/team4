@@ -1,14 +1,17 @@
 package org.example.project.common.presentation.ui.buttons
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
+import org.example.project.common.presentation.ui.theme.ScriptLensTypography
 
 @Composable
 fun ScriptLensButton(
@@ -16,22 +19,26 @@ fun ScriptLensButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     buttonStyle: ScriptLensButtonStyle = ScriptLensButtonStyle.Primary,
+    buttonSize: ScriptLensButtonSize = ScriptLensButtonSize.Large
 ) {
 
     Button(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(buttonSize.height),
         onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
             containerColor = buttonStyle.containerColor,
             contentColor = buttonStyle.textColor
         ),
+        contentPadding = PaddingValues(horizontal = ScriptLensSpacing.padding_24),
         border = buttonStyle.borderStroke
 
     ) {
         Text(
-            modifier = Modifier.padding(vertical = 16.dp),
             text = text,
+            style = ScriptLensTypography.Label,
             color = buttonStyle.textColor
         )
     }

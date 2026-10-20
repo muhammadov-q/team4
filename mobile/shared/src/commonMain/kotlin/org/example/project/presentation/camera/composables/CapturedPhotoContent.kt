@@ -7,16 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.project.common.presentation.ui.theme.ScriptLensSpacing
 import org.example.project.common.presentation.ui.buttons.ScriptLensButton
 import org.example.project.common.presentation.ui.buttons.ScriptLensButtonStyle
 import org.example.project.presentation.camera.models.DigitPredictionModel
@@ -25,6 +24,12 @@ import org.example.project.presentation.camera.models.PredictionModel
 import androidx.compose.material3.MaterialTheme
 import org.example.project.presentation.camera.composables.predictions.PredictionSummary
 import org.example.project.presentation.camera.helpers.decodePhoto
+import org.jetbrains.compose.resources.stringResource
+import scriptlens.shared.generated.resources.Res
+import scriptlens.shared.generated.resources.captured_photo_description
+import scriptlens.shared.generated.resources.action_take_new_photo
+import scriptlens.shared.generated.resources.action_choose_another_photo
+import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @Composable
 fun CapturedPhotoContent(
@@ -41,21 +46,21 @@ fun CapturedPhotoContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
-                .background(Color.White),
+                .clip(MaterialTheme.shapes.extraLarge)
+                .background(ScriptLensColors.Surface),
             contentAlignment = Alignment.Center
         ) {
             imageBitMap?.let {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
-                        .clip(RoundedCornerShape(22.dp))
+                        .padding(ScriptLensSpacing.padding_8)
+                        .clip(MaterialTheme.shapes.extraLarge)
                         .aspectRatio(imageBitMap.width.toFloat() / imageBitMap.height.toFloat())
                 ) {
                     Image(
                         bitmap = imageBitMap,
-                        contentDescription = "Uploaded photo with predictions",
+                        contentDescription = stringResource(Res.string.captured_photo_description),
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier.matchParentSize(),
                     )
@@ -69,20 +74,20 @@ fun CapturedPhotoContent(
         }
 
         PredictionSummary(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = ScriptLensSpacing.padding_16),
             prediction = prediction
         )
 
         ScriptLensButton(
-            modifier = Modifier.padding(vertical = 8.dp),
-            text = "Take a new photo",
+            modifier = Modifier.padding(vertical = ScriptLensSpacing.padding_8),
+            text = stringResource(Res.string.action_take_new_photo),
             onClick = onTakeNewPhotoClicked,
             buttonStyle = ScriptLensButtonStyle.Primary
         )
 
         ScriptLensButton(
-            modifier = Modifier.padding(bottom = 4.dp),
-            text = "Choose another photo from photos",
+            modifier = Modifier.padding(bottom = ScriptLensSpacing.padding_4),
+            text = stringResource(Res.string.action_choose_another_photo),
             onClick = onChooseFromPhotosClicked,
             buttonStyle = ScriptLensButtonStyle.Secondary
         )

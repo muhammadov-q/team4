@@ -8,11 +8,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CancellationException
+import org.example.project.domain.model.ApiException
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.example.project.data.network.models.PredictionDto
 
 class PhotoUploadApi(
     private val client: HttpClient,
@@ -20,55 +21,45 @@ class PhotoUploadApi(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun upload(photo: ByteArray): PredictionResponse {
-        println("Uploading photo of size ${photo.size} bytes")
-        val endpoint =
-            "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
-        println("POST $endpoint")
-        val response = client.post(endpoint) {
-            setBody(
-                MultiPartFormDataContent(
-                    formData {
-                        append(
-                            key = config.multipartFieldName,
-                            value = photo,
-                            headers = Headers.build {
-                                append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
-                                append(HttpHeaders.ContentDisposition, "filename=\"photo.jpg\"")
-                            },
-                        )
-                    },
-                ),
+    suspend fun upload(photo: ByteArray): PredictionDto {
+        val endpoint = "${config.baseUrl.trimEnd('/')}/${config.uploadPath.trimStart('/')}"
+
+        val status: Int
+        val body: String
+        try {
+            val response = client.post(endpoint) { setBody(photoBody(photo)) }
+            status = response.status.value
+            body = response.bodyAsText()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (exception: Exception) {
+            println("$TAG: no response from $endpoint: $exception")
+            throw ApiException(0)
+        }
+
+        println("$TAG: response $status")
+        if (status != HttpStatusCode.OK.value) {
+            throw ApiException(status)
+        }
+        // A malformed 200 body throws SerializationException, which the view model maps to RecognitionFailed.
+        return json.decodeFromString(body)
+    }
+
+    private fun photoBody(photo: ByteArray) = MultiPartFormDataContent(
+        formData {
+            append(
+                key = config.multipartFieldName,
+                value = photo,
+                headers = Headers.build {
+                    append(HttpHeaders.ContentType, ContentType.Image.JPEG.toString())
+                    append(HttpHeaders.ContentDisposition, "filename=\"photo.jpg\"")
+                }
             )
         }
-        val responseText = response.bodyAsText()
+    )
 
-        println("Response ${response.status.value}: $responseText")
-        if (response.status != HttpStatusCode.OK) {
-            error("Prediction request failed (${response.status.value}): $responseText")
-        }
-        return json.decodeFromString(responseText)
+    private companion object {
+        const val TAG = "PhotoUploadApi"
     }
 }
 
-@Serializable
-data class PredictionResponse(
-    val predictions: List<DigitResponse>,
-    @SerialName("model_version")
-    val modelVersion: String,
-)
-
-@Serializable
-data class DigitResponse(
-    val digit: Int,
-    val probabilities: Map<String, Double>,
-    val box: BoxResponse,
-)
-
-@Serializable
-data class BoxResponse(
-    val x: Double,
-    val y: Double,
-    val w: Double,
-    val h: Double,
-)
