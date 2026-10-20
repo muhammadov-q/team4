@@ -30,6 +30,7 @@ fi
 
 LOG="$(mktemp)"
 SERVER_LOG="$(mktemp)"
+DB_DIR="$(mktemp -d)"
 SERVER_PID=""
 
 cleanup() {
@@ -37,6 +38,7 @@ cleanup() {
         kill "$SERVER_PID" 2>/dev/null || true
     fi
     rm -f "$LOG" "$SERVER_LOG"
+    rm -rf "$DB_DIR"
 }
 trap cleanup EXIT
 
@@ -55,9 +57,9 @@ run_step() {
 }
 
 start_server() {
-    print_step "Starting API (dummy predictor) on port $PORT..."
-    ML_PREDICTOR=dummy uv run uvicorn app.main:app --app-dir src --port "$PORT" \
-        >"$SERVER_LOG" 2>&1 &
+    print_step "Starting API (dummy predictor, throwaway database) on port $PORT..."
+    DATABASE_URL="sqlite:///$DB_DIR/check.db" ML_PREDICTOR=dummy \
+        uv run uvicorn app.main:app --app-dir src --port "$PORT" >"$SERVER_LOG" 2>&1 &
     SERVER_PID=$!
 
     for _ in $(seq 1 30); do
@@ -82,7 +84,7 @@ print_header "TEAM4 BACKEND CHECKS"
 if [ "${CHECK_SKIP_INSTALL:-0}" = "1" ] && [ -d .venv ]; then
     print_step "Skipping install (CHECK_SKIP_INSTALL=1)"
 else
-    run_step "Install" "uv sync" uv sync --frozen
+    run_step "Install" "uv lock, then uv sync" uv sync --locked
 fi
 
 if ! command -v npx >/dev/null 2>&1; then
@@ -92,6 +94,7 @@ fi
 
 run_step "Lint" "uv run ruff check --fix" uv run ruff check
 run_step "Formatting" "uv run ruff format" uv run ruff format --check
+run_step "Type check" "uv run mypy" uv run mypy
 run_step "Unit tests" "uv run pytest" uv run pytest
 
 start_server
@@ -100,6 +103,7 @@ run_step "API tests (Bruno)" "cd $BRUNO_DIR && npx @usebruno/cli run --env local
 
 print_header "ALL CHECKS PASSED ✓"
 echo -e "${GREEN}✓ Lint + format (ruff)${NC}"
+echo -e "${GREEN}✓ Type check (mypy)${NC}"
 echo -e "${GREEN}✓ Unit tests (pytest)${NC}"
 echo -e "${GREEN}✓ API tests (Bruno)${NC}"
 echo ""

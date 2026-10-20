@@ -1,0 +1,17 @@
+meta {
+  name: Recognitions - one result
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/recognitions/{{recognitionId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{recognitionId}}
+  res.body.filename: eq test.png
+}

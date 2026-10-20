@@ -1,0 +1,23 @@
+meta {
+  name: Auth - sign in
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/sign-in
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{email}}",
+    "password": "correct horse"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.email: eq {{email}}
+}

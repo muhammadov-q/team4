@@ -35,7 +35,10 @@ afterEach(() => {
 
 const page = () => new File(['png-bytes'], 'folio-1r.png', { type: 'image/png' })
 
+const saved = { id: 1, created_at: '2026-10-15T12:00:00Z', filename: 'folio-1r.png' }
+
 const mockResponse = (digits: number[]) => ({
+  ...saved,
   predictions: digits.map((digit) => ({
     digit,
     probabilities: { [digit]: 1 },
@@ -69,7 +72,14 @@ describe('RecognitionWorkbench', () => {
     expect(within(response).getByText('mock')).toBeInTheDocument()
     expect(within(response).getByText('Machine output')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledOnce()
-    expect(fetch).toHaveBeenCalledWith('/api/predict', expect.objectContaining({ method: 'POST' }))
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/recognitions',
+      expect.objectContaining({ method: 'POST' })
+    )
+    expect(screen.getByRole('link', { name: 'Open it' })).toHaveAttribute(
+      'href',
+      '/dashboard/history/1'
+    )
   })
 
   it('marks the digits it found on the page preview', async () => {
@@ -77,6 +87,7 @@ describe('RecognitionWorkbench', () => {
       'fetch',
       vi.fn().mockResolvedValue(
         Response.json({
+          ...saved,
           predictions: [
             { digit: 7, probabilities: { '7': 0.9 }, box: { x: 10, y: 20, w: 30, h: 40 } },
           ],

@@ -6,7 +6,9 @@ const PAGE_PNG = Buffer.from(
 )
 
 test('uploads a page and shows the backend response', async ({ page }) => {
-  await page.goto('/')
+  //await page.goto('/')
+  await page.goto('/dashboard')
+  await expect(page.getByText('Signed in as', { exact: false })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
 
   await page.getByLabel('Page image').setInputFiles({
@@ -16,7 +18,7 @@ test('uploads a page and shows the backend response', async ({ page }) => {
   })
   await expect(page.getByRole('img', { name: 'Preview of folio-1r.png' })).toBeVisible()
 
-  const request = page.waitForRequest('**/api/predict')
+  const request = page.waitForRequest('**/api/recognitions')
   await page.getByRole('button', { name: 'Recognize page' }).click()
   expect((await request).method()).toBe('POST')
 
@@ -29,10 +31,11 @@ test('uploads a page and shows the backend response', async ({ page }) => {
 test('rejects a file that is not an image without calling the backend', async ({ page }) => {
   let called = false
   page.on('request', (req) => {
-    if (req.url().includes('/api/predict')) called = true
+    if (req.url().includes('/api/recognitions')) called = true
   })
-  await page.goto('/')
-
+  //await page.goto('/')
+  await page.goto('/dashboard')
+  await expect(page.getByText('Signed in as', { exact: false })).toBeVisible()
   await page.getByLabel('Page image').setInputFiles({
     name: 'notes.txt',
     mimeType: 'text/plain',

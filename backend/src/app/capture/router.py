@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -6,14 +6,17 @@ from pydantic import BaseModel
 
 from app.capture.repository import CaptureSession, InMemoryCaptureSessionRepository
 from app.capture.service import CaptureService
-from app.uploads import UPLOAD_ERRORS, ErrorResponse, ImageUpload, capped_upload
+from app.uploads import (
+    ERROR_415_PAGE,
+    PAGE_TYPES,
+    UPLOAD_ERRORS,
+    ErrorResponse,
+    ImageUpload,
+    capped_upload,
+)
 
 ERROR_404 = "This phone link no longer works. Make a new one on your computer."
-ERROR_415 = "Send a JPG, PNG or TIFF photo."
-
-CAPTURE_TYPES = {"image/jpeg", "image/png", "image/tiff"}
-
-NOT_FOUND: dict[int | str, dict] = {
+NOT_FOUND: dict[int | str, dict[str, Any]] = {
     404: {"model": ErrorResponse, "description": "Session expired or unknown"}
 }
 
@@ -60,8 +63,8 @@ async def upload_capture_image(
     service: Service,
     upload: Annotated[ImageUpload, Depends(capped_upload)],
 ) -> CaptureSessionResponse:
-    if upload.content_type not in CAPTURE_TYPES:
-        raise HTTPException(status_code=415, detail=ERROR_415)
+    if upload.content_type not in PAGE_TYPES:
+        raise HTTPException(status_code=415, detail=ERROR_415_PAGE)
     session = service.upload(session_id, upload.content, upload.content_type)
     return CaptureSessionResponse.of(session)
 

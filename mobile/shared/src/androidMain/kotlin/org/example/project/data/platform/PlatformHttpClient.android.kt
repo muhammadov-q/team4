@@ -5,7 +5,7 @@ import io.ktor.client.engine.cio.CIO
 
 actual fun createPlatformHttpClient(): HttpClient =
     HttpClient(CIO) {
-        expectSuccess = true
+        expectSuccess = false
     }
 
 actual fun localBackendBaseUrl(): String = "http://127.0.0.1:8000"

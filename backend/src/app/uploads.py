@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -7,6 +7,9 @@ from pydantic import BaseModel
 ERROR_400 = "Empty file"
 ERROR_413 = "File too large"
 ERROR_415 = "File must be an image"
+ERROR_415_PAGE = "Send a JPG, PNG or TIFF photo."
+
+PAGE_TYPES = {"image/jpeg", "image/png", "image/tiff"}
 
 MAX_FILE_SIZE = 30 * 1024 * 1024  # 30MB
 
@@ -15,7 +18,7 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-UPLOAD_ERRORS: dict[int | str, dict] = {
+UPLOAD_ERRORS: dict[int | str, dict[str, Any]] = {
     400: {"model": ErrorResponse, "description": f"Bad request, {ERROR_400}"},
     413: {"model": ErrorResponse, "description": ERROR_413},
     415: {
@@ -29,6 +32,7 @@ UPLOAD_ERRORS: dict[int | str, dict] = {
 class ImageUpload:
     content: bytes
     content_type: str
+    filename: str = ""
 
 
 async def read_capped(upload: UploadFile, max_size: int) -> bytes:
@@ -54,7 +58,11 @@ async def capped_upload(image: UploadFile) -> ImageUpload:
     if not content:
         raise HTTPException(status_code=400, detail=ERROR_400)
 
-    return ImageUpload(content=content, content_type=image.content_type)
+    return ImageUpload(
+        content=content,
+        content_type=image.content_type,
+        filename=image.filename or "",
+    )
 
 
 async def capped_image(upload: Annotated[ImageUpload, Depends(capped_upload)]) -> bytes:

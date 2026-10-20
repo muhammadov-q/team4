@@ -52,6 +52,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.ktor.client.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.imagepickerkmp)
+            implementation(libs.navigation.compose)
         }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
@@ -65,6 +67,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
     }
 }

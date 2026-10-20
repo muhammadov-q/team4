@@ -1,0 +1,27 @@
+meta {
+  name: Recognitions - read and save a page
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/recognitions
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  image: @file(fixtures/test.png)
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isNumber
+  res.body.filename: eq test.png
+  res.body.model_version: isString
+  res.body.predictions: isArray
+}
+
+script:post-response {
+  bru.setVar("recognitionId", res.getBody().id);
+}

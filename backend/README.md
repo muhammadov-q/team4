@@ -70,7 +70,17 @@ ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```bash
 cd backend
 uv run pytest
+uv run pytest --cov --cov-report=term-missing   # with coverage
 ```
+
+### Type check
+
+```bash
+cd backend
+uv run mypy
+```
+
+mypy runs in strict mode (settings in `pyproject.toml`), so new functions need type annotations. Tests are checked too, but their functions don't need annotations.
 
 ### Bruno (needs the API)
 
@@ -83,6 +93,27 @@ ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 cd backend/bruno
 bru run --env local
 ```
+
+## Database
+
+The backend stores accounts in SQLite at `data/team4.db` (not committed). It creates the file and runs any pending migrations when it starts, so there's no setup step. Set `DATABASE_URL` to use another file; delete `data/` to start over.
+
+After changing a model in `src/app/auth/models.py`, add a migration and read it before committing. The command compares the models with your local database, so start the backend once first:
+
+```bash
+cd backend
+uv run alembic revision --autogenerate -m "describe the change"
+```
+
+More in `docs/architecture/database.md`.
+
+## Sign-in
+
+`/auth/sign-up`, `/auth/sign-in`, `/auth/sign-out` and `/auth/me` handle accounts. A signed-in browser holds the `team4_session` cookie. The code is in `src/app/auth/`, the rules in `docs/architecture/authentication.md`.
+
+## Results history
+
+`/recognitions` reads a page like `/predict` and also saves it for the signed-in user, image included. `GET /recognitions` lists your results, newest first; `GET /recognitions/{id}` and `/recognitions/{id}/image` return one. The web app uses these; `/predict` stays open for the mobile app. The code is in `src/app/recognitions/`.
 
 ## Phone capture sessions
 

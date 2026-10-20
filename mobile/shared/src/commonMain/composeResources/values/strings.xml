@@ -1,0 +1,40 @@
+<resources>
+    <!-- Navigation / screen titles -->
+    <string name="nav_camera">Camera</string>
+    <string name="nav_documents">Documents</string>
+    <string name="nav_source">Source</string>
+
+    <!-- Camera screen -->
+    <string name="camera_title">Read handwritten digits</string>
+    <string name="camera_subtitle">Photograph a page and the model finds each digit and reads it.</string>
+    <string name="camera_empty_hint">Lay the page flat in good light JPG, PNG or TIFF</string>
+    <string name="captured_photo_description">Uploaded photo with predictions</string>
+
+    <!-- Actions -->
+    <string name="action_take_photo">Take a photo</string>
+    <string name="action_choose_photo">Choose from photos</string>
+    <string name="action_take_new_photo">Take a new photo</string>
+    <string name="action_choose_another_photo">Choose another photo from photos</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Prediction summary -->
+    <string name="prediction_digits_read">Digits read</string>
+    <string name="prediction_confidence_label">How sure the model is</string>
+
+    <!-- Upload errors -->
+    <string name="error_service_offline_title">Recognition service offline</string>
+    <string name="error_service_offline_message">The recognition service is currently unavailable. Please try again later.</string>
+    <string name="error_image_too_large_title">Image too large</string>
+    <string name="error_image_too_large_message">The selected image exceeds the maximum allowed size. Please choose a smaller image.</string>
+    <string name="error_image_rejected_title">Image rejected</string>
+    <string name="error_image_rejected_message">The selected image was rejected by the recognition service. Please choose a different image.</string>
+    <string name="error_recognition_failed_title">Recognition failed</string>
+    <string name="error_recognition_failed_message">An error occurred during the recognition process. Please try again.</string>
+
+    <!-- Photo capture errors -->
+    <string name="error_photo_unavailable_title">Photo unavailable</string>
+    <string name="error_camera_open">Could not open the camera.</string>
+    <string name="error_gallery_open">Could not open the photo library.</string>
+    <string name="error_photo_no_data">The photo contained no image data.</string>
+    <string name="error_photo_select">Could not select a photo. Please choose a different image.</string>
+</resources>
