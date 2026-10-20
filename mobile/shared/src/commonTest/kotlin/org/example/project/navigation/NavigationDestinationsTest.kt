@@ -1,5 +1,6 @@
 package org.example.project.navigation
 
+import org.example.project.core.navigation.Screen
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,7 +1,7 @@
 package org.example.project
 
-import org.example.project.presentation.camera.CameraContract
-import org.example.project.presentation.camera.models.CameraScreenState
+import org.example.project.feature.camera.presentation.CameraContract
+import org.example.project.feature.camera.presentation.models.CameraScreenState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
