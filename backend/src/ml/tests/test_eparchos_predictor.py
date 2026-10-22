@@ -199,6 +199,8 @@ def test_real_page_rebuilds_the_line_texts():
     root = ET.parse(XML_PATH).getroot()
     for line in root.findall(".//{*}TextLine"):
         line_xml = ET.tostring(line)
-        expected = line.findtext("{*}TextEquiv/{*}Unicode").split()
+        line_text = line.findtext("{*}TextEquiv/{*}Unicode")
+        assert line_text is not None, f"line {line.get('id')} has no text"
+        expected = line_text.split()
         got = [w.text for w in parse_page_xml(b"<PcGts>" + line_xml + b"</PcGts>")]
         assert got == expected[: len(got)]
