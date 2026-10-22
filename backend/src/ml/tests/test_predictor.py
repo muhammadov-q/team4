@@ -1,6 +1,6 @@
 import pytest
 
-from ml.predictor import AbstractPredictor, DigitResult, DummyPredictor
+from ml.predictor import AbstractPredictor, Prediction, DummyPredictor
 
 
 class MinimalPredictor(AbstractPredictor):
@@ -8,7 +8,7 @@ class MinimalPredictor(AbstractPredictor):
     def model_version(self):
         return ""
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         return []
 
 
@@ -32,7 +32,7 @@ def test_subclass_without_predict_cannot_be_instantiated():
 
 def test_subclass_without_model_version_cannot_be_instantiated():
     class Incomplete(AbstractPredictor):
-        def predict(self, image: bytes) -> list[DigitResult]:
+        def predict(self, image: bytes) -> list[Prediction]:
             return []
 
     with pytest.raises(TypeError):
@@ -55,7 +55,7 @@ def test_dummy_predictor_is_an_abstract_predictor():
 def test_dummy_predictor_attributes():
     predictor = DummyPredictor()
     assert predictor.model_version == "mock"
-    assert predictor.dummy == [2, 5, 0, 0, 0, 0]
+    assert predictor.dummy == ["2", "5", "0", "0", "0", "0"]
 
 
 @pytest.mark.parametrize(
@@ -64,18 +64,18 @@ def test_dummy_predictor_attributes():
 )
 def test_dummy_predictor_always_returns_dummy_digits(image):
     predictor = DummyPredictor()
-    assert [r.digit for r in predictor.predict(image)] == predictor.dummy
+    assert [r.text for r in predictor.predict(image)] == predictor.dummy
 
 
 def test_dummy_predictor_returns_a_list_of_digit_results():
     results = DummyPredictor().predict(b"img")
     assert isinstance(results, list)
-    assert all(isinstance(r, DigitResult) for r in results)
+    assert all(isinstance(r, Prediction) for r in results)
 
 
 def test_dummy_predictor_is_fully_confident():
     for r in DummyPredictor().predict(b"img"):
-        assert r.probabilities == {r.digit: 1.0}
+        assert r.probabilities == {r.text: 1.0}
 
 
 def test_dummy_predictor_boxes_have_four_values():
