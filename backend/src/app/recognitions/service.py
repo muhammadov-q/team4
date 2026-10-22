@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-from app.prediction import DigitResponse
+from app.prediction import PredictionItem
 from app.recognitions.models import Recognition
 from app.recognitions.repository import RecognitionRepository
 from app.uploads import ImageUpload
@@ -35,7 +35,7 @@ class RecognitionService:
                 content_type=upload.content_type,
                 image=upload.content,
                 model_version=self._predictor.model_version,
-                predictions=[DigitResponse.of(r).model_dump() for r in results],
+                predictions=[PredictionItem.of(r).model_dump() for r in results],
             )
         )
 

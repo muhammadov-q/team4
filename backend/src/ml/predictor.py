@@ -5,9 +5,9 @@ Box = tuple[int, int, int, int]  # x, y, w, h
 
 
 @dataclass
-class DigitResult:
-    digit: int
-    probabilities: dict[int, float]
+class Prediction:
+    text: str
+    probabilities: dict[str, float]
     box: Box
 
 
@@ -20,7 +20,7 @@ class AbstractPredictor(ABC):
         """Return the version of the model."""
 
     @abstractmethod
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         """Take the raw image bytes and return the detected digits."""
 
 
@@ -30,14 +30,14 @@ class DummyPredictor(AbstractPredictor):
     def __init__(self) -> None:
         super().__init__()
         self.model = "mock"
-        self.dummy = [2, 5, 0, 0, 0, 0]
+        self.dummy = ["2", "5", "0", "0", "0", "0"]
 
     @property
     def model_version(self) -> str:
         return self.model
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         return [
-            DigitResult(digit=d, probabilities={d: 1.0}, box=(0, 0, 0, 0))
+            Prediction(text=d, probabilities={d: 1.0}, box=(0, 0, 0, 0))
             for d in self.dummy
         ]
