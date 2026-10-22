@@ -1,6 +1,6 @@
 import pytest
 
-from ml.predictor import AbstractPredictor, Prediction, DummyPredictor
+from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 
 class MinimalPredictor(AbstractPredictor):

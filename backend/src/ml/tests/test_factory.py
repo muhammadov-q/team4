@@ -2,7 +2,7 @@ import pytest
 
 from ml.factory import PREDICTORS, create_predictor
 from ml.knn_predictor import MODEL_PATH
-from ml.predictor import AbstractPredictor, Prediction, DummyPredictor
+from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 
 class FakePredictor(AbstractPredictor):
