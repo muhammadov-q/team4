@@ -8,7 +8,7 @@ test('guests can access the dashboard without signing in', async ({ page }) => {
   await page.goto('/')
 
   await expect(page).toHaveURL('/dashboard')
-  await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Read a manuscript page' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Choose image' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Sign out' })).toHaveCount(0)

@@ -4,9 +4,11 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { usePhoneLink } from '@/hooks/use-phone-link'
 import { useRecognize } from '@/hooks/use-recognitions'
+import { useWordSelection } from '@/hooks/use-word-selection'
 import { checkImageFile } from '@/lib/image-file'
 import { PhoneLinkBar } from '@/components/phone-capture/phone-link-bar'
 import { PhoneLinkDialog } from '@/components/phone-capture/phone-link-dialog'
+import { Transcript } from '@/components/transcript/transcript'
 import { ImageCropper } from './image-cropper'
 import { PageDropzone } from './page-dropzone'
 import { PagePreview } from './page-preview'
@@ -19,6 +21,8 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
 
   const run = useRecognize()
   const abortRef = useRef<AbortController | null>(null)
+  const recognition = run.isSuccess ? run.data.recognition : undefined
+  const selection = useWordSelection(recognition)
 
   function stopRun() {
     abortRef.current?.abort()
@@ -96,7 +100,10 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
   useEffect(() => () => abortRef.current?.abort(), [])
 
   return (
-    <div id="workbench" className="grid scroll-mt-28 grid-cols-1 items-start gap-8 lg:grid-cols-2">
+    <div
+      id="workbench"
+      className="grid scroll-mt-28 grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+    >
       <div className="space-y-3">
         {phoneActive && (
           <PhoneLinkBar
@@ -112,7 +119,9 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
           ) : (
             <PagePreview
               file={page}
-              predictions={run.isSuccess ? run.data.recognition.predictions : undefined}
+              words={recognition?.predictions}
+              selected={selection.selected}
+              onSelectWord={selection.select}
               onReplace={choosePage}
               onCrop={() => {
                 stopRun()
@@ -131,11 +140,21 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
             {rejection}
           </p>
         )}
+
+        {recognition && !cropping && (
+          <Transcript
+            words={recognition.predictions}
+            selected={selection.selected}
+            onSelect={selection.select}
+          />
+        )}
       </div>
 
       <RecognitionPanel
         hasPage={page !== null && !cropping}
         run={run}
+        selected={selection.selected}
+        onSelectWord={selection.select}
         onRecognize={recognize}
         onCancel={stopRun}
       />

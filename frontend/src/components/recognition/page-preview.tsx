@@ -2,15 +2,17 @@
 
 import { SmartphoneIcon } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
-import type { DigitPrediction, ImageSize } from '@/lib/digits'
 import { IMAGE_ACCEPT, formatBytes } from '@/lib/image-file'
+import type { ImageSize, Word } from '@/lib/words'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
-import { DigitBoxes } from './digit-boxes'
+import { WordBoxes } from '@/components/transcript/word-boxes'
 
 interface PagePreviewProps {
   file: File
-  predictions?: DigitPrediction[]
+  words?: Word[]
+  selected?: number | null
+  onSelectWord?: (index: number) => void
   onReplace: (file: File) => void
   onCrop: () => void
   onRemove: () => void
@@ -19,7 +21,9 @@ interface PagePreviewProps {
 
 export function PagePreview({
   file,
-  predictions,
+  words,
+  selected = null,
+  onSelectWord = () => {},
   onReplace,
   onCrop,
   onRemove,
@@ -70,7 +74,9 @@ export function PagePreview({
               onError={() => setUnpreviewable(file)}
               className="block max-h-[70vh] w-auto max-w-full rounded-md"
             />
-            {size && predictions && <DigitBoxes predictions={predictions} image={size} />}
+            {size && words && (
+              <WordBoxes words={words} image={size} selected={selected} onSelect={onSelectWord} />
+            )}
           </div>
         )}
       </div>

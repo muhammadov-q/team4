@@ -23,7 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 const TIPS = [
   'Lay the page flat in good light',
   'Fill the frame with the page',
-  'Hold still so the digits stay sharp',
+  'Hold still so the writing stays sharp',
 ]
 
 export function PhoneCapture({ sessionId }: { sessionId: string }) {

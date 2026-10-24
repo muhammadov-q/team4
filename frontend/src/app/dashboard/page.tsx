@@ -9,10 +9,11 @@ export default async function DashboardPage() {
     <>
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">
-          Read handwritten digits
+          Read a manuscript page
         </h1>
         <p className="mt-3 text-lg text-muted-foreground">
-          Upload a photo and the model finds each digit and reads it.
+          Upload a photo of the page. The model reads each word, and you can pick any word to see
+          its translation.
         </p>
       </div>
 

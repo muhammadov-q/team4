@@ -235,20 +235,19 @@ export interface components {
             /** Password */
             password: string;
         };
-        /** DigitResponse */
-        DigitResponse: {
-            /** Digit */
-            digit: number;
-            /** Probabilities */
-            probabilities: {
-                [key: string]: number;
-            };
-            box: components["schemas"]["BoxResponse"];
-        };
         /** ErrorResponse */
         ErrorResponse: {
             /** Detail */
             detail: string;
+        };
+        /** GlossResponse */
+        GlossResponse: {
+            /** Lemma */
+            lemma: string;
+            /** Translation */
+            translation: string;
+            /** Definition */
+            definition: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -258,9 +257,25 @@ export interface components {
         /** PredictResponse */
         PredictResponse: {
             /** Predictions */
-            predictions: components["schemas"]["DigitResponse"][];
+            predictions: components["schemas"]["PredictionItem"][];
             /** Model Version */
             model_version: string;
+        };
+        /** PredictionItem */
+        PredictionItem: {
+            /** Text */
+            text: string;
+            /** Probabilities */
+            probabilities: {
+                [key: string]: number;
+            };
+            box: components["schemas"]["BoxResponse"];
+            /**
+             * Line
+             * @default 0
+             */
+            line: number;
+            gloss: components["schemas"]["GlossResponse"] | null;
         };
         /** RecognitionResponse */
         RecognitionResponse: {
@@ -276,7 +291,7 @@ export interface components {
             /** Model Version */
             model_version: string;
             /** Predictions */
-            predictions: components["schemas"]["DigitResponse"][];
+            predictions: components["schemas"]["PredictionItem"][];
         };
         /** SignUpRequest */
         SignUpRequest: {

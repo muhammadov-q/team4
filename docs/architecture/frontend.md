@@ -27,6 +27,7 @@ sequenceDiagram
 | `frontend/src/lib/api/recognitions.ts`   | One module per endpoint group, typed from the generated schema.                        |
 | `frontend/src/hooks/use-recognitions.ts` | TanStack Query hooks. All server state goes through hooks.                             |
 | `frontend/src/components/recognition/`   | The upload and recognition flow.                                                       |
+| `frontend/src/components/transcript/`    | The transcript, the word boxes on the page and the panel for the picked word.          |
 | `frontend/src/components/history/`       | The results history (`/dashboard/history`) and one saved result.                       |
 | `frontend/src/components/phone-capture/` | The QR code dialog on the computer and the camera page on the phone (`/capture/[id]`). |
 | `frontend/src/components/ui/`            | shadcn primitives plus `LoadingOrb` and `Skeleton`.                                    |

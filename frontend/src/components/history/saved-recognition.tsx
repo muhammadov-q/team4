@@ -4,14 +4,16 @@ import { ArrowLeftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ErrorNotice } from '@/components/error-notice'
-import { DigitBoxes } from '@/components/recognition/digit-boxes'
 import { RecognitionResult } from '@/components/recognition/recognition-result'
+import { Transcript } from '@/components/transcript/transcript'
+import { WordBoxes } from '@/components/transcript/word-boxes'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRecognition } from '@/hooks/use-recognitions'
+import { useWordSelection } from '@/hooks/use-word-selection'
 import { recognitionImageUrl, type Recognition } from '@/lib/api/recognitions'
-import type { ImageSize } from '@/lib/digits'
 import { formatDateTime } from '@/lib/format'
+import type { ImageSize } from '@/lib/words'
 
 export function SavedRecognition({ id }: { id: number }) {
   const query = useRecognition(id)
@@ -49,19 +51,34 @@ export function SavedRecognition({ id }: { id: number }) {
         </Card>
       )}
 
-      {query.isSuccess && (
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
-          <SavedPage key={query.data.id} recognition={query.data} />
-          <Card className="lg:sticky lg:top-8">
-            <RecognitionResult recognition={query.data} />
-          </Card>
-        </div>
-      )}
+      {query.isSuccess && <SavedReading key={query.data.id} recognition={query.data} />}
     </>
   )
 }
 
-function SavedPage({ recognition }: { recognition: Recognition }) {
+function SavedReading({ recognition }: { recognition: Recognition }) {
+  const { selected, select } = useWordSelection(recognition)
+
+  return (
+    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+      <div className="space-y-8">
+        <SavedPage recognition={recognition} selected={selected} onSelectWord={select} />
+        <Transcript words={recognition.predictions} selected={selected} onSelect={select} />
+      </div>
+      <Card className="lg:sticky lg:top-8">
+        <RecognitionResult recognition={recognition} selected={selected} onSelect={select} />
+      </Card>
+    </div>
+  )
+}
+
+interface SavedPageProps {
+  recognition: Recognition
+  selected: number | null
+  onSelectWord: (index: number) => void
+}
+
+function SavedPage({ recognition, selected, onSelectWord }: SavedPageProps) {
   const [size, setSize] = useState<ImageSize | null>(null)
   const [failed, setFailed] = useState(false)
 
@@ -86,7 +103,14 @@ function SavedPage({ recognition }: { recognition: Recognition }) {
             onError={() => setFailed(true)}
             className="block max-h-[70vh] w-auto max-w-full rounded-md"
           />
-          {size && <DigitBoxes predictions={recognition.predictions} image={size} />}
+          {size && (
+            <WordBoxes
+              words={recognition.predictions}
+              image={size}
+              selected={selected}
+              onSelect={onSelectWord}
+            />
+          )}
         </div>
       )}
     </div>
@@ -95,7 +119,10 @@ function SavedPage({ recognition }: { recognition: Recognition }) {
 
 function SavedRecognitionSkeleton() {
   return (
-    <div aria-hidden className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+    <div
+      aria-hidden
+      className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+    >
       <Skeleton className="h-80 rounded-2xl" />
       <Card className="space-y-6">
         <Skeleton className="h-5 w-32" />

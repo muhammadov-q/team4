@@ -9,8 +9,8 @@ import { Chip } from '@/components/ui/chip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRecognitions } from '@/hooks/use-recognitions'
 import { ApiError } from '@/lib/api/client'
-import { readDigits } from '@/lib/digits'
 import { formatDateTime } from '@/lib/format'
+import { readText } from '@/lib/words'
 
 export function HistoryList() {
   const history = useRecognitions()
@@ -76,8 +76,8 @@ export function HistoryList() {
                 </span>
                 <Annotation className="block">{formatDateTime(recognition.created_at)}</Annotation>
               </span>
-              <span className="max-w-[50%] shrink-0 truncate text-lg font-medium tabular-nums">
-                {readDigits(recognition.predictions) || 'No digits'}
+              <span className="max-w-[50%] shrink-0 truncate font-greek text-lg font-medium">
+                {readText(recognition.predictions) || 'No words'}
               </span>
             </Link>
           </li>

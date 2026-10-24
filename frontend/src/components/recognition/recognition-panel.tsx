@@ -16,11 +16,20 @@ import { RecognitionResult } from './recognition-result'
 interface RecognitionPanelProps {
   hasPage: boolean
   run: ReturnType<typeof useRecognize>
+  selected: number | null
+  onSelectWord: (index: number) => void
   onRecognize: () => void
   onCancel: () => void
 }
 
-export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: RecognitionPanelProps) {
+export function RecognitionPanel({
+  hasPage,
+  run,
+  selected,
+  onSelectWord,
+  onRecognize,
+  onCancel,
+}: RecognitionPanelProps) {
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
 
   return (
@@ -28,7 +37,9 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
       <div className="space-y-2">
         <p className="font-mono text-sm text-muted-foreground">Recognition</p>
         <h2 className="text-2xl font-medium">Read the page</h2>
-        <p className="text-muted-foreground">The model reads the page and returns its result.</p>
+        <p className="text-muted-foreground">
+          The model reads each word on the page and translates it.
+        </p>
       </div>
 
       <Button
@@ -45,7 +56,12 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
       {run.isError && <ErrorNotice {...describeRecognitionError(run.error)} />}
       {run.isSuccess && (
         <>
-          <RecognitionResult recognition={run.data.recognition} durationMs={run.data.durationMs} />
+          <RecognitionResult
+            recognition={run.data.recognition}
+            durationMs={run.data.durationMs}
+            selected={selected}
+            onSelect={onSelectWord}
+          />
 
           {run.data.savedId !== undefined ? (
             <p className="text-sm text-muted-foreground">
