@@ -21,13 +21,13 @@ function stubFetch(response: Response | Promise<Response>) {
 }
 
 describe('SignOutButton', () => {
-  it('signs out and goes to the sign-in page', async () => {
+  it('signs out and goes to the dashboard', async () => {
     const fetch = stubFetch(new Response(null, { status: 204 }))
     renderWithProviders(<SignOutButton />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
 
-    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/sign-in'))
+    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/dashboard'))
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-out')
   })
 

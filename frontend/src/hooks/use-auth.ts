@@ -2,31 +2,33 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import { getCurrentUser, signIn, signOut, signUp, type User } from '@/lib/api/auth'
 import { ApiError } from '@/lib/api/client'
 
 export const CURRENT_USER_KEY = ['auth', 'me'] as const
 
 export function useCurrentUser() {
-  const router = useRouter()
-  const query = useQuery({
+  return useQuery({
     queryKey: CURRENT_USER_KEY,
-    queryFn: ({ signal }) => getCurrentUser(signal),
+    queryFn: async ({ signal }) => {
+      try {
+        return await getCurrentUser(signal)
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          return null
+        }
+
+        throw error
+      }
+    },
     retry: false,
   })
-
-  const sessionEnded = query.error instanceof ApiError && query.error.status === 401
-  useEffect(() => {
-    if (sessionEnded) router.replace('/sign-in')
-  }, [sessionEnded, router])
-
-  return query
 }
 
 function useStartSession<Input>(start: (input: Input) => Promise<User>) {
   const queryClient = useQueryClient()
   const router = useRouter()
+
   return useMutation({
     mutationFn: start,
     onSuccess: (user: User) => {
@@ -47,11 +49,19 @@ export function useSignUp() {
 export function useSignOut() {
   const queryClient = useQueryClient()
   const router = useRouter()
+
   return useMutation({
     mutationFn: signOut,
-    onSuccess: () => {
-      queryClient.clear()
-      router.replace('/sign-in')
+    onSuccess: async () => {
+      await queryClient.cancelQueries()
+
+      queryClient.removeQueries({
+        predicate: (query) =>
+          !(query.queryKey[0] === CURRENT_USER_KEY[0] && query.queryKey[1] === CURRENT_USER_KEY[1]),
+      })
+
+      queryClient.setQueryData(CURRENT_USER_KEY, null)
+      router.replace('/dashboard')
     },
   })
 }

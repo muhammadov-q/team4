@@ -44,10 +44,15 @@ describe('useCurrentUser', () => {
     expect(router.replace).not.toHaveBeenCalled()
   })
 
-  it('sends you to sign in when the session has ended', async () => {
+  it('treats an unauthenticated user as a guest without redirecting', async () => {
     stubFetch(Response.json({ detail: 'Sign in to continue.' }, { status: 401 }))
-    renderAuthHook(useCurrentUser)
-    await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/sign-in'))
+
+    const { result } = renderAuthHook(useCurrentUser)
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(result.current.data).toBeNull()
+    expect(router.replace).not.toHaveBeenCalled()
   })
 
   it('stays put when the backend fails for another reason', async () => {
@@ -85,15 +90,19 @@ describe.each([
 })
 
 describe('useSignOut', () => {
-  it('forgets everything cached and goes to sign in', async () => {
+  it('clears cached data and returns to the dashboard as a guest', async () => {
     const fetch = stubFetch(new Response(null, { status: 204 }))
+
     queryClient.setQueryData(CURRENT_USER_KEY, ADA)
+    queryClient.setQueryData(['private-data'], { value: 'cached' })
+
     const { result } = renderAuthHook(useSignOut)
 
     await act(() => result.current.mutateAsync())
 
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-out')
-    expect(queryClient.getQueryData(CURRENT_USER_KEY)).toBeUndefined()
-    expect(router.replace).toHaveBeenCalledWith('/sign-in')
+    expect(queryClient.getQueryData(CURRENT_USER_KEY)).toBeNull()
+    expect(queryClient.getQueryData(['private-data'])).toBeUndefined()
+    expect(router.replace).toHaveBeenCalledWith('/dashboard')
   })
 })

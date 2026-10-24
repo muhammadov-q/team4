@@ -13,9 +13,8 @@ function visit(path: string, cookie?: string) {
 const passesThrough = (response: Response) => response.headers.get('x-middleware-next') === '1'
 
 describe('proxy', () => {
-  it('sends you to sign in when there is no session cookie', () => {
-    const response = visit('/')
-    expect(getRedirectUrl(response)).toBe('http://localhost:3000/sign-in')
+  it.each(['/', '/dashboard'])('allows guests to access %s', (path) => {
+    expect(passesThrough(visit(path))).toBe(true)
   })
 
   it('lets you in with a session cookie', () => {
