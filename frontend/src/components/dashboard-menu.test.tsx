@@ -6,8 +6,10 @@ import { DashboardMenu } from './dashboard-menu'
 const navigation = vi.hoisted(() => ({ pathname: '/dashboard' }))
 vi.mock('next/navigation', () => ({ usePathname: () => navigation.pathname }))
 
-vi.mock('@/components/auth/signed-in-as', () => ({
-  SignedInAs: () => <span>Signed in as Ena</span>,
+vi.mock('@/components/auth/account-card', () => ({
+  AccountCard: ({ expanded }: { expanded: boolean }) => (
+    <span>Account card {expanded ? 'expanded' : 'collapsed'}</span>
+  ),
 }))
 
 vi.mock('@/components/theme-toggle', () => ({
@@ -18,11 +20,16 @@ beforeEach(() => {
   navigation.pathname = '/dashboard'
 })
 
+const PROJECT_LINKS = [
+  ['Docs', 'https://github.com/muhammadov-q/team4/tree/develop/docs'],
+  ['Source', 'https://github.com/muhammadov-q/team4'],
+]
+
 describe('DashboardMenu', () => {
-  it('starts expanded with the user information visible', () => {
+  it('starts expanded with the account card', () => {
     render(<DashboardMenu />)
 
-    expect(screen.getByText('Signed in as Ena')).toBeVisible()
+    expect(screen.getByText('Account card expanded')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Team4' })).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveAttribute(
       'aria-expanded',
@@ -36,18 +43,30 @@ describe('DashboardMenu', () => {
 
     await user.click(screen.getByRole('button', { name: 'Collapse navigation' }))
 
-    expect(screen.queryByText('Signed in as Ena')).not.toBeInTheDocument()
-    expect(screen.queryByText('Read')).not.toBeInTheDocument()
+    expect(screen.getByText('Account card collapsed')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Team4' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Docs/ })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Read' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveAttribute(
       'aria-expanded',
       'false'
     )
+    expect(screen.getByRole('button', { name: 'Expand navigation' })).toHaveTextContent('T4')
 
     await user.click(screen.getByRole('button', { name: 'Expand navigation' }))
 
-    expect(screen.getByText('Signed in as Ena')).toBeVisible()
-    expect(screen.getByText('Read')).toBeVisible()
+    expect(screen.getByText('Account card expanded')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Team4' })).toBeVisible()
+  })
+
+  it('names a page on hover when collapsed', async () => {
+    const user = userEvent.setup()
+    render(<DashboardMenu />)
+
+    await user.click(screen.getByRole('button', { name: 'Collapse navigation' }))
+    await user.hover(screen.getByRole('link', { name: 'History' }))
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('History')
   })
 
   it('does not expand the collapsed sidebar on hover', () => {
@@ -69,6 +88,8 @@ describe('DashboardMenu', () => {
     render(<DashboardMenu />)
 
     await user.tab()
+    expect(screen.getByRole('link', { name: 'Team4' })).toHaveFocus()
+    await user.tab()
     expect(screen.getByRole('button', { name: 'Collapse navigation' })).toHaveFocus()
 
     await user.keyboard('{Enter}')
@@ -81,7 +102,24 @@ describe('DashboardMenu', () => {
     )
   })
 
-  it('provides navigation links and theme switching', () => {
+  it('keeps Docs and Source outside the page navigation', () => {
+    render(<DashboardMenu />)
+
+    const nav = screen.getByRole('navigation', { name: 'Dashboard navigation' })
+
+    for (const [name, href] of PROJECT_LINKS) {
+      const link = screen.getByRole('link', { name: `${name} (opens in a new tab)` })
+
+      expect(link).toHaveAttribute('href', href)
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(nav).not.toContainElement(link)
+    }
+
+    expect(screen.getByRole('button', { name: 'Switch theme' })).toBeVisible()
+  })
+
+  it('marks Read as the page on the dashboard', () => {
     render(<DashboardMenu />)
 
     expect(screen.getByRole('link', { name: 'Read' })).toHaveAttribute('href', '/dashboard')
@@ -91,23 +129,6 @@ describe('DashboardMenu', () => {
       '/dashboard/history'
     )
     expect(screen.getByRole('link', { name: 'History' })).not.toHaveAttribute('aria-current')
-
-    const links = [
-      ['Docs', 'https://github.com/muhammadov-q/team4/tree/develop/docs'],
-      ['Source', 'https://github.com/muhammadov-q/team4'],
-    ]
-
-    for (const [name, href] of links) {
-      const link = screen.getByRole('link', {
-        name: `${name} (opens in a new tab)`,
-      })
-
-      expect(link).toHaveAttribute('href', href)
-      expect(link).toHaveAttribute('target', '_blank')
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
-    }
-
-    expect(screen.getByRole('button', { name: 'Switch theme' })).toBeVisible()
   })
 
   it.each(['/dashboard/history', '/dashboard/history/3'])(

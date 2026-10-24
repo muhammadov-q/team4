@@ -19,3 +19,11 @@ if (typeof URL.createObjectURL !== 'function') {
   URL.createObjectURL = () => 'blob:preview'
   URL.revokeObjectURL = () => {}
 }
+
+if (typeof globalThis.ResizeObserver !== 'function') {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}

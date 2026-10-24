@@ -52,7 +52,7 @@ export function SavedRecognition({ id }: { id: number }) {
       {query.isSuccess && (
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
           <SavedPage key={query.data.id} recognition={query.data} />
-          <Card className="lg:sticky lg:top-28">
+          <Card className="lg:sticky lg:top-8">
             <RecognitionResult recognition={query.data} />
           </Card>
         </div>

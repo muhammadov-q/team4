@@ -1,4 +1,3 @@
-import { SignOutButton } from '@/components/auth/sign-out-button'
 import { DashboardMenu } from '@/components/dashboard-menu'
 
 export default function DashboardLayout({ children }: LayoutProps<'/dashboard'>) {
@@ -7,11 +6,7 @@ export default function DashboardLayout({ children }: LayoutProps<'/dashboard'>)
       <DashboardMenu />
 
       <div className="min-w-0 flex-1">
-        <header className="flex justify-end px-4 py-4 sm:px-6">
-          <SignOutButton />
-        </header>
-
-        <main className="mx-auto w-full max-w-[1400px] px-4 pt-6 pb-12 sm:px-6 lg:px-10">
+        <main className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
           {children}
         </main>
       </div>

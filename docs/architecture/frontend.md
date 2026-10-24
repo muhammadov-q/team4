@@ -30,7 +30,7 @@ sequenceDiagram
 | `frontend/src/components/history/`       | The results history (`/dashboard/history`) and one saved result.                       |
 | `frontend/src/components/phone-capture/` | The QR code dialog on the computer and the camera page on the phone (`/capture/[id]`). |
 | `frontend/src/components/ui/`            | shadcn primitives plus `LoadingOrb` and `Skeleton`.                                    |
-| `frontend/src/components/auth/`          | Sign-in and sign-up forms, the sign-out button and the "Signed in as" chip.            |
+| `frontend/src/components/auth/`          | Sign-in and sign-up forms, the sign-out button and the account card in the sidebar.    |
 | `frontend/src/proxy.ts`                  | Sends visitors without a session cookie to `/sign-in`.                                 |
 
 ## Signing in
