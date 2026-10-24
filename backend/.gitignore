@@ -1,2 +1,4 @@
 src/ml/models
-data/
+src/ml/notebooks/data/
+models/
+/data/

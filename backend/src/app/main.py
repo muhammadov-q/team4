@@ -13,7 +13,7 @@ from app.capture.router import capture_session_not_found
 from app.capture.router import router as capture_router
 from app.capture.service import CaptureSessionNotFound
 from app.db import engine, migrate
-from app.prediction import DigitResponse, get_predictor
+from app.prediction import PredictionItem, get_predictor
 from app.recognitions.router import recognition_not_found
 from app.recognitions.router import router as recognitions_router
 from app.recognitions.service import RecognitionNotFound
@@ -37,7 +37,7 @@ app.add_exception_handler(RecognitionNotFound, recognition_not_found)
 
 
 class PredictResponse(BaseModel):
-    predictions: list[DigitResponse]
+    predictions: list[PredictionItem]
     model_version: str
 
 
@@ -56,6 +56,6 @@ async def predict(
         raise HTTPException(status_code=422, detail=str(e)) from e
 
     return PredictResponse(
-        predictions=[DigitResponse.of(d) for d in results],
+        predictions=[PredictionItem.of(r) for r in results],
         model_version=predictor.model_version,
     )

@@ -5,7 +5,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ml.knn_predictor import MODEL_PATH, KnnPredictor
-from ml.predictor import AbstractPredictor, DigitResult
+from ml.predictor import AbstractPredictor, Prediction
 
 
 class FakeModel:
@@ -231,8 +231,8 @@ def test_to_original_coordinates_when_image_was_shrunk(predictor):
 def test_predict_returns_one_result_per_digit(predictor, digit_image):
     results = predictor.predict(digit_image)
     assert len(results) == 1
-    assert isinstance(results[0], DigitResult)
-    assert results[0].digit == 7
+    assert isinstance(results[0], Prediction)
+    assert results[0].text == "7"
 
 
 def test_predict_finds_several_digits_in_reading_order(predictor):
@@ -275,7 +275,7 @@ def test_predict_boxes_fit_inside_the_original_image(predictor, digit_image):
 @pytest.mark.skipif(not MODEL_PATH.exists(), reason="KNN model not trained")
 def test_real_model_recognises_a_seven(digit_image):
     (result,) = KnnPredictor().predict(digit_image)
-    assert result.digit == 7
+    assert result.text == "7"
 
 
 # --- __init__ / model loading -----------------------------------------------
@@ -319,5 +319,5 @@ def test_predict_uses_the_loaded_model(monkeypatch, tmp_path, digit_image):
 
     (result,) = KnnPredictor().predict(digit_image)
 
-    assert result.digit == 4
-    assert result.probabilities[4] == 1.0
+    assert result.text == "4"
+    assert result.probabilities["4"] == 1.0

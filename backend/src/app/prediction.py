@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from ml import AbstractPredictor, create_predictor
-from ml.predictor import DigitResult
+from ml.predictor import Prediction
 
 predictor: AbstractPredictor = create_predictor()
 
@@ -17,16 +17,16 @@ class BoxResponse(BaseModel):
     h: int
 
 
-class DigitResponse(BaseModel):
-    digit: int
-    probabilities: dict[int, float]
+class PredictionItem(BaseModel):
+    text: str
+    probabilities: dict[str, float]
     box: BoxResponse
 
     @classmethod
-    def of(cls, result: DigitResult) -> "DigitResponse":
+    def of(cls, result: Prediction) -> "PredictionItem":
         x, y, w, h = result.box
         return cls(
-            digit=result.digit,
+            text=result.text,
             probabilities=result.probabilities,
             box=BoxResponse(x=x, y=y, w=w, h=h),
         )

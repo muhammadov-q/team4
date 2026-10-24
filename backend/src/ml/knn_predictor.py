@@ -8,7 +8,7 @@ import numpy as np
 from cv2.typing import MatLike
 from numpy.typing import NDArray
 
-from ml.predictor import AbstractPredictor, Box, DigitResult
+from ml.predictor import AbstractPredictor, Box, Prediction
 
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "knn_mnist.joblib"
 
@@ -160,7 +160,7 @@ class KnnPredictor(AbstractPredictor):
             round(h / scale),
         )
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         grayscale, scale = self.load_image_in_grayscale(image)
         blurred = self.add_blur_on_image(grayscale)
         binary = self.binarize(blurred)
@@ -173,9 +173,9 @@ class KnnPredictor(AbstractPredictor):
         for digit, box in samples:
             pred, probs = self.predict_digit(digit, self.model)
             results.append(
-                DigitResult(
-                    digit=pred,
-                    probabilities=probs,
+                Prediction(
+                    text=str(pred),
+                    probabilities={str(d): p for d, p in probs.items()},
                     box=self.to_original_coordinates(box, scale),
                 )
             )

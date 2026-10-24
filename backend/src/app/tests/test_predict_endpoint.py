@@ -1,7 +1,7 @@
 from app.main import app
 from app.prediction import get_predictor
 from app.uploads import MAX_FILE_SIZE
-from ml.predictor import AbstractPredictor, DigitResult
+from ml.predictor import AbstractPredictor, Prediction
 
 
 class FailingPredictor(AbstractPredictor):
@@ -11,7 +11,7 @@ class FailingPredictor(AbstractPredictor):
     def model_version(self):
         return "failing"
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         raise ValueError("Impossible to decode image")
 
 
@@ -27,13 +27,13 @@ def test_predict_with_image_returns_mock_values(client):
     assert response.status_code == 200
     body = response.json()
     assert body["model_version"] == "mock"
-    assert [p["digit"] for p in body["predictions"]] == [2, 5, 0, 0, 0, 0]
+    assert [p["text"] for p in body["predictions"]] == ["2", "5", "0", "0", "0", "0"]
 
 
 def test_predict_response_shape(client):
     response = upload(client, "test.png", b"fake png bytes", "image/png")
     first = response.json()["predictions"][0]
-    assert set(first) == {"digit", "probabilities", "box"}
+    assert set(first) == {"text", "probabilities", "box"}
     assert set(first["box"]) == {"x", "y", "w", "h"}
     # JSON object keys are always strings
     assert first["probabilities"] == {"2": 1.0}
