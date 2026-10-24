@@ -1,0 +1,9 @@
+package org.example.project.feature.camera.presentation.helpers
+
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import org.jetbrains.skia.Image
+
+actual fun decodePhoto(bytes: ByteArray): ImageBitmap? =
+    Image.makeFromEncoded(bytes).toComposeImageBitmap()
+
