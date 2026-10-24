@@ -24,7 +24,7 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
 
   return (
-    <Card className="space-y-8 lg:sticky lg:top-28">
+    <Card className="space-y-8 lg:sticky lg:top-8">
       <div className="space-y-2">
         <p className="font-mono text-sm text-muted-foreground">Recognition</p>
         <h2 className="text-2xl font-medium">Read the page</h2>
