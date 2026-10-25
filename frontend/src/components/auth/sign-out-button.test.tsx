@@ -21,14 +21,19 @@ function stubFetch(response: Response | Promise<Response>) {
 }
 
 describe('SignOutButton', () => {
-  it('signs out and goes to the dashboard', async () => {
+  it('signs out and reloads the dashboard', async () => {
     const fetch = stubFetch(new Response(null, { status: 204 }))
+    const assign = vi.fn()
+    vi.stubGlobal('location', { assign })
+
     renderWithProviders(<SignOutButton />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
 
-    await vi.waitFor(() => expect(router.replace).toHaveBeenCalledWith('/dashboard'))
+    await vi.waitFor(() => expect(assign).toHaveBeenCalledWith('/dashboard'))
+    expect(assign).toHaveBeenCalledTimes(1)
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-out')
+    expect(router.replace).not.toHaveBeenCalled()
   })
 
   it('is disabled while signing out', async () => {

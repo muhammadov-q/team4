@@ -48,7 +48,6 @@ export function useSignUp() {
 
 export function useSignOut() {
   const queryClient = useQueryClient()
-  const router = useRouter()
 
   return useMutation({
     mutationFn: signOut,
@@ -61,7 +60,9 @@ export function useSignOut() {
       })
 
       queryClient.setQueryData(CURRENT_USER_KEY, null)
-      router.replace('/dashboard')
+      // Reload the page to clear local image and recognition state after sign-out.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign('/dashboard')
     },
   })
 }

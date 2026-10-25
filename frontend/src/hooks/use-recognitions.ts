@@ -5,6 +5,7 @@ import { ApiError } from '@/lib/api/client'
 import { predictPage, type Prediction } from '@/lib/api/predict'
 import { getRecognition, listRecognitions, recognizePage } from '@/lib/api/recognitions'
 import { CURRENT_USER_KEY } from './use-auth'
+import type { User } from '@/lib/api/auth'
 
 export const RECOGNITIONS_KEY = ['recognitions'] as const
 
@@ -27,6 +28,16 @@ export function useRecognize() {
       signal?: AbortSignal
     }): Promise<RecognizeResult> => {
       const startedAt = performance.now()
+      const currentUser = queryClient.getQueryData<User | null>(CURRENT_USER_KEY)
+
+      if (currentUser === null) {
+        const prediction = await predictPage(file, signal)
+
+        return {
+          recognition: prediction,
+          durationMs: performance.now() - startedAt,
+        }
+      }
 
       try {
         const recognition = await recognizePage(file, signal)

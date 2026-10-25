@@ -90,8 +90,10 @@ describe.each([
 })
 
 describe('useSignOut', () => {
-  it('clears cached data and returns to the dashboard as a guest', async () => {
+  it('clears cached data and reloads the dashboard as a guest', async () => {
     const fetch = stubFetch(new Response(null, { status: 204 }))
+    const assign = vi.fn()
+    vi.stubGlobal('location', { assign })
 
     queryClient.setQueryData(CURRENT_USER_KEY, ADA)
     queryClient.setQueryData(['private-data'], { value: 'cached' })
@@ -103,6 +105,8 @@ describe('useSignOut', () => {
     expect(fetch.mock.calls[0][0]).toBe('/api/auth/sign-out')
     expect(queryClient.getQueryData(CURRENT_USER_KEY)).toBeNull()
     expect(queryClient.getQueryData(['private-data'])).toBeUndefined()
-    expect(router.replace).toHaveBeenCalledWith('/dashboard')
+    expect(assign).toHaveBeenCalledTimes(1)
+    expect(assign).toHaveBeenCalledWith('/dashboard')
+    expect(router.replace).not.toHaveBeenCalled()
   })
 })
