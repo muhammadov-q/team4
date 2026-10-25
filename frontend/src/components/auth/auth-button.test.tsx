@@ -3,10 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '@/test/render'
 import { AuthButton } from './auth-button'
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ replace: vi.fn() }),
-}))
-
 afterEach(() => {
   vi.unstubAllGlobals()
 })

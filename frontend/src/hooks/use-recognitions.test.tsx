@@ -2,8 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { makeRecognition } from '@/test/recognitions'
-import { useRecognitions, useRecognize } from './use-recognitions'
 import { CURRENT_USER_KEY } from './use-auth'
+import { useRecognitions, useRecognize } from './use-recognitions'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -51,32 +51,34 @@ describe('useRecognize', () => {
     expect(result.current.recognize.data?.recognition).toEqual(second)
   })
 })
-it('uploads only once to public prediction for a known guest', async () => {
-  const saved = makeRecognition()
-  const prediction = {
-    predictions: saved.predictions,
-    model_version: saved.model_version,
-  }
 
-  const fetch = vi.fn().mockResolvedValue(Response.json(prediction))
-  vi.stubGlobal('fetch', fetch)
-
-  const { result } = renderWithClient(useRecognize, true)
-  const file = new File(['bytes'], 'digits.png', { type: 'image/png' })
-
-  await act(() => result.current.mutateAsync({ file }))
-
-  await waitFor(() => expect(result.current.isSuccess).toBe(true))
-
-  expect(fetch).toHaveBeenCalledTimes(1)
-  expect(fetch.mock.calls[0][0]).toBe('/api/predict')
-  expect(result.current.data?.recognition).toEqual(prediction)
-  expect(result.current.data?.savedId).toBeUndefined()
-
-  const init = fetch.mock.calls[0][1] as RequestInit
-  expect((init.body as FormData).get('image')).toBe(file)
-})
 describe('guest recognition', () => {
+  it('uploads only once to public prediction for a known guest', async () => {
+    const saved = makeRecognition()
+    const prediction = {
+      predictions: saved.predictions,
+      model_version: saved.model_version,
+    }
+
+    const fetch = vi.fn().mockResolvedValue(Response.json(prediction))
+    vi.stubGlobal('fetch', fetch)
+
+    const { result } = renderWithClient(useRecognize, true)
+    const file = new File(['bytes'], 'digits.png', { type: 'image/png' })
+
+    await act(() => result.current.mutateAsync({ file }))
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch.mock.calls[0][0]).toBe('/api/predict')
+    expect(result.current.data?.recognition).toEqual(prediction)
+    expect(result.current.data?.savedId).toBeUndefined()
+
+    const init = fetch.mock.calls[0][1] as RequestInit
+    expect((init.body as FormData).get('image')).toBe(file)
+  })
+
   it('uses public prediction when authentication is required', async () => {
     const saved = makeRecognition()
     const prediction = {

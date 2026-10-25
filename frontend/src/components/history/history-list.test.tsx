@@ -62,6 +62,7 @@ describe('HistoryList', () => {
     expect(alert).toHaveTextContent('Could not load your history')
     expect(alert).toHaveTextContent('The backend is not reachable.')
   })
+
   it('shows a sign-in prompt when history returns 401', async () => {
     stubHistory(Response.json({ detail: 'Sign in to continue.' }, { status: 401 }))
     renderWithProviders(<HistoryList />)

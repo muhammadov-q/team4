@@ -14,10 +14,7 @@ export function useCurrentUser() {
       try {
         return await getCurrentUser(signal)
       } catch (error) {
-        if (error instanceof ApiError && error.status === 401) {
-          return null
-        }
-
+        if (error instanceof ApiError && error.status === 401) return null
         throw error
       }
     },
@@ -32,6 +29,7 @@ function useStartSession<Input>(start: (input: Input) => Promise<User>) {
   return useMutation({
     mutationFn: start,
     onSuccess: (user: User) => {
+      queryClient.removeQueries()
       queryClient.setQueryData(CURRENT_USER_KEY, user)
       router.replace('/dashboard')
     },

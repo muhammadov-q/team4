@@ -8,9 +8,9 @@ import { Card } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRecognitions } from '@/hooks/use-recognitions'
+import { ApiError } from '@/lib/api/client'
 import { readDigits } from '@/lib/digits'
 import { formatDateTime } from '@/lib/format'
-import { ApiError } from '@/lib/api/client'
 
 export function HistoryList() {
   const history = useRecognitions()

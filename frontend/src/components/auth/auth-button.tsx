@@ -1,19 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser } from '@/hooks/use-auth'
 import { SignOutButton } from './sign-out-button'
 
 export function AuthButton() {
   const { data: user, isPending, isError } = useCurrentUser()
 
-  if (isPending) {
-    return (
-      <span role="status" className="text-sm text-muted-foreground">
-        Loading account…
-      </span>
-    )
-  }
+  if (isPending) return <Skeleton className="h-10 w-26 rounded-xl" />
 
   if (isError) {
     return (

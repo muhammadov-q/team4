@@ -85,6 +85,7 @@ describe('RecognitionWorkbench', () => {
 
     expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/recognitions', '/api/predict'])
   })
+
   it('sends the chosen page to the backend and shows the response', async () => {
     const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse([2, 5, 0, 0, 0, 0])))
     vi.stubGlobal('fetch', fetch)

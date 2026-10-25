@@ -4,8 +4,7 @@ export const SESSION_COOKIE = 'team4_session'
 
 const AUTH_PAGES = new Set(['/sign-in', '/sign-up'])
 
-// Public pages are accessible with or without a session.
-// The backend validates the session when account data is requested.
+// Only checks that the cookie exists; the backend checks the session itself.
 export function proxy(request: NextRequest) {
   const hasSession = request.cookies.has(SESSION_COOKIE)
   const onAuthPage = AUTH_PAGES.has(request.nextUrl.pathname)

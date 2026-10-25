@@ -78,6 +78,17 @@ describe.each([
     expect(router.replace).toHaveBeenCalledWith('/dashboard')
   })
 
+  it('drops data cached before signing in', async () => {
+    stubFetch(Response.json(ADA))
+    queryClient.setQueryData(['recognitions'], [{ id: 7 }])
+    const { result } = renderAuthHook(useStart)
+
+    await act(() => result.current.mutateAsync(CREDENTIALS))
+
+    expect(queryClient.getQueryData(['recognitions'])).toBeUndefined()
+    expect(queryClient.getQueryData(CURRENT_USER_KEY)).toEqual(ADA)
+  })
+
   it('stays on the form when the backend says no', async () => {
     stubFetch(Response.json({ detail: 'Wrong email or password.' }, { status: 401 }))
     const { result } = renderAuthHook(useStart)
