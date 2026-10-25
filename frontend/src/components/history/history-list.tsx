@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRecognitions } from '@/hooks/use-recognitions'
+import { ApiError } from '@/lib/api/client'
 import { readDigits } from '@/lib/digits'
 import { formatDateTime } from '@/lib/format'
 
@@ -15,6 +16,21 @@ export function HistoryList() {
   const history = useRecognitions()
 
   if (history.isPending) return <HistorySkeleton />
+
+  if (history.error instanceof ApiError && history.error.status === 401) {
+    return (
+      <Card className="space-y-4">
+        <p className="font-medium">Sign in to view your history</p>
+        <p className="text-muted-foreground">
+          You can recognize images as a guest. Sign in to save future results and view your saved
+          history.
+        </p>
+        <Button asChild>
+          <Link href="/sign-in">Sign in</Link>
+        </Button>
+      </Card>
+    )
+  }
 
   if (history.isError) {
     return (

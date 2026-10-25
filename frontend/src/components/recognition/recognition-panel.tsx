@@ -46,15 +46,29 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
       {run.isSuccess && (
         <>
           <RecognitionResult recognition={run.data.recognition} durationMs={run.data.durationMs} />
-          <p className="text-sm text-muted-foreground">
-            Saved to your history.{' '}
-            <Link
-              href={`/dashboard/history/${run.data.recognition.id}`}
-              className="font-medium text-foreground underline underline-offset-4"
-            >
-              Open it
-            </Link>
-          </p>
+
+          {run.data.savedId !== undefined ? (
+            <p className="text-sm text-muted-foreground">
+              Saved to your history.{' '}
+              <Link
+                href={`/dashboard/history/${run.data.savedId}`}
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                Open it
+              </Link>
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              This result is not saved.{' '}
+              <Link
+                href="/sign-in"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                Sign in
+              </Link>{' '}
+              to save future results to your history.
+            </p>
+          )}
         </>
       )}
     </Card>
