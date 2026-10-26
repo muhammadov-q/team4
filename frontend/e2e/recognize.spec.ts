@@ -28,7 +28,7 @@ test('uploads a page and shows the backend response', async ({ page }) => {
 
   const transcript = page.getByRole('region', { name: 'Transcript' })
   await expect(transcript).toBeVisible()
-  await transcript.getByRole('button').first().click()
+  await transcript.getByRole('listitem').first().getByRole('button').first().click()
   await expect(response.getByRole('region', { name: 'Selected word' })).toContainText(
     'Line 1, word 1'
   )

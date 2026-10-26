@@ -113,6 +113,19 @@ describe('RecognitionWorkbench', () => {
     expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/recognitions', '/api/predict'])
   })
 
+  it('introduces the page until a page image is chosen, then makes room for it', async () => {
+    const { user } = setup()
+    const intro = screen.getByText(/pick any word to see its translation/i)
+    expect(screen.getByRole('heading', { level: 1, name: 'Read a manuscript page' })).toBeVisible()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+
+    expect(intro).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Read a manuscript page' })).toHaveClass(
+      'sr-only'
+    )
+  })
+
   it('sends the chosen page to the backend and shows the response', async () => {
     const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse(['2', '5', '0'])))
     vi.stubGlobal('fetch', fetch)

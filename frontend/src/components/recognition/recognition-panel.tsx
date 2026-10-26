@@ -9,15 +9,17 @@ import { LoadingOrb } from '@/components/ui/loading-orb'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useElapsed } from '@/hooks/use-elapsed'
 import type { useRecognize } from '@/hooks/use-recognitions'
+import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatDuration } from '@/lib/format'
+import type { ImageSource } from '@/lib/image-file'
 import { describeRecognitionError } from './describe-error'
 import { RecognitionResult } from './recognition-result'
 
 interface RecognitionPanelProps {
   hasPage: boolean
   run: ReturnType<typeof useRecognize>
-  selected: number | null
-  onSelectWord: (index: number) => void
+  selection: WordSelection
+  image?: ImageSource
   onRecognize: () => void
   onCancel: () => void
 }
@@ -25,12 +27,47 @@ interface RecognitionPanelProps {
 export function RecognitionPanel({
   hasPage,
   run,
-  selected,
-  onSelectWord,
+  selection,
+  image,
   onRecognize,
   onCancel,
 }: RecognitionPanelProps) {
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
+
+  if (run.isSuccess) {
+    return (
+      <Card className="space-y-6 lg:sticky lg:top-8">
+        <RecognitionResult
+          recognition={run.data.recognition}
+          selection={selection}
+          image={image}
+          durationMs={run.data.durationMs}
+        />
+        {run.data.savedId !== undefined ? (
+          <p className="text-sm text-muted-foreground">
+            Saved to your history.{' '}
+            <Link
+              href={`/dashboard/history/${run.data.savedId}`}
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Open it
+            </Link>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            This result is not saved.{' '}
+            <Link
+              href="/sign-in"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Sign in
+            </Link>{' '}
+            to save future results to your history.
+          </p>
+        )}
+      </Card>
+    )
+  }
 
   return (
     <Card className="space-y-8 lg:sticky lg:top-8">
@@ -54,39 +91,6 @@ export function RecognitionPanel({
       {run.isIdle && <IdleState hasPage={hasPage} />}
       {run.isPending && <PendingState submittedAt={run.submittedAt} onCancel={onCancel} />}
       {run.isError && <ErrorNotice {...describeRecognitionError(run.error)} />}
-      {run.isSuccess && (
-        <>
-          <RecognitionResult
-            recognition={run.data.recognition}
-            durationMs={run.data.durationMs}
-            selected={selected}
-            onSelect={onSelectWord}
-          />
-
-          {run.data.savedId !== undefined ? (
-            <p className="text-sm text-muted-foreground">
-              Saved to your history.{' '}
-              <Link
-                href={`/dashboard/history/${run.data.savedId}`}
-                className="font-medium text-foreground underline underline-offset-4"
-              >
-                Open it
-              </Link>
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              This result is not saved.{' '}
-              <Link
-                href="/sign-in"
-                className="font-medium text-foreground underline underline-offset-4"
-              >
-                Sign in
-              </Link>{' '}
-              to save future results to your history.
-            </p>
-          )}
-        </>
-      )}
     </Card>
   )
 }

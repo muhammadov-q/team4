@@ -1,25 +1,28 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { Recognition } from '@/lib/api/recognitions'
 import { makeRecognition } from '@/test/recognitions'
 import { renderWithProviders } from '@/test/render'
+import { makeSelection } from '@/test/selection'
 import { RecognitionResult } from './recognition-result'
 
 function renderResult(
   overrides: Partial<Recognition> = {},
   { durationMs, selected = null }: { durationMs?: number; selected?: number | null } = {}
 ) {
-  const onSelect = vi.fn()
+  const selection = makeSelection({ selected })
   renderWithProviders(
     <RecognitionResult
       recognition={makeRecognition(overrides)}
       durationMs={durationMs}
-      selected={selected}
-      onSelect={onSelect}
+      selection={selection}
     />
   )
-  return { region: screen.getByRole('region', { name: 'Model response' }), onSelect }
+  return {
+    region: screen.getByRole('region', { name: 'Model response' }),
+    onSelect: selection.select,
+  }
 }
 
 describe('RecognitionResult', () => {
@@ -29,7 +32,6 @@ describe('RecognitionResult', () => {
     expect(within(region).getByText('Pick a word')).toBeInTheDocument()
     expect(within(region).getByText('Machine output')).toBeInTheDocument()
     expect(within(region).getByText('eparchos-6791')).toBeInTheDocument()
-    expect(within(region).getByText(/boxes on your page/i)).toBeInTheDocument()
   })
 
   it('shows the picked word and moves to the next one', async () => {
@@ -39,7 +41,7 @@ describe('RecognitionResult', () => {
     expect(word).toHaveTextContent('Φύσις')
     expect(word).toHaveTextContent('nature')
 
-    await userEvent.click(within(region).getByRole('button', { name: /next word/i }))
+    await userEvent.click(within(region).getByRole('button', { name: 'Next word' }))
     expect(onSelect).toHaveBeenCalledWith(1)
   })
 
@@ -55,10 +57,9 @@ describe('RecognitionResult', () => {
 
     expect(within(region).getByText('No words found')).toBeInTheDocument()
     expect(within(region).queryByText('Pick a word')).not.toBeInTheDocument()
-    expect(within(region).queryByText(/boxes on your page/i)).not.toBeInTheDocument()
   })
 
-  it('flags the mock and skips the boxes hint, since the mock has no boxes', () => {
+  it('flags the mock model', () => {
     const { region } = renderResult({
       model_version: 'mock',
       predictions: [
@@ -73,7 +74,6 @@ describe('RecognitionResult', () => {
     })
 
     expect(within(region).getByText(/placeholder output from the mock model/i)).toBeInTheDocument()
-    expect(within(region).queryByText(/boxes on your page/i)).not.toBeInTheDocument()
   })
 
   it('shows how long the model took only when it just ran', () => {

@@ -4,6 +4,8 @@ import {
   confidenceOf,
   groupLines,
   hasBox,
+  lineSpans,
+  loupeCrop,
   positionOf,
   readText,
   type Word,
@@ -86,5 +88,40 @@ describe('boxToPercent', () => {
       width: 20,
       height: 20,
     })
+  })
+})
+
+describe('lineSpans', () => {
+  it('spans each line from its highest to its lowest word box, skipping words without one', () => {
+    const boxed = (line: number, y: number, h: number): Word => ({
+      ...word('w', line),
+      box: { x: 0, y, w: 10, h },
+    })
+    const unboxed = { ...word('?', 2), box: { x: 0, y: 0, w: 0, h: 0 } }
+
+    expect(lineSpans([boxed(0, 10, 20), boxed(0, 5, 10), boxed(1, 50, 20), unboxed])).toEqual([
+      { line: 0, top: 5, bottom: 30 },
+      { line: 1, top: 50, bottom: 70 },
+    ])
+  })
+})
+
+describe('loupeCrop', () => {
+  const page = { width: 1000, height: 1000 }
+
+  it('centres the word with a margin, in the given shape', () => {
+    const crop = loupeCrop({ x: 400, y: 400, w: 100, h: 50 }, 3, page)
+
+    expect(crop.w / crop.h).toBeCloseTo(3)
+    expect(crop.x + crop.w / 2).toBeCloseTo(450)
+    expect(crop.y + crop.h / 2).toBeCloseTo(425)
+    expect(crop.h).toBeCloseTo(110)
+  })
+
+  it('stays on the page at its edges', () => {
+    const crop = loupeCrop({ x: 0, y: 0, w: 40, h: 40 }, 3, page)
+
+    expect(crop.x).toBe(0)
+    expect(crop.y).toBe(0)
   })
 })

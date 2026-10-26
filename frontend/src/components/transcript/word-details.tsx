@@ -1,29 +1,38 @@
 'use client'
 
-import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
-import { Chip } from '@/components/ui/chip'
+import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatPercent } from '@/lib/format'
-import { confidenceOf, positionOf, type Word } from '@/lib/words'
+import type { ImageSource } from '@/lib/image-file'
+import { confidenceOf, hasBox, positionOf, type Word } from '@/lib/words'
+import { Loupe } from './loupe'
 
 interface WordDetailsProps {
   words: Word[]
-  selected: number | null
-  onSelect: (index: number) => void
+  selection: WordSelection
+  image?: ImageSource
 }
 
-export function WordDetails({ words, selected, onSelect }: WordDetailsProps) {
+export function WordDetails({ words, selection, image }: WordDetailsProps) {
+  const { selected, select } = selection
   const word = selected === null ? undefined : words[selected]
 
   if (selected === null || word === undefined) {
     return (
-      <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
-        <p className="font-medium">Pick a word</p>
-        <p className="text-sm text-muted-foreground">
-          Click a word on the page or in the transcript to see where it is, what it means and its
-          translation.
-        </p>
+      <div className="space-y-4">
+        <div className="grid aspect-[3/1] place-items-center rounded-2xl bg-muted px-6 text-center">
+          <div className="space-y-1">
+            <p className="font-medium">Pick a word</p>
+            <p className="text-sm text-muted-foreground">
+              Click a word in the transcript or a box on the page.
+            </p>
+          </div>
+        </div>
+        <KeyHint>
+          Or press <Kbd>→</Kbd> to start with the first word.
+        </KeyHint>
       </div>
     )
   }
@@ -33,18 +42,41 @@ export function WordDetails({ words, selected, onSelect }: WordDetailsProps) {
 
   return (
     <section aria-label="Selected word" className="space-y-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <p className="font-greek text-heading font-medium break-words">{word.text}</p>
-          <Annotation>
+      {image && hasBox(word.box) && <Loupe image={image} box={word.box} word={word.text} />}
+
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0 space-y-2">
+          <p className="font-greek text-heading leading-none font-medium break-words">
+            {word.text}
+          </p>
+          <Annotation className="block">
             Line {position.line}, word {position.word}
           </Annotation>
         </div>
-        <Chip className="shrink-0">Machine translation</Chip>
+        <div className="flex shrink-0 gap-1">
+          <Button
+            variant="outline"
+            size="icon-sm"
+            aria-label="Previous word"
+            disabled={selected === 0}
+            onClick={() => select(selected - 1)}
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon-sm"
+            aria-label="Next word"
+            disabled={selected === words.length - 1}
+            onClick={() => select(selected + 1)}
+          >
+            <ChevronRightIcon />
+          </Button>
+        </div>
       </div>
 
       {gloss ? (
-        <dl className="space-y-2">
+        <dl className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-3 rounded-xl bg-muted px-5 py-4">
           <Entry term="Translation">
             <span className="text-lg font-medium">{gloss.translation}</span>
           </Entry>
@@ -52,48 +84,46 @@ export function WordDetails({ words, selected, onSelect }: WordDetailsProps) {
             <span className="font-greek text-lg">{gloss.lemma}</span>
           </Entry>
           <Entry term="Definition">{gloss.definition}</Entry>
+          <Entry term="Confidence">
+            <span className="font-mono text-sm tabular-nums">
+              {formatPercent(confidenceOf(word))}
+            </span>
+          </Entry>
         </dl>
       ) : (
         <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
           <p className="font-medium">No translation yet</p>
           <p className="text-sm text-muted-foreground">
-            The model read this word but has no translation for it.
+            The model read this word with {formatPercent(confidenceOf(word))} confidence but has no
+            translation for it.
           </p>
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Annotation>Read with {formatPercent(confidenceOf(word))} confidence</Annotation>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={selected === 0}
-            onClick={() => onSelect(selected - 1)}
-          >
-            <ArrowLeftIcon />
-            Previous word
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={selected === words.length - 1}
-            onClick={() => onSelect(selected + 1)}
-          >
-            Next word
-            <ArrowRightIcon />
-          </Button>
-        </div>
-      </div>
+      <KeyHint>
+        <Kbd>←</Kbd> <Kbd>→</Kbd> move between words, <Kbd>Esc</Kbd> clears
+      </KeyHint>
     </section>
   )
 }
 
 function Entry({ term, children }: { term: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1 rounded-xl bg-muted px-5 py-4">
+    <>
       <dt className="text-sm text-muted-foreground">{term}</dt>
       <dd>{children}</dd>
-    </div>
+    </>
+  )
+}
+
+function KeyHint({ children }: { children: React.ReactNode }) {
+  return <p className="text-caption text-muted-foreground pointer-coarse:hidden">{children}</p>
+}
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-caption text-foreground">
+      {children}
+    </kbd>
   )
 }

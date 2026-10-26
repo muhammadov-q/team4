@@ -58,3 +58,55 @@ export function boxToPercent(box: WordBox, image: ImageSize): BoxPercent {
     height: (box.h / image.height) * 100,
   }
 }
+
+export interface LineSpan {
+  line: number
+  top: number
+  bottom: number
+}
+
+export function lineSpans(words: Word[]): LineSpan[] {
+  const spans = new Map<number, LineSpan>()
+
+  for (const word of words) {
+    if (!hasBox(word.box)) continue
+    const top = word.box.y
+    const bottom = word.box.y + word.box.h
+    const span = spans.get(word.line)
+    spans.set(
+      word.line,
+      span
+        ? { line: word.line, top: Math.min(span.top, top), bottom: Math.max(span.bottom, bottom) }
+        : { line: word.line, top, bottom }
+    )
+  }
+
+  return [...spans.values()]
+}
+
+export interface Crop {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+export function loupeCrop(box: WordBox, aspect: number, image: ImageSize): Crop {
+  const margin = box.h * 0.6
+  let w = box.w + margin * 2
+  let h = box.h + margin * 2
+
+  if (w / h < aspect) w = h * aspect
+  else h = w / aspect
+
+  return {
+    x: clamp(box.x + box.w / 2 - w / 2, 0, image.width - w),
+    y: clamp(box.y + box.h / 2 - h / 2, 0, image.height - h),
+    w,
+    h,
+  }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(value, max))
+}
