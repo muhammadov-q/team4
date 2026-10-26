@@ -1,5 +1,6 @@
 'use client'
 
+import { LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useSignOut } from '@/hooks/use-auth'
@@ -10,11 +11,13 @@ export function SignOutButton() {
   return (
     <Button
       variant="ghost"
-      className="rounded-xl bg-muted/90 text-foreground backdrop-blur"
+      size="icon-sm"
+      aria-label="Sign out"
+      title="Sign out"
       disabled={signOut.isPending}
       onClick={() => signOut.mutate(undefined, { onError: (error) => toast.error(error.message) })}
     >
-      Sign out
+      <LogOut />
     </Button>
   )
 }
