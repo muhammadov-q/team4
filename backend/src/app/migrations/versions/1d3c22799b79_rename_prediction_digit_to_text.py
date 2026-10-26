@@ -9,10 +9,14 @@ so they match PredictionItem.
 
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import sqlalchemy as sa
 from alembic import op
+
+# One saved prediction as it is stored in the JSON column
+PredictionJson = dict[str, Any]
 
 revision: str = "1d3c22799b79"
 down_revision: str | Sequence[str] | None = "066af846b424"
@@ -27,18 +31,16 @@ recognitions = sa.table(
 )
 
 
-def _digit_to_text(prediction: dict) -> dict:
+def _digit_to_text(prediction: PredictionJson) -> PredictionJson:
     if "digit" not in prediction:
         return prediction  # already migrated
     new = dict(prediction)
     new["text"] = str(new.pop("digit"))
-    new["probabilities"] = {
-        str(k): v for k, v in new.get("probabilities", {}).items()
-    }
+    new["probabilities"] = {str(k): v for k, v in new.get("probabilities", {}).items()}
     return new
 
 
-def _text_to_digit(prediction: dict) -> dict:
+def _text_to_digit(prediction: PredictionJson) -> PredictionJson:
     if "text" not in prediction:
         return prediction
     try:
@@ -53,11 +55,9 @@ def _text_to_digit(prediction: dict) -> dict:
     return new
 
 
-def _convert(convert) -> None:
+def _convert(convert: Callable[[PredictionJson], PredictionJson]) -> None:
     conn = op.get_bind()
-    rows = conn.execute(
-        sa.select(recognitions.c.id, recognitions.c.predictions)
-    ).all()
+    rows = conn.execute(sa.select(recognitions.c.id, recognitions.c.predictions)).all()
     for row_id, predictions in rows:
         if not predictions:
             continue
