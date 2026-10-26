@@ -62,4 +62,22 @@ describe('HistoryList', () => {
     expect(alert).toHaveTextContent('Could not load your history')
     expect(alert).toHaveTextContent('The backend is not reachable.')
   })
+
+  it('shows a sign-in prompt when history returns 401', async () => {
+    stubHistory(Response.json({ detail: 'Sign in to continue.' }, { status: 401 }))
+    renderWithProviders(<HistoryList />)
+
+    expect(await screen.findByText('Sign in to view your history')).toBeInTheDocument()
+
+    expect(
+      screen.getByText(
+        'You can recognize images as a guest. Sign in to save future results and view your saved history.'
+      )
+    ).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/sign-in')
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Past results' })).not.toBeInTheDocument()
+  })
 })

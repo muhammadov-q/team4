@@ -3,14 +3,14 @@
 import { useId } from 'react'
 import { Annotation } from '@/components/ui/annotation'
 import { Chip } from '@/components/ui/chip'
-import type { Recognition } from '@/lib/api/recognitions'
+import type { Prediction } from '@/lib/api/predict'
 import { confidenceOf, hasBox, readDigits, type DigitPrediction } from '@/lib/digits'
 import { formatDuration, formatPercent } from '@/lib/format'
 
 const MOCK_MODEL_VERSION = 'mock'
 
 interface RecognitionResultProps {
-  recognition: Recognition
+  recognition: Prediction
   durationMs?: number
 }
 

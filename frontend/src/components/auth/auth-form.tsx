@@ -44,7 +44,7 @@ const COPY: Record<Mode, FormCopy> = {
   },
   'sign-up': {
     title: 'Create an account',
-    intro: 'You need an account to read pages. Fields marked * are required.',
+    intro: 'Creating an account is optional. Fields marked * are required.',
     submit: 'Create account',
     pending: 'Creating account…',
     passwordAutoComplete: 'new-password',
@@ -199,6 +199,13 @@ function AccountForm({
           {copy.switchLabel}
         </Link>
       </p>
+
+      <Link
+        href="/dashboard"
+        className="self-center rounded text-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
+        Continue as guest
+      </Link>
     </Card>
   )
 }

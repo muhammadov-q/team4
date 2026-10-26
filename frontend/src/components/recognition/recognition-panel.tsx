@@ -24,7 +24,7 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
 
   return (
-    <Card className="space-y-8 lg:sticky lg:top-28">
+    <Card className="space-y-8 lg:sticky lg:top-8">
       <div className="space-y-2">
         <p className="font-mono text-sm text-muted-foreground">Recognition</p>
         <h2 className="text-2xl font-medium">Read the page</h2>
@@ -46,15 +46,29 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
       {run.isSuccess && (
         <>
           <RecognitionResult recognition={run.data.recognition} durationMs={run.data.durationMs} />
-          <p className="text-sm text-muted-foreground">
-            Saved to your history.{' '}
-            <Link
-              href={`/dashboard/history/${run.data.recognition.id}`}
-              className="font-medium text-foreground underline underline-offset-4"
-            >
-              Open it
-            </Link>
-          </p>
+
+          {run.data.savedId !== undefined ? (
+            <p className="text-sm text-muted-foreground">
+              Saved to your history.{' '}
+              <Link
+                href={`/dashboard/history/${run.data.savedId}`}
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                Open it
+              </Link>
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              This result is not saved.{' '}
+              <Link
+                href="/sign-in"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                Sign in
+              </Link>{' '}
+              to save future results to your history.
+            </p>
+          )}
         </>
       )}
     </Card>

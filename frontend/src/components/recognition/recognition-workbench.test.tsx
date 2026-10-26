@@ -56,6 +56,36 @@ function setup({ applyAccept = true } = {}) {
 const recognizeButton = () => screen.getByRole('button', { name: /recognize page/i })
 
 describe('RecognitionWorkbench', () => {
+  it('shows that a guest result is not saved', async () => {
+    const response = mockResponse([2, 5])
+    const prediction = {
+      predictions: response.predictions,
+      model_version: response.model_version,
+    }
+
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ detail: 'Sign in to continue.' }, { status: 401 }))
+      .mockResolvedValueOnce(Response.json(prediction))
+
+    vi.stubGlobal('fetch', fetch)
+    const { user } = setup()
+
+    await user.upload(screen.getByLabelText('Page image'), page())
+    await user.click(recognizeButton())
+
+    expect(await screen.findByText(/This result is not saved\./)).toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/sign-in')
+    expect(screen.queryByRole('link', { name: 'Open it' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/Saved to your history\./)).not.toBeInTheDocument()
+
+    const result = screen.getByRole('region', { name: 'Model response' })
+    expect(within(result).getByText('Digits read').nextElementSibling).toHaveTextContent('25')
+
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/api/recognitions', '/api/predict'])
+  })
+
   it('sends the chosen page to the backend and shows the response', async () => {
     const fetch = vi.fn().mockResolvedValue(Response.json(mockResponse([2, 5, 0, 0, 0, 0])))
     vi.stubGlobal('fetch', fetch)

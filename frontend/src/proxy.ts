@@ -9,12 +9,10 @@ export function proxy(request: NextRequest) {
   const hasSession = request.cookies.has(SESSION_COOKIE)
   const onAuthPage = AUTH_PAGES.has(request.nextUrl.pathname)
 
-  if (!hasSession && !onAuthPage) {
-    return NextResponse.redirect(new URL('/sign-in', request.url))
-  }
   if (hasSession && onAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
+
   return NextResponse.next()
 }
 
