@@ -1,4 +1,4 @@
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 
 export function Chip({ className, children, ...props }: React.ComponentProps<'span'>) {
   return (

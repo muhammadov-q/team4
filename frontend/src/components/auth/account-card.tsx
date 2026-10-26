@@ -1,8 +1,8 @@
 'use client'
 
-import { cn } from 'cn'
 import { LogInIcon } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 import { SignOutButton } from '@/components/auth/sign-out-button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser } from '@/hooks/use-auth'

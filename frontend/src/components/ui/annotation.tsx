@@ -1,4 +1,4 @@
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 
 export function Annotation({ className, ...props }: React.ComponentProps<'span'>) {
   return (

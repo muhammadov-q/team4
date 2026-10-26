@@ -2,7 +2,7 @@
 
 import { ImageUpIcon, SmartphoneIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 import { IMAGE_ACCEPT } from '@/lib/image-file'
 import { Button } from '@/components/ui/button'
 
