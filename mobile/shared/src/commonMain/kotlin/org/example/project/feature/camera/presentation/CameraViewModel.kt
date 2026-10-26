@@ -43,8 +43,16 @@ class CameraViewModel(
 
             is CameraEvent.RetryUploadRequested -> retryUpload()
 
+            is CameraEvent.SelectPrediction -> onPredictionSelected(event.index)
+
             is CameraEvent.OnImagePickerProcessingStarted -> setLoading(true)
         }
+    }
+
+    private fun onPredictionSelected(index: Int) {
+        val predictions = _state.value.prediction?.predictions ?: return
+        if (index !in predictions.indices) return
+        _state.setState { it.copy(selectedPredictionIndex = index) }
     }
 
     private fun onPhotoCaptureFailed(message: String) {
@@ -84,6 +92,7 @@ class CameraViewModel(
                     cameraScreenState = CameraScreenState.PhotoCaptured,
                     photo = bytes,
                     prediction = null,
+                    selectedPredictionIndex = null,
                     isLoading = true
                 )
             }
@@ -103,9 +112,11 @@ class CameraViewModel(
         viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo)
+                val predictionModel = mapPredictionToUiModel(prediction)
                 _state.setState {
                     it.copy(
-                        prediction = mapPredictionToUiModel(prediction),
+                        prediction = predictionModel,
+                        selectedPredictionIndex = null,
                         isLoading = false,
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )

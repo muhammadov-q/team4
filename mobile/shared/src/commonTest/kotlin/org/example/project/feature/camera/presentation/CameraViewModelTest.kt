@@ -11,9 +11,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.example.project.common.presentation.ui.helpers.UiText
 import org.example.project.feature.camera.domain.model.ApiException
-import org.example.project.feature.camera.domain.model.DigitPrediction
 import org.example.project.feature.camera.domain.model.Prediction
 import org.example.project.feature.camera.domain.model.PredictionBox
+import org.example.project.feature.camera.domain.model.PredictionGloss
+import org.example.project.feature.camera.domain.model.WordPrediction
 import org.example.project.feature.camera.domain.repository.PhotoRepository
 import org.example.project.feature.camera.domain.usecase.UploadPhotoUseCase
 import org.example.project.feature.camera.presentation.models.CameraScreenErrorState
@@ -24,6 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -131,7 +133,58 @@ class CameraViewModelTest {
         assertIs<CameraScreenState.PhotoCaptured>(state.cameraScreenState)
         assertFalse(state.isLoading)
         assertEquals("v1", state.prediction?.modelVersion)
-        assertEquals(1, state.prediction?.predictions?.size)
+        assertEquals(2, state.prediction?.predictions?.size)
+        assertNull(state.selectedPredictionIndex)
+    }
+
+    @Test
+    fun selectingAnotherWordUpdatesSelectedIndexWithoutUploadingAgain() = runCameraTest {
+        var uploads = 0
+        val viewModel = createViewModel {
+            uploads++
+            samplePrediction()
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1, 2, 3)))
+        advanceUntilIdle()
+        assertEquals(1, uploads)
+        assertNull(viewModel.state.value.selectedPredictionIndex)
+
+        viewModel.onEvent(CameraEvent.SelectPrediction(1))
+        advanceUntilIdle()
+
+        assertEquals(1, uploads)
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+    }
+
+    @Test
+    fun choosingNewImageClearsOldPredictionAndSelectionBeforeNextUploadCompletes() = runCameraTest {
+        val firstPrediction = samplePrediction()
+        val secondPrediction = samplePrediction(modelVersion = "v2")
+        var uploads = 0
+        val viewModel = createViewModel {
+            uploads++
+            if (uploads == 1) firstPrediction else secondPrediction
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1, 1, 1)))
+        advanceUntilIdle()
+        viewModel.onEvent(CameraEvent.SelectPrediction(1))
+        assertEquals(1, viewModel.state.value.selectedPredictionIndex)
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(2, 2, 2)))
+
+        val transientState = viewModel.state.value
+        assertNull(transientState.prediction)
+        assertNull(transientState.selectedPredictionIndex)
+        assertTrue(transientState.isLoading)
+
+        advanceUntilIdle()
+        assertEquals(2, uploads)
+        val finalState = viewModel.state.value
+        assertNotNull(finalState.prediction)
+        assertEquals("v2", finalState.prediction.modelVersion)
+        assertNull(finalState.selectedPredictionIndex)
     }
 
     @Test
@@ -199,15 +252,32 @@ class CameraViewModelTest {
         assertFalse(viewModel.state.value.isLoading)
     }
 
-    private fun samplePrediction() = Prediction(
+    private fun samplePrediction(modelVersion: String = "v1") = Prediction(
         predictions = listOf(
-            DigitPrediction(
-                digit = 3,
-                probabilities = mapOf("3" to 0.92),
-                box = PredictionBox(x = 80.0, y = 60.0, w = 120.0, h = 180.0)
-            )
+            WordPrediction(
+                text = "λόγος",
+                probabilities = mapOf("λόγος" to 0.92, "λόγον" to 0.08),
+                box = PredictionBox(x = 80.0, y = 60.0, w = 120.0, h = 180.0),
+                line = 0,
+                gloss = PredictionGloss(
+                    lemma = "λόγος",
+                    translation = "word",
+                    definition = "A word or account.",
+                ),
+            ),
+            WordPrediction(
+                text = "ἐστίν",
+                probabilities = mapOf("ἐστίν" to 0.84, "ἐστι" to 0.16),
+                box = PredictionBox(x = 240.0, y = 60.0, w = 120.0, h = 180.0),
+                line = 0,
+                gloss = PredictionGloss(
+                    lemma = "εἰμί",
+                    translation = "is",
+                    definition = "Third-person singular of to be.",
+                ),
+            ),
         ),
-        modelVersion = "v1"
+        modelVersion = modelVersion
     )
 
     private fun runCameraTest(block: suspend TestScope.() -> Unit) = runTest {
