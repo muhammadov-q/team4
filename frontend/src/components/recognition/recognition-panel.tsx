@@ -9,26 +9,74 @@ import { LoadingOrb } from '@/components/ui/loading-orb'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useElapsed } from '@/hooks/use-elapsed'
 import type { useRecognize } from '@/hooks/use-recognitions'
+import type { WordSelection } from '@/hooks/use-word-selection'
 import { formatDuration } from '@/lib/format'
+import type { ImageSource } from '@/lib/image-file'
 import { describeRecognitionError } from './describe-error'
 import { RecognitionResult } from './recognition-result'
 
 interface RecognitionPanelProps {
   hasPage: boolean
   run: ReturnType<typeof useRecognize>
+  selection: WordSelection
+  image?: ImageSource
   onRecognize: () => void
   onCancel: () => void
 }
 
-export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: RecognitionPanelProps) {
+export function RecognitionPanel({
+  hasPage,
+  run,
+  selection,
+  image,
+  onRecognize,
+  onCancel,
+}: RecognitionPanelProps) {
   const label = run.isPending ? 'Recognizing…' : run.isError ? 'Try again' : 'Recognize page'
+
+  if (run.isSuccess) {
+    return (
+      <Card className="space-y-6 lg:sticky lg:top-8">
+        <RecognitionResult
+          recognition={run.data.recognition}
+          selection={selection}
+          image={image}
+          durationMs={run.data.durationMs}
+        />
+        {run.data.savedId !== undefined ? (
+          <p className="text-sm text-muted-foreground">
+            Saved to your history.{' '}
+            <Link
+              href={`/dashboard/history/${run.data.savedId}`}
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Open it
+            </Link>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            This result is not saved.{' '}
+            <Link
+              href="/sign-in"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Sign in
+            </Link>{' '}
+            to save future results to your history.
+          </p>
+        )}
+      </Card>
+    )
+  }
 
   return (
     <Card className="space-y-8 lg:sticky lg:top-8">
       <div className="space-y-2">
         <p className="font-mono text-sm text-muted-foreground">Recognition</p>
         <h2 className="text-2xl font-medium">Read the page</h2>
-        <p className="text-muted-foreground">The model reads the page and returns its result.</p>
+        <p className="text-muted-foreground">
+          The model reads each word on the page and translates it.
+        </p>
       </div>
 
       <Button
@@ -43,34 +91,6 @@ export function RecognitionPanel({ hasPage, run, onRecognize, onCancel }: Recogn
       {run.isIdle && <IdleState hasPage={hasPage} />}
       {run.isPending && <PendingState submittedAt={run.submittedAt} onCancel={onCancel} />}
       {run.isError && <ErrorNotice {...describeRecognitionError(run.error)} />}
-      {run.isSuccess && (
-        <>
-          <RecognitionResult recognition={run.data.recognition} durationMs={run.data.durationMs} />
-
-          {run.data.savedId !== undefined ? (
-            <p className="text-sm text-muted-foreground">
-              Saved to your history.{' '}
-              <Link
-                href={`/dashboard/history/${run.data.savedId}`}
-                className="font-medium text-foreground underline underline-offset-4"
-              >
-                Open it
-              </Link>
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              This result is not saved.{' '}
-              <Link
-                href="/sign-in"
-                className="font-medium text-foreground underline underline-offset-4"
-              >
-                Sign in
-              </Link>{' '}
-              to save future results to your history.
-            </p>
-          )}
-        </>
-      )}
     </Card>
   )
 }

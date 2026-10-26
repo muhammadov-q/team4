@@ -1,16 +1,19 @@
 'use client'
 
-import { SmartphoneIcon } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
-import type { DigitPrediction, ImageSize } from '@/lib/digits'
+import { CropIcon, ImageUpIcon, SmartphoneIcon, XIcon } from 'lucide-react'
+import { useRef, useState } from 'react'
+import type { WordSelection } from '@/hooks/use-word-selection'
 import { IMAGE_ACCEPT, formatBytes } from '@/lib/image-file'
+import type { Word } from '@/lib/words'
 import { Annotation } from '@/components/ui/annotation'
 import { Button } from '@/components/ui/button'
-import { DigitBoxes } from './digit-boxes'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { PageScan } from '@/components/transcript/page-scan'
 
 interface PagePreviewProps {
   file: File
-  predictions?: DigitPrediction[]
+  words?: Word[]
+  selection?: WordSelection
   onReplace: (file: File) => void
   onCrop: () => void
   onRemove: () => void
@@ -19,7 +22,8 @@ interface PagePreviewProps {
 
 export function PagePreview({
   file,
-  predictions,
+  words,
+  selection,
   onReplace,
   onCrop,
   onRemove,
@@ -27,85 +31,57 @@ export function PagePreview({
 }: PagePreviewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [unpreviewable, setUnpreviewable] = useState<File | null>(null)
-  const [loaded, setLoaded] = useState<{ file: File; size: ImageSize } | null>(null)
-  const size = loaded?.file === file ? loaded.size : null
-
-  const attachPreview = useCallback(
-    (img: HTMLImageElement | null) => {
-      if (!img) return
-
-      const url = URL.createObjectURL(file)
-      img.src = url
-
-      return () => URL.revokeObjectURL(url)
-    },
-    [file]
-  )
 
   const canCrop = file.type !== 'image/tiff' && unpreviewable !== file
 
   return (
-    <div className="space-y-5">
-      <div className="grid min-h-72 place-items-center overflow-hidden rounded-2xl bg-card p-4">
-        {unpreviewable === file ? (
-          <p className="max-w-xs p-6 text-center text-sm text-muted-foreground">
-            This browser can&apos;t preview this image (TIFF usually). The page is still sent as it
-            is.
+    <div className="space-y-3">
+      <div className="overflow-hidden rounded-2xl bg-card">
+        <div className="flex items-center justify-between gap-3 py-2 pr-2 pl-5">
+          <p className="min-w-0 truncate text-sm" title={file.name}>
+            <span className="font-medium">{file.name}</span>{' '}
+            <Annotation>{formatBytes(file.size)}</Annotation>
           </p>
-        ) : (
-          <div className="relative max-w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              ref={attachPreview}
-              alt={`Preview of ${file.name}`}
-              onLoad={(event) =>
-                setLoaded({
-                  file,
-                  size: {
-                    width: event.currentTarget.naturalWidth,
-                    height: event.currentTarget.naturalHeight,
-                  },
-                })
-              }
-              onError={() => setUnpreviewable(file)}
-              className="block max-h-[70vh] w-auto max-w-full rounded-md"
-            />
-            {size && predictions && <DigitBoxes predictions={predictions} image={size} />}
-          </div>
-        )}
-      </div>
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate font-medium" title={file.name}>
-            {file.name}
-          </p>
-          <Annotation>{formatBytes(file.size)}</Annotation>
+          <TooltipProvider>
+            <div className="flex shrink-0 gap-1">
+              {onUsePhone && (
+                <ToolButton
+                  label="Use phone"
+                  className="pointer-coarse:hidden"
+                  onClick={onUsePhone}
+                >
+                  <SmartphoneIcon />
+                </ToolButton>
+              )}
+              <ToolButton label="Replace page" onClick={() => inputRef.current?.click()}>
+                <ImageUpIcon />
+              </ToolButton>
+              <ToolButton label="Crop" onClick={onCrop} disabled={!canCrop}>
+                <CropIcon />
+              </ToolButton>
+              <ToolButton label="Remove page" onClick={onRemove}>
+                <XIcon />
+              </ToolButton>
+            </div>
+          </TooltipProvider>
         </div>
 
-        <div className="flex shrink-0 gap-2">
-          {onUsePhone && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="pointer-coarse:hidden"
-              onClick={onUsePhone}
-            >
-              <SmartphoneIcon />
-              Use phone
-            </Button>
+        <div className="grid min-h-72 place-items-center px-4 pb-4">
+          {unpreviewable === file ? (
+            <p className="max-w-xs p-6 text-center text-sm text-muted-foreground">
+              This browser can&apos;t preview this image (TIFF usually). The page is still sent as
+              it is.
+            </p>
+          ) : (
+            <PageScan
+              image={file}
+              alt={`Preview of ${file.name}`}
+              words={words}
+              selection={selection}
+              onError={() => setUnpreviewable(file)}
+            />
           )}
-          <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-            Replace
-          </Button>
-
-          <Button variant="outline" size="sm" onClick={onCrop} disabled={!canCrop}>
-            Crop
-          </Button>
-
-          <Button variant="ghost" size="sm" onClick={onRemove}>
-            Remove
-          </Button>
         </div>
       </div>
 
@@ -132,5 +108,24 @@ export function PagePreview({
         }}
       />
     </div>
+  )
+}
+
+function ToolButton({
+  label,
+  children,
+  ...props
+}: React.ComponentProps<typeof Button> & { label: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon-sm" aria-label={label} {...props}>
+          {children}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" sideOffset={6}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
   )
 }

@@ -1,71 +1,86 @@
 import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import type { Recognition } from '@/lib/api/recognitions'
+import { makeRecognition } from '@/test/recognitions'
 import { renderWithProviders } from '@/test/render'
+import { makeSelection } from '@/test/selection'
 import { RecognitionResult } from './recognition-result'
 
-type Answer = Pick<Recognition, 'predictions' | 'model_version'>
-
-function renderResult(answer: Answer, durationMs?: number) {
-  const recognition = { id: 1, created_at: '', filename: 'folio-1r.png', ...answer }
-  renderWithProviders(<RecognitionResult recognition={recognition} durationMs={durationMs} />)
-  return screen.getByRole('region', { name: 'Model response' })
-}
-
-const knnResponse: Answer = {
-  predictions: [
-    { digit: 4, probabilities: { '4': 0.92, '9': 0.08 }, box: { x: 100, y: 50, w: 200, h: 100 } },
-    { digit: 2, probabilities: { '2': 0.61, '7': 0.39 }, box: { x: 500, y: 50, w: 200, h: 100 } },
-  ],
-  model_version: 'KNN-100126',
+function renderResult(
+  overrides: Partial<Recognition> = {},
+  { durationMs, selected = null }: { durationMs?: number; selected?: number | null } = {}
+) {
+  const selection = makeSelection({ selected })
+  renderWithProviders(
+    <RecognitionResult
+      recognition={makeRecognition(overrides)}
+      durationMs={durationMs}
+      selection={selection}
+    />
+  )
+  return {
+    region: screen.getByRole('region', { name: 'Model response' }),
+    onSelect: selection.select,
+  }
 }
 
 describe('RecognitionResult', () => {
-  it('shows the digits read and how sure the model is about each one', () => {
-    const region = renderResult(knnResponse)
+  it('asks to pick a word until one is picked', () => {
+    const { region } = renderResult()
 
-    expect(within(region).getByText('Digits read').nextElementSibling).toHaveTextContent('42')
+    expect(within(region).getByText('Pick a word')).toBeInTheDocument()
     expect(within(region).getByText('Machine output')).toBeInTheDocument()
-    expect(within(region).getByText('KNN-100126')).toBeInTheDocument()
+    expect(within(region).getByText('eparchos-6791')).toBeInTheDocument()
+  })
 
-    const list = within(region).getByRole('list', { name: 'How sure the model is' })
-    const digits = within(list).getAllByRole('listitem')
-    expect(digits.map((item) => item.textContent)).toEqual(['492%', '261%'])
-    expect(within(region).getByText(/boxes on your page/i)).toBeInTheDocument()
+  it('shows the picked word and moves to the next one', async () => {
+    const { region, onSelect } = renderResult({}, { selected: 0 })
+
+    const word = within(region).getByRole('region', { name: 'Selected word' })
+    expect(word).toHaveTextContent('Φύσις')
+    expect(word).toHaveTextContent('nature')
+
+    await userEvent.click(within(region).getByRole('button', { name: 'Next word' }))
+    expect(onSelect).toHaveBeenCalledWith(1)
   })
 
   it('shows only the answer, not the raw response', () => {
-    const region = renderResult(knnResponse)
+    const { region } = renderResult({}, { selected: 0 })
 
     expect(region).not.toHaveTextContent('probabilities')
     expect(region).not.toHaveTextContent('model_version')
   })
 
-  it('says so when no digits were found', () => {
-    const region = renderResult({ predictions: [], model_version: 'KNN-100126' })
+  it('says so when no words were found', () => {
+    const { region } = renderResult({ predictions: [] })
 
-    expect(within(region).getByText('No digits found')).toBeInTheDocument()
-    expect(
-      within(region).queryByRole('list', { name: 'How sure the model is' })
-    ).not.toBeInTheDocument()
-    expect(within(region).queryByText(/boxes on your page/i)).not.toBeInTheDocument()
+    expect(within(region).getByText('No words found')).toBeInTheDocument()
+    expect(within(region).queryByText('Pick a word')).not.toBeInTheDocument()
   })
 
-  it('flags the mock and skips the boxes hint, since the mock has no boxes', () => {
-    const region = renderResult({
-      predictions: [{ digit: 2, probabilities: { '2': 1 }, box: { x: 0, y: 0, w: 0, h: 0 } }],
+  it('flags the mock model', () => {
+    const { region } = renderResult({
       model_version: 'mock',
+      predictions: [
+        {
+          text: '2',
+          probabilities: { '2': 1 },
+          box: { x: 0, y: 0, w: 0, h: 0 },
+          line: 0,
+          gloss: null,
+        },
+      ],
     })
 
     expect(within(region).getByText(/placeholder output from the mock model/i)).toBeInTheDocument()
-    expect(within(region).queryByText(/boxes on your page/i)).not.toBeInTheDocument()
   })
 
   it('shows how long the model took only when it just ran', () => {
-    expect(renderResult(knnResponse, 120)).toHaveTextContent('120 ms')
+    expect(renderResult({}, { durationMs: 120 }).region).toHaveTextContent('120 ms')
   })
 
   it('leaves the time out for a saved result', () => {
-    expect(renderResult(knnResponse)).not.toHaveTextContent(/\d+ ms/)
+    expect(renderResult().region).not.toHaveTextContent(/\d+ ms/)
   })
 })

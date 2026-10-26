@@ -2,7 +2,7 @@ import pytest
 
 from ml.factory import PREDICTORS, create_predictor
 from ml.knn_predictor import MODEL_PATH
-from ml.predictor import AbstractPredictor, DigitResult, DummyPredictor
+from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 
 class FakePredictor(AbstractPredictor):
@@ -10,7 +10,7 @@ class FakePredictor(AbstractPredictor):
     def model_version(self):
         return ""
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         return []
 
 
@@ -66,7 +66,7 @@ def test_every_registered_predictor_follows_the_contract(name, digit_image):
     results = predictor.predict(digit_image)
     assert isinstance(results, list)
     for r in results:
-        assert isinstance(r, DigitResult)
-        assert isinstance(r.digit, int)
+        assert isinstance(r, Prediction)
+        assert isinstance(r.text, str)
         assert isinstance(r.probabilities, dict)
         assert len(r.box) == 4

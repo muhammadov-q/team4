@@ -1,6 +1,5 @@
 'use client'
 
-import { cn } from 'cn'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowUpRight, ChevronLeft, ChevronRight, History, ScanLine } from 'lucide-react'
@@ -9,6 +8,7 @@ import { AccountCard } from '@/components/auth/account-card'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 const REPO_URL = 'https://github.com/muhammadov-q/team4'
 

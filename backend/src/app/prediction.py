@@ -1,9 +1,15 @@
-from pydantic import BaseModel
+from dataclasses import asdict
+
+from pydantic import BaseModel, ConfigDict
 
 from ml import AbstractPredictor, create_predictor
-from ml.predictor import DigitResult
+from ml.predictor import Prediction
+from ml.translating_predictor import TranslatingPredictor
+from ml.translator import GlossaryTranslator
 
-predictor: AbstractPredictor = create_predictor()
+predictor: AbstractPredictor = TranslatingPredictor(
+    create_predictor(), GlossaryTranslator()
+)
 
 
 def get_predictor() -> AbstractPredictor:
@@ -17,16 +23,31 @@ class BoxResponse(BaseModel):
     h: int
 
 
-class DigitResponse(BaseModel):
-    digit: int
-    probabilities: dict[int, float]
+class GlossResponse(BaseModel):
+    lemma: str
+    translation: str
+    definition: str
+
+
+class PredictionItem(BaseModel):
+    # The defaults are for old saved results; every response has the fields
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
+    text: str
+    probabilities: dict[str, float]
     box: BoxResponse
+    line: int = 0
+    gloss: GlossResponse | None = None
 
     @classmethod
-    def of(cls, result: DigitResult) -> "DigitResponse":
+    def of(cls, result: Prediction) -> "PredictionItem":
         x, y, w, h = result.box
         return cls(
-            digit=result.digit,
+            text=result.text,
             probabilities=result.probabilities,
             box=BoxResponse(x=x, y=y, w=w, h=h),
+            line=result.line,
+            gloss=None
+            if result.gloss is None
+            else GlossResponse(**asdict(result.gloss)),
         )

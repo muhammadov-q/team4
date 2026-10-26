@@ -9,7 +9,7 @@ test('uploads a page and shows the backend response', async ({ page }) => {
   //await page.goto('/')
   await page.goto('/dashboard')
   await expect(page.getByText('Signed in as', { exact: false })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Read handwritten digits' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Read a manuscript page' })).toBeVisible()
 
   await page.getByLabel('Page image').setInputFiles({
     name: 'folio-1r.png',
@@ -25,7 +25,13 @@ test('uploads a page and shows the backend response', async ({ page }) => {
   const response = page.getByRole('region', { name: 'Model response' })
   await expect(response).toBeVisible()
   await expect(response.getByText('Machine output')).toBeVisible()
-  await expect(response.getByText('Digits read')).toBeVisible()
+
+  const transcript = page.getByRole('region', { name: 'Transcript' })
+  await expect(transcript).toBeVisible()
+  await transcript.getByRole('listitem').first().getByRole('button').first().click()
+  await expect(response.getByRole('region', { name: 'Selected word' })).toContainText(
+    'Line 1, word 1'
+  )
 })
 
 test('rejects a file that is not an image without calling the backend', async ({ page }) => {

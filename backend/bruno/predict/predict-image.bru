@@ -24,20 +24,26 @@ tests {
   const predictions = res.getBody().predictions;
 
   test("returns the dummy digits in order", function () {
-    expect(predictions.map((p) => p.digit)).to.eql([2, 5, 0, 0, 0, 0]);
+    expect(predictions.map((p) => p.text)).to.eql(["2", "5", "0", "0", "0", "0"]);
   });
 
-  test("each prediction has digit, probabilities and box", function () {
+  test("each prediction has text, probabilities, box, line and gloss", function () {
     for (const p of predictions) {
-      expect(p).to.have.all.keys("digit", "probabilities", "box");
+      expect(p).to.have.all.keys("text", "probabilities", "box", "line", "gloss");
       expect(p.box).to.have.all.keys("x", "y", "w", "h");
     }
   });
 
-  test("dummy is fully confident in each digit", function () {
+  test("digits have no gloss and sit on the first line", function () {
     for (const p of predictions) {
-      // JSON object keys are strings
-      expect(p.probabilities).to.eql({ [String(p.digit)]: 1.0 });
+      expect(p.gloss).to.eql(null);
+      expect(p.line).to.eql(0);
+    }
+  });
+
+  test("dummy is fully confident in each prediction", function () {
+    for (const p of predictions) {
+      expect(p.probabilities).to.eql({ [p.text]: 1.0 });
     }
   });
 }

@@ -4,9 +4,11 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { usePhoneLink } from '@/hooks/use-phone-link'
 import { useRecognize } from '@/hooks/use-recognitions'
+import { useWordSelection } from '@/hooks/use-word-selection'
 import { checkImageFile } from '@/lib/image-file'
 import { PhoneLinkBar } from '@/components/phone-capture/phone-link-bar'
 import { PhoneLinkDialog } from '@/components/phone-capture/phone-link-dialog'
+import { Transcript } from '@/components/transcript/transcript'
 import { ImageCropper } from './image-cropper'
 import { PageDropzone } from './page-dropzone'
 import { PagePreview } from './page-preview'
@@ -19,6 +21,8 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
 
   const run = useRecognize()
   const abortRef = useRef<AbortController | null>(null)
+  const recognition = run.isSuccess ? run.data.recognition : undefined
+  const selection = useWordSelection(recognition, recognition?.predictions.length ?? 0)
 
   function stopRun() {
     abortRef.current?.abort()
@@ -96,58 +100,84 @@ export function RecognitionWorkbench({ lanAddress = null }: { lanAddress?: strin
   useEffect(() => () => abortRef.current?.abort(), [])
 
   return (
-    <div id="workbench" className="grid scroll-mt-28 grid-cols-1 items-start gap-8 lg:grid-cols-2">
-      <div className="space-y-3">
-        {phoneActive && (
-          <PhoneLinkBar
-            linked={phone.status === 'linked'}
-            onShowCode={phone.start}
-            onStop={phone.stop}
-          />
-        )}
-
-        {page ? (
-          cropping ? (
-            <ImageCropper file={page} onApply={applyCrop} onCancel={() => setCropping(false)} />
-          ) : (
-            <PagePreview
-              file={page}
-              predictions={run.isSuccess ? run.data.recognition.predictions : undefined}
-              onReplace={choosePage}
-              onCrop={() => {
-                stopRun()
-                setCropping(true)
-              }}
-              onRemove={removePage}
-              onUsePhone={phoneActive ? undefined : phone.start}
-            />
-          )
-        ) : (
-          <PageDropzone onFile={choosePage} onUsePhone={phone.start} />
-        )}
-
-        {rejection && (
-          <p role="alert" className="text-sm text-foreground">
-            {rejection}
+    <>
+      {page ? (
+        <h1 className="sr-only">Read a manuscript page</h1>
+      ) : (
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">
+            Read a manuscript page
+          </h1>
+          <p className="mt-3 text-lg text-muted-foreground">
+            Upload a photo of the page. The model reads each word, and you can pick any word to see
+            its translation.
           </p>
-        )}
+        </div>
+      )}
+
+      <div
+        id="workbench"
+        className="grid scroll-mt-28 grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+      >
+        <div className="space-y-3">
+          {phoneActive && (
+            <PhoneLinkBar
+              linked={phone.status === 'linked'}
+              onShowCode={phone.start}
+              onStop={phone.stop}
+            />
+          )}
+
+          {page ? (
+            cropping ? (
+              <ImageCropper file={page} onApply={applyCrop} onCancel={() => setCropping(false)} />
+            ) : (
+              <PagePreview
+                file={page}
+                words={recognition?.predictions}
+                selection={selection}
+                onReplace={choosePage}
+                onCrop={() => {
+                  stopRun()
+                  setCropping(true)
+                }}
+                onRemove={removePage}
+                onUsePhone={phoneActive ? undefined : phone.start}
+              />
+            )
+          ) : (
+            <PageDropzone onFile={choosePage} onUsePhone={phone.start} />
+          )}
+
+          {rejection && (
+            <p role="alert" className="text-sm text-foreground">
+              {rejection}
+            </p>
+          )}
+
+          {recognition && !cropping && (
+            <Transcript words={recognition.predictions} selection={selection} />
+          )}
+        </div>
+
+        <RecognitionPanel
+          hasPage={page !== null && !cropping}
+          run={run}
+          selection={selection}
+          image={page ?? undefined}
+          onRecognize={recognize}
+          onCancel={stopRun}
+        />
+
+        <PhoneLinkDialog
+          open={phone.open}
+          onOpenChange={phone.setOpen}
+          status={phone.status}
+          sessionId={phone.sessionId}
+          lanAddress={lanAddress}
+          onNewCode={phone.start}
+        />
       </div>
-
-      <RecognitionPanel
-        hasPage={page !== null && !cropping}
-        run={run}
-        onRecognize={recognize}
-        onCancel={stopRun}
-      />
-
-      <PhoneLinkDialog
-        open={phone.open}
-        onOpenChange={phone.setOpen}
-        status={phone.status}
-        sessionId={phone.sessionId}
-        lanAddress={lanAddress}
-        onNewCode={phone.start}
-      />
-    </div>
+    </>
   )
 }

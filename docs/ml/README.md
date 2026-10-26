@@ -3,6 +3,8 @@ The first version of the backend runs a mock predictor, `DummyPredictor`, that i
 
 For now, we have a `KnnPredictor`. It consist of a pipeline finding artifacts on a picture that may be a digit. Then it preprocess the artifact to have a 28x28 sample to compare using a KNN and then predict the digit. More details can be found on the [dedicated model page](models/KNN).
 
+For the word by word reading, `EparchosPredictor` is a mock too: it ignores the image and returns the words of one page of the [Eparchos dataset](https://zenodo.org/records/4095301) (page 6791) with their boxes and line numbers. `TranslatingPredictor` then adds a gloss to each word (dictionary form, translation, definition) from `GlossaryTranslator`, a small hand-written Greek to English glossary in `backend/src/ml/data/glossary.json` that only covers that page.
+
 Nothing decided yet. The backend runs a mock predictor, `DummyPredictor`, that ignores the image and returns a fixed value, so the app works end to end before a real model is in ([[architecture/design-patterns]]).
 
 This note gets the tasks, datasets, splits and metrics once the team agrees on them. Each model we then use gets a card in [[models/README|models]].

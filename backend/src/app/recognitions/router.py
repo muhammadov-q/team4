@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.router import NOT_SIGNED_IN, CurrentUser
 from app.db import get_db
-from app.prediction import DigitResponse, get_predictor
+from app.prediction import PredictionItem, get_predictor
 from app.recognitions.models import Recognition
 from app.recognitions.repository import RecognitionRepository
 from app.recognitions.service import RecognitionService
@@ -48,7 +48,7 @@ class RecognitionResponse(BaseModel):
     created_at: datetime
     filename: str
     model_version: str
-    predictions: list[DigitResponse]
+    predictions: list[PredictionItem]
 
     @classmethod
     def of(cls, recognition: Recognition) -> "RecognitionResponse":
@@ -58,7 +58,7 @@ class RecognitionResponse(BaseModel):
             filename=recognition.filename,
             model_version=recognition.model_version,
             predictions=[
-                DigitResponse.model_validate(p) for p in recognition.predictions
+                PredictionItem.model_validate(p) for p in recognition.predictions
             ],
         )
 

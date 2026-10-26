@@ -5,7 +5,7 @@ import pytest
 from app.recognitions.repository import RecognitionRepository
 from app.recognitions.service import RecognitionNotFound, RecognitionService
 from app.uploads import ImageUpload
-from ml.predictor import AbstractPredictor, DigitResult, DummyPredictor
+from ml.predictor import AbstractPredictor, DummyPredictor, Prediction
 
 PAGE = ImageUpload(content=b"png bytes", content_type="image/png", filename="1r.png")
 NOON = datetime(2026, 10, 15, 12, 0, tzinfo=UTC)
@@ -16,7 +16,7 @@ class UnreadablePredictor(AbstractPredictor):
     def model_version(self) -> str:
         return "unreadable"
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         raise ValueError("Impossible to decode image")
 
 
@@ -45,11 +45,13 @@ def test_recognize_saves_the_page_and_what_the_model_read(service, db, ada):
     assert saved.filename == "1r.png"
     assert saved.model_version == "mock"
     assert saved.created_at == NOON
-    assert [p["digit"] for p in saved.predictions] == [2, 5, 0, 0, 0, 0]
+    assert [p["text"] for p in saved.predictions] == ["2", "5", "0", "0", "0", "0"]
     assert saved.predictions[0] == {
-        "digit": 2,
+        "text": "2",
         "probabilities": {"2": 1.0},
         "box": {"x": 0, "y": 0, "w": 0, "h": 0},
+        "line": 0,
+        "gloss": None,
     }
     assert service.image(ada, recognition.id) == (b"png bytes", "image/png")
     assert [r.id for r in service.history(ada)] == [recognition.id]

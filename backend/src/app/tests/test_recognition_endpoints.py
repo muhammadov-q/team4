@@ -5,7 +5,7 @@ from app.auth.router import ERROR_401
 from app.main import app
 from app.prediction import get_predictor
 from app.recognitions.router import ERROR_404
-from ml.predictor import AbstractPredictor, DigitResult
+from ml.predictor import AbstractPredictor, Prediction
 
 
 class UnreadablePredictor(AbstractPredictor):
@@ -13,7 +13,7 @@ class UnreadablePredictor(AbstractPredictor):
     def model_version(self) -> str:
         return "unreadable"
 
-    def predict(self, image: bytes) -> list[DigitResult]:
+    def predict(self, image: bytes) -> list[Prediction]:
         raise ValueError("Impossible to decode image")
 
 
@@ -50,7 +50,7 @@ def test_reading_a_page_saves_it_to_your_history(ada):
     }
     assert created["filename"] == "folio-1r.png"
     assert created["model_version"] == "mock"
-    assert [p["digit"] for p in created["predictions"]] == [2, 5, 0, 0, 0, 0]
+    assert [p["text"] for p in created["predictions"]] == ["2", "5", "0", "0", "0", "0"]
     assert created["predictions"][0]["probabilities"] == {"2": 1.0}
     assert created["created_at"].endswith("Z")
 

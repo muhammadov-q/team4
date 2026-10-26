@@ -1,4 +1,5 @@
 import { fireEvent, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { makeRecognition } from '@/test/recognitions'
 import { renderWithProviders } from '@/test/render'
@@ -15,7 +16,7 @@ function stubFetch(response: Response) {
 }
 
 describe('SavedRecognition', () => {
-  it('shows the saved page with the digits the model read', async () => {
+  it('shows the saved page with the words the model read', async () => {
     const fetch = stubFetch(Response.json(makeRecognition({ id: 7 })))
     renderWithProviders(<SavedRecognition id={7} />)
 
@@ -24,22 +25,35 @@ describe('SavedRecognition', () => {
     expect(fetch).toHaveBeenCalledWith('/api/recognitions/7', expect.anything())
 
     const result = screen.getByRole('region', { name: 'Model response' })
-    expect(within(result).getByText('Digits read').nextElementSibling).toHaveTextContent('42')
     expect(within(result).getByText('Machine output')).toBeInTheDocument()
+    const transcript = screen.getByRole('region', { name: 'Transcript' })
+    expect(transcript).toHaveTextContent('3 words on 2 lines')
 
     const page = screen.getByRole('img', { name: 'Saved page folio-1r.png' })
     expect(page).toHaveAttribute('src', '/api/recognitions/7/image')
-    expect(screen.queryAllByTestId('digit-box')).toHaveLength(0)
+    expect(screen.queryAllByTestId('word-box')).toHaveLength(0)
 
     Object.defineProperty(page, 'naturalWidth', { value: 100 })
     Object.defineProperty(page, 'naturalHeight', { value: 100 })
     fireEvent.load(page)
 
-    expect(screen.getAllByTestId('digit-box')).toHaveLength(2)
+    expect(screen.getAllByTestId('word-box')).toHaveLength(3)
     expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute(
       'href',
       '/dashboard/history'
     )
+  })
+
+  it('shows the translation of a picked word', async () => {
+    stubFetch(Response.json(makeRecognition({ id: 7 })))
+    renderWithProviders(<SavedRecognition id={7} />)
+
+    const transcript = await screen.findByRole('region', { name: 'Transcript' })
+    await userEvent.click(within(transcript).getByRole('button', { name: 'Φύσις' }))
+
+    const word = screen.getByRole('region', { name: 'Selected word' })
+    expect(word).toHaveTextContent('Line 1, word 1')
+    expect(word).toHaveTextContent('nature')
   })
 
   it('says so, once, when the result is not in your history', async () => {

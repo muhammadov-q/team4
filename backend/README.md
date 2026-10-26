@@ -63,6 +63,13 @@ cd backend
 ML_PREDICTOR="knn" uv run uvicorn app.main:app --reload
 ```
 
+For the word by word demo, run the `eparchos` mock. It ignores the uploaded image and always returns the 139 words of Eparchos page 6791 with their translations, so upload that page (`6791 (1).png` from the [Eparchos dataset](https://zenodo.org/records/4095301)) for the boxes to line up.
+
+```bash
+cd backend
+ML_PREDICTOR="eparchos" uv run uvicorn app.main:app --reload
+```
+
 ## Run the tests
 
 ### pytest (no server needed)

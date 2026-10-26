@@ -1,4 +1,4 @@
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 
 export function LinkDot({ pulse = false, className }: { pulse?: boolean; className?: string }) {
   return (
