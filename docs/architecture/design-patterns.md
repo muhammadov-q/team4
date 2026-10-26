@@ -6,6 +6,8 @@ Patterns that are in the code today. When a new one lands, add a row with the fi
 | -------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Factory              | `create_predictor` in `backend/src/ml/factory.py`                                            | Builds the predictor named by its argument or by the `ML_PREDICTOR` environment variable, so switching models doesn't touch the route.       |
 | Strategy             | `AbstractPredictor` in `backend/src/ml/predictor.py`                                         | Every model has the same `predict` and `model_version`, so `/predict` works with any of them.                                                |
+| Strategy             | `AbstractTranslator` in `backend/src/ml/translator.py`                                       | The glossary mock and a real translation model can be swapped without touching the predictors.                                               |
+| Decorator            | `TranslatingPredictor` in `backend/src/ml/translating_predictor.py`                          | Wraps any predictor and adds a gloss to each word, so no predictor has to know about translation.                                            |
 | Dependency injection | `get_predictor` in `backend/src/app/main.py`, `capped_image` in `backend/src/app/uploads.py` | FastAPI `Depends` hands the route its predictor and the checked image bytes, so the route doesn't build them itself.                         |
 | Repository           | `InMemoryCaptureSessionRepository` in `backend/src/app/capture/repository.py`                | All storage of phone capture sessions goes through it, so `CaptureService` doesn't know where they live.                                     |
 | Repository           | `RecognitionRepository` in `backend/src/app/recognitions/repository.py`                      | All access to saved results goes through it, and every query is scoped to one user.                                                          |
@@ -22,21 +24,32 @@ classDiagram
     class AbstractPredictor {
         <<abstract>>
         +str model_version
-        +predict(bytes image) list[DigitResult]
+        +predict(bytes image) list[Prediction]
     }
-    class DummyPredictor {
-        +str model_version
-        +predict(bytes image) list[DigitResult]
+    class DummyPredictor
+    class KnnPredictor
+    class EparchosPredictor
+    class TranslatingPredictor {
+        +AbstractPredictor predictor
+        +AbstractTranslator translator
     }
-    class KnnPredictor {
-	    +str model_version
-	    +predict(bytes image) list[DigitResult]
+    class AbstractTranslator {
+        <<abstract>>
+        +translate(list[str] words) list[Gloss | None]
     }
+    class GlossaryTranslator
     class factory {
         <<module>>
         +create_predictor(name) AbstractPredictor
     }
     AbstractPredictor <|-- DummyPredictor
     AbstractPredictor <|-- KnnPredictor
+    AbstractPredictor <|-- EparchosPredictor
+    AbstractPredictor <|-- TranslatingPredictor
+    TranslatingPredictor o-- AbstractPredictor : wraps
+    TranslatingPredictor o-- AbstractTranslator
+    AbstractTranslator <|-- GlossaryTranslator
     factory ..> AbstractPredictor : creates
 ```
+
+`backend/src/app/prediction.py` wraps the predictor from the factory in a `TranslatingPredictor` with a `GlossaryTranslator`.

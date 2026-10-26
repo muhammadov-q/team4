@@ -1,0 +1,437 @@
+{
+  "Ἐπιλύσεις": {
+    "lemma": "ἐπίλυσις",
+    "translation": "solutions",
+    "definition": "noun: a release; the solving or explanation of a problem"
+  },
+  "σύντομοι": {
+    "lemma": "σύντομος",
+    "translation": "brief",
+    "definition": "adjective: cut short, brief, concise"
+  },
+  "καί": {
+    "lemma": "καί",
+    "translation": "and",
+    "definition": "conjunction: and, also, even"
+  },
+  "ἐξηγήσεις": {
+    "lemma": "ἐξήγησις",
+    "translation": "explanations",
+    "definition": "noun: a telling in full, an explanation, an interpretation"
+  },
+  "ἀποριῶν": {
+    "lemma": "ἀπορία",
+    "translation": "of problems",
+    "definition": "noun: a difficulty, a puzzle, a question that is hard to answer"
+  },
+  "φυσι-": {
+    "lemma": "φυσικός",
+    "translation": "natural",
+    "definition": "adjective: natural, about nature; about natural philosophy. First part of φυσικῶν, split at the end of the line"
+  },
+  "κῶν": {
+    "lemma": "φυσικός",
+    "translation": "natural",
+    "definition": "adjective: natural, about nature; about natural philosophy. End of φυσικῶν, which starts on the line above"
+  },
+  "τοῦ": {
+    "lemma": "ὁ",
+    "translation": "of the",
+    "definition": "article: the"
+  },
+  "σοφωτάτου": {
+    "lemma": "σοφός",
+    "translation": "of the most wise",
+    "definition": "adjective: wise, skilled, learned; here in the superlative, most wise"
+  },
+  "ψελλοῦ": {
+    "lemma": "Ψελλός",
+    "translation": "of Psellos",
+    "definition": "name: Michael Psellos, a Byzantine scholar of the 11th century"
+  },
+  "γραφεῖσα": {
+    "lemma": "γράφω",
+    "translation": "written",
+    "definition": "verb: to write; here a passive participle, having been written"
+  },
+  "πρός": {
+    "lemma": "πρός",
+    "translation": "for",
+    "definition": "preposition: towards, to; with the accusative, addressed to"
+  },
+  "τόν": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  },
+  "βασιλέα": {
+    "lemma": "βασιλεύς",
+    "translation": "emperor",
+    "definition": "noun: king; in Byzantine Greek, the emperor"
+  },
+  "κύρ": {
+    "lemma": "κύρ",
+    "translation": "lord",
+    "definition": "title: lord, sir; a short form of κύριος"
+  },
+  "μιχαήλ": {
+    "lemma": "Μιχαήλ",
+    "translation": "Michael",
+    "definition": "name: Michael; here the emperor Michael VII Doukas"
+  },
+  "δοῦκαν": {
+    "lemma": "Δούκας",
+    "translation": "Doukas",
+    "definition": "name: Doukas, the emperor's family name. The :- mark after it ends the title"
+  },
+  "περί": {
+    "lemma": "περί",
+    "translation": "on, about",
+    "definition": "preposition: around; with the genitive, about, concerning"
+  },
+  "φύσεως": {
+    "lemma": "φύσις",
+    "translation": "of nature",
+    "definition": "noun: nature, the way a thing grows and is"
+  },
+  "Φ": {
+    "lemma": "φύσις",
+    "translation": "Nature",
+    "definition": "the decorated first letter of Φύσις, drawn apart from the rest of the word"
+  },
+  "ύσις": {
+    "lemma": "φύσις",
+    "translation": "Nature",
+    "definition": "noun: nature, the way a thing grows and is. The rest of Φύσις after its decorated first letter"
+  },
+  "ἐστί": {
+    "lemma": "εἰμί",
+    "translation": "is",
+    "definition": "verb: to be"
+  },
+  "ἐστιν": {
+    "lemma": "εἰμί",
+    "translation": "is",
+    "definition": "verb: to be"
+  },
+  "δύναμις": {
+    "lemma": "δύναμις",
+    "translation": "a power",
+    "definition": "noun: power, force, ability"
+  },
+  "ὀφθαλμοῖς": {
+    "lemma": "ὀφθαλμός",
+    "translation": "to the eyes",
+    "definition": "noun: eye"
+  },
+  "μέν": {
+    "lemma": "μέν",
+    "translation": "on the one hand",
+    "definition": "particle: marks the first of two contrasted parts, answered by δέ"
+  },
+  "ἀθέατος": {
+    "lemma": "ἀθέατος",
+    "translation": "invisible",
+    "definition": "adjective: unseen, that cannot be seen"
+  },
+  "νῶ": {
+    "lemma": "νοῦς",
+    "translation": "to the mind",
+    "definition": "noun: mind, intellect"
+  },
+  "δέ": {
+    "lemma": "δέ",
+    "translation": "but, and",
+    "definition": "particle: but, and; answers μέν"
+  },
+  "α´": {
+    "lemma": "α´",
+    "translation": "1",
+    "definition": "numeral: the letter alpha with a stroke means 1; here the chapter number"
+  },
+  "θεωρητική": {
+    "lemma": "θεωρητικός",
+    "translation": "visible",
+    "definition": "adjective: that can be seen or studied by the mind"
+  },
+  "τοῖς": {
+    "lemma": "ὁ",
+    "translation": "in the",
+    "definition": "article: the"
+  },
+  "σώμασιν": {
+    "lemma": "σῶμα",
+    "translation": "bodies",
+    "definition": "noun: body"
+  },
+  "ἐσπαρμένη": {
+    "lemma": "σπείρω",
+    "translation": "sown",
+    "definition": "verb: to sow, to scatter; here a passive participle, having been sown"
+  },
+  "παρά": {
+    "lemma": "παρά",
+    "translation": "by",
+    "definition": "preposition: beside; with the genitive, from, by"
+  },
+  "θεοῦ": {
+    "lemma": "θεός",
+    "translation": "of God",
+    "definition": "noun: god; in this text, God"
+  },
+  "θεός": {
+    "lemma": "θεός",
+    "translation": "God",
+    "definition": "noun: god; in this text, God"
+  },
+  "ἀρχή": {
+    "lemma": "ἀρχή",
+    "translation": "the source",
+    "definition": "noun: beginning, origin, first cause; also rule, power"
+  },
+  "κινήσεως": {
+    "lemma": "κίνησις",
+    "translation": "of motion",
+    "definition": "noun: movement, motion"
+  },
+  "κίνησιν": {
+    "lemma": "κίνησις",
+    "translation": "motion",
+    "definition": "noun: movement, motion"
+  },
+  "ἡρεμίας": {
+    "lemma": "ἠρεμία",
+    "translation": "of rest",
+    "definition": "noun: rest, stillness"
+  },
+  "αὕτη": {
+    "lemma": "οὗτος",
+    "translation": "it, this",
+    "definition": "pronoun: this"
+  },
+  "γάρ": {
+    "lemma": "γάρ",
+    "translation": "for",
+    "definition": "particle: for, because; gives a reason"
+  },
+  "ἡ": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  },
+  "κι-": {
+    "lemma": "κινέω",
+    "translation": "moving",
+    "definition": "verb: to move, to set in motion. First part of κινοῦσα, split at the end of the line"
+  },
+  "νοῦσα": {
+    "lemma": "κινέω",
+    "translation": "moving",
+    "definition": "verb: to move, to set in motion. End of κινοῦσα, which starts on the line above"
+  },
+  "τά": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  },
+  "φυσικά": {
+    "lemma": "φυσικός",
+    "translation": "natural",
+    "definition": "adjective: natural, about nature"
+  },
+  "σώματα": {
+    "lemma": "σῶμα",
+    "translation": "bodies",
+    "definition": "noun: body"
+  },
+  "αὖθις": {
+    "lemma": "αὖθις",
+    "translation": "again",
+    "definition": "adverb: again, back again"
+  },
+  "ἡρεμεῖν": {
+    "lemma": "ἠρεμέω",
+    "translation": "to be at rest",
+    "definition": "verb: to be still, to rest"
+  },
+  "ποιοῦσα": {
+    "lemma": "ποιέω",
+    "translation": "making",
+    "definition": "verb: to make, to do, to cause"
+  },
+  "πάντα": {
+    "lemma": "πᾶς",
+    "translation": "all",
+    "definition": "adjective: all, every, whole"
+  },
+  "οἷον": {
+    "lemma": "οἷος",
+    "translation": "such as, like",
+    "definition": "adverb: as, like, for example"
+  },
+  "στοιχεῖα": {
+    "lemma": "στοιχεῖον",
+    "translation": "the elements",
+    "definition": "noun: element; earth, water, air and fire"
+  },
+  "ἐκ": {
+    "lemma": "ἐκ",
+    "translation": "from, out of",
+    "definition": "preposition: with the genitive, out of, from"
+  },
+  "τούτων": {
+    "lemma": "οὗτος",
+    "translation": "of these",
+    "definition": "pronoun: this; plural, these"
+  },
+  "συγκείμενα": {
+    "lemma": "σύγκειμαι",
+    "translation": "composed",
+    "definition": "verb: to lie together; to be made up of"
+  },
+  "εἰ": {
+    "lemma": "εἰ",
+    "translation": "if",
+    "definition": "conjunction: if; εἰ καί means even if"
+  },
+  "ὑπό": {
+    "lemma": "ὑπό",
+    "translation": "by",
+    "definition": "preposition: under; with the genitive, by"
+  },
+  "τήν": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  },
+  "ἡσυχίαν": {
+    "lemma": "ἡσυχία",
+    "translation": "rest",
+    "definition": "noun: stillness, quiet, rest"
+  },
+  "ἔχει": {
+    "lemma": "ἔχω",
+    "translation": "they have",
+    "definition": "verb: to have, to hold"
+  },
+  "ἀλλά": {
+    "lemma": "ἀλλά",
+    "translation": "but, yet",
+    "definition": "conjunction: but"
+  },
+  "προσεχῶς": {
+    "lemma": "προσεχῶς",
+    "translation": "directly",
+    "definition": "adverb: next, nearest; as the nearest cause"
+  },
+  "κινεῖται": {
+    "lemma": "κινέω",
+    "translation": "they are moved",
+    "definition": "verb: to move; here passive, to be moved"
+  },
+  "πολλά": {
+    "lemma": "πολύς",
+    "translation": "many",
+    "definition": "adjective: much; plural, many"
+  },
+  "εἰσί": {
+    "lemma": "εἰμί",
+    "translation": "are",
+    "definition": "verb: to be"
+  },
+  "κινοῦντα": {
+    "lemma": "κινέω",
+    "translation": "the things that move",
+    "definition": "verb: to move, to set in motion"
+  },
+  "πρῶτον": {
+    "lemma": "πρῶτος",
+    "translation": "first",
+    "definition": "adverb: first, in the first place"
+  },
+  "ὁ": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  },
+  "εἶτα": {
+    "lemma": "εἶτα",
+    "translation": "then",
+    "definition": "adverb: then, next"
+  },
+  "νοῦς": {
+    "lemma": "νοῦς",
+    "translation": "the mind",
+    "definition": "noun: mind, intellect"
+  },
+  "ψυχή": {
+    "lemma": "ψυχή",
+    "translation": "the soul",
+    "definition": "noun: soul, life"
+  },
+  "τελευταῖον": {
+    "lemma": "τελευταῖος",
+    "translation": "last",
+    "definition": "adverb: last, at the end"
+  },
+  "φύσις": {
+    "lemma": "φύσις",
+    "translation": "nature",
+    "definition": "noun: nature, the way a thing grows and is"
+  },
+  "ἥτις": {
+    "lemma": "ὅστις",
+    "translation": "which",
+    "definition": "pronoun: who, which, whoever"
+  },
+  "ὄργανον": {
+    "lemma": "ὄργανον",
+    "translation": "a tool",
+    "definition": "noun: tool, instrument"
+  },
+  "ἄνθρωπον": {
+    "lemma": "ἄνθρωπος",
+    "translation": "the human",
+    "definition": "noun: human being, person"
+  },
+  "ζῶα": {
+    "lemma": "ζῷον",
+    "translation": "the animals",
+    "definition": "noun: living being, animal"
+  },
+  "κινεῖ": {
+    "lemma": "κινέω",
+    "translation": "moves",
+    "definition": "verb: to move, to set in motion"
+  },
+  "ἁπλᾶ": {
+    "lemma": "ἁπλοῦς",
+    "translation": "simple",
+    "definition": "adjective: simple, single, not made of parts"
+  },
+  "σύνθετα": {
+    "lemma": "σύνθετος",
+    "translation": "composite",
+    "definition": "adjective: put together, made of parts"
+  },
+  "μόνη": {
+    "lemma": "μόνος",
+    "translation": "alone",
+    "definition": "adjective: alone, only"
+  },
+  "πάλιν": {
+    "lemma": "πάλιν",
+    "translation": "again",
+    "definition": "adverb: back, again"
+  },
+  "ἵστησι": {
+    "lemma": "ἵστημι",
+    "translation": "stops",
+    "definition": "verb: to make stand; with the genitive, to stop from"
+  },
+  "τῆς": {
+    "lemma": "ὁ",
+    "translation": "the",
+    "definition": "article: the"
+  }
+}

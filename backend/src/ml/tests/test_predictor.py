@@ -78,6 +78,12 @@ def test_dummy_predictor_is_fully_confident():
         assert r.probabilities == {r.text: 1.0}
 
 
+def test_a_prediction_starts_on_the_first_line_without_a_gloss():
+    prediction = Prediction(text="7", probabilities={"7": 1.0}, box=(0, 0, 1, 1))
+    assert prediction.line == 0
+    assert prediction.gloss is None
+
+
 def test_dummy_predictor_boxes_have_four_values():
     for r in DummyPredictor().predict(b"img"):
         assert len(r.box) == 4

@@ -69,7 +69,7 @@ def test_polygon_becomes_its_bounding_box():
 def test_returns_predictions_with_text_box_and_full_confidence():
     (result,) = parse_page_xml(page([word("καὶ", "307,12 354,12 354,42 307,42")]))
     assert result == Prediction(
-        text="καὶ", probabilities={"καὶ": 1.0}, box=(307, 12, 47, 30)
+        text="καὶ", probabilities={"καὶ": 1.0}, box=(307, 12, 47, 30), line=0
     )
 
 
@@ -90,6 +90,18 @@ def test_keeps_lines_in_document_order():
         [word("second", "10,50 30,50 30,70 10,70")],
     )
     assert [w.text for w in parse_page_xml(xml)] == ["first", "second"]
+
+
+def test_numbers_lines_from_zero():
+    xml = page(
+        [word("a", "0,0 10,0 10,10 0,10"), word("b", "20,0 30,0 30,10 20,10")],
+        [word("c", "0,50 10,50 10,60 0,60")],
+    )
+    assert [(w.text, w.line) for w in parse_page_xml(xml)] == [
+        ("a", 0),
+        ("b", 0),
+        ("c", 1),
+    ]
 
 
 def test_strips_whitespace_around_text():
@@ -183,6 +195,12 @@ def test_real_page_starts_with_the_first_word_on_the_page(real_words):
     # "Ἐπιλύσεις" is stored last in its line in the XML, but is read first
     assert [w.text for w in real_words[:3]] == ["Ἐπιλύσεις", "σύντομοι", "καὶ"]
     assert real_words[0].box == (59, 14, 106, 39)  # "59,14 165,14 165,53 59,53"
+
+
+def test_real_page_has_16_lines_in_reading_order(real_words):
+    lines = [w.line for w in real_words]
+    assert lines == sorted(lines)
+    assert set(lines) == set(range(16))
 
 
 def test_real_page_boxes_fit_inside_the_image(real_words):

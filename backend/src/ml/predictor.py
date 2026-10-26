@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from ml.translator import Gloss
+
 Box = tuple[int, int, int, int]  # x, y, w, h
 
 
@@ -9,6 +11,8 @@ class Prediction:
     text: str
     probabilities: dict[str, float]
     box: Box
+    line: int = 0
+    gloss: Gloss | None = None
 
 
 class AbstractPredictor(ABC):
@@ -21,7 +25,7 @@ class AbstractPredictor(ABC):
 
     @abstractmethod
     def predict(self, image: bytes) -> list[Prediction]:
-        """Take the raw image bytes and return the detected digits."""
+        """Take the raw image bytes and return what it reads, word by word."""
 
 
 class DummyPredictor(AbstractPredictor):

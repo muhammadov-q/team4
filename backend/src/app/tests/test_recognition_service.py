@@ -50,6 +50,8 @@ def test_recognize_saves_the_page_and_what_the_model_read(service, db, ada):
         "text": "2",
         "probabilities": {"2": 1.0},
         "box": {"x": 0, "y": 0, "w": 0, "h": 0},
+        "line": 0,
+        "gloss": None,
     }
     assert service.image(ada, recognition.id) == (b"png bytes", "image/png")
     assert [r.id for r in service.history(ada)] == [recognition.id]

@@ -21,14 +21,15 @@ def parse_page_xml(xml: bytes) -> list[Prediction]:
     """
     Return every word of a PAGE XML document, in reading order.
 
-    Lines are kept in document order (top to bottom), but words inside a line
-    are not stored left to right in Eparchos, so they are sorted by x.
+    Lines are kept in document order (top to bottom) and numbered from 0, but
+    words inside a line are not stored left to right in Eparchos, so they are
+    sorted by x.
     Words without text or coordinates are skipped. "{*}" matches any
     namespace, so every PAGE schema version works.
     """
     root = ET.fromstring(xml)
     words: list[Prediction] = []
-    for line in root.findall(".//{*}TextLine"):
+    for line_number, line in enumerate(root.findall(".//{*}TextLine")):
         line_words = []
         for word in line.findall("{*}Word"):
             text = (word.findtext("{*}TextEquiv/{*}Unicode") or "").strip()
@@ -36,7 +37,11 @@ def parse_page_xml(xml: bytes) -> list[Prediction]:
             if not text or coords is None or not coords.get("points"):
                 continue
             box = polygon_to_box(coords.get("points", ""))
-            line_words.append(Prediction(text=text, probabilities={text: 1.0}, box=box))
+            line_words.append(
+                Prediction(
+                    text=text, probabilities={text: 1.0}, box=box, line=line_number
+                )
+            )
         line_words.sort(key=lambda w: w.box[0])
         words.extend(line_words)
     return words
