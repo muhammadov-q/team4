@@ -35,6 +35,7 @@ import scriptlens.shared.generated.resources.prediction_recognized_text_label
 import scriptlens.shared.generated.resources.prediction_select_word_hint
 import scriptlens.shared.generated.resources.prediction_translation_label
 import scriptlens.shared.generated.resources.prediction_transcription_label
+import scriptlens.shared.generated.resources.prediction_gloss_unavailable
 import org.example.project.common.presentation.ui.theme.ScriptLensColors
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -140,8 +141,9 @@ fun PredictionSummary(
                         color = ScriptLensColors.Subtext,
                     )
                 } else {
+                    val unavailableText = stringResource(Res.string.prediction_gloss_unavailable)
                     Text(
-                        text = selectedPrediction.gloss.translation.ifBlank { "-" },
+                        text = selectedPrediction.gloss.translation.ifBlank { unavailableText },
                         style = ScriptLensTypography.Heading,
                         color = ScriptLensColors.Text,
                     )
@@ -149,14 +151,17 @@ fun PredictionSummary(
                     PredictionDetailRow(
                         label = stringResource(Res.string.prediction_recognized_text_label),
                         value = selectedPrediction.text,
+                        unavailableText = unavailableText,
                     )
                     PredictionDetailRow(
                         label = stringResource(Res.string.prediction_lemma_label),
                         value = selectedPrediction.gloss.lemma,
+                        unavailableText = unavailableText,
                     )
                     PredictionDetailRow(
                         label = stringResource(Res.string.prediction_definition_label),
                         value = selectedPrediction.gloss.definition,
+                        unavailableText = unavailableText,
                     )
                 }
             }
@@ -165,7 +170,7 @@ fun PredictionSummary(
 }
 
 @Composable
-private fun PredictionDetailRow(label: String, value: String) {
+private fun PredictionDetailRow(label: String, value: String, unavailableText: String) {
     Text(
         modifier = Modifier.padding(top = ScriptLensSpacing.padding_8),
         text = label,
@@ -173,7 +178,7 @@ private fun PredictionDetailRow(label: String, value: String) {
         color = ScriptLensColors.Subtext,
     )
     Text(
-        text = value.ifBlank { "-" },
+        text = value.ifBlank { unavailableText },
         style = ScriptLensTypography.Body,
         color = ScriptLensColors.Text,
     )

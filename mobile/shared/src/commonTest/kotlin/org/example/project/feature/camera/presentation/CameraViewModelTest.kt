@@ -2,7 +2,11 @@ package org.example.project.feature.camera.presentation
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -230,6 +234,68 @@ class CameraViewModelTest {
         assertIs<CameraScreenState.PhotoCaptured>(finalState.cameraScreenState)
         assertFalse(finalState.isLoading)
         assertEquals("v1", finalState.prediction?.modelVersion)
+    }
+
+    @Test
+    fun reverseOrderUploadCompletionKeepsLatestPhotoState() = runCameraTest {
+        val firstUpload = CompletableDeferred<Prediction>()
+        val secondUpload = CompletableDeferred<Prediction>()
+        var uploads = 0
+        val viewModel = createViewModel {
+            uploads++
+            if (uploads == 1) {
+                withContext(NonCancellable) { firstUpload.await() }
+            } else {
+                secondUpload.await()
+            }
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1, 1, 1)))
+        advanceUntilIdle()
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(2, 2, 2)))
+
+        secondUpload.complete(samplePrediction(modelVersion = "v2"))
+        advanceUntilIdle()
+
+        assertEquals(2, uploads)
+        assertEquals("v2", viewModel.state.value.prediction?.modelVersion)
+        assertContentEquals(byteArrayOf(2, 2, 2), viewModel.state.value.photo)
+        assertFalse(viewModel.state.value.isLoading)
+
+        firstUpload.complete(samplePrediction(modelVersion = "v1"))
+        advanceUntilIdle()
+
+        assertEquals("v2", viewModel.state.value.prediction?.modelVersion)
+        assertContentEquals(byteArrayOf(2, 2, 2), viewModel.state.value.photo)
+    }
+
+    @Test
+    fun newUploadCancelsObsoleteInFlightUpload() = runCameraTest {
+        val firstUploadCancelled = CompletableDeferred<Unit>()
+        var uploads = 0
+        val viewModel = createViewModel {
+            uploads++
+            if (uploads == 1) {
+                try {
+                    awaitCancellation()
+                } finally {
+                    firstUploadCancelled.complete(Unit)
+                }
+            }
+            samplePrediction(modelVersion = "v2")
+        }
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(1, 1, 1)))
+        advanceUntilIdle()
+
+        viewModel.onEvent(CameraEvent.OnPhotoPicked(byteArrayOf(2, 2, 2)))
+        advanceUntilIdle()
+
+        firstUploadCancelled.await()
+        assertEquals(2, uploads)
+        assertEquals("v2", viewModel.state.value.prediction?.modelVersion)
+        assertContentEquals(byteArrayOf(2, 2, 2), viewModel.state.value.photo)
+        assertFalse(viewModel.state.value.isLoading)
     }
 
     @Test

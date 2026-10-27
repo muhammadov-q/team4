@@ -71,19 +71,20 @@ fun CapturedPhotoContent(
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .graphicsLayer {
-                            scaleX = zoomScale
-                            scaleY = zoomScale
-                            translationX = panOffset.x
-                            translationY = panOffset.y
-                        }
                         .transformable(state = transformableState),
                 ) {
                     Image(
                         bitmap = image,
                         contentDescription = stringResource(Res.string.captured_photo_description),
                         contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.matchParentSize(),
+                        modifier = Modifier
+                            .matchParentSize()
+                            .graphicsLayer {
+                                scaleX = zoomScale
+                                scaleY = zoomScale
+                                translationX = panOffset.x
+                                translationY = panOffset.y
+                            },
                     )
 
                     PredictionOverlay(

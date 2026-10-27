@@ -87,5 +87,29 @@ class PredictionMapperTest {
         assertEquals(listOf("second", "first"), ui.predictions.map { it.text })
         assertEquals(listOf(1, 0), ui.predictions.map { it.line })
     }
+
+    @Test
+    fun mapPredictionToUiModelPreservesBlankGlossValues() {
+        val domain = Prediction(
+            predictions = listOf(
+                WordPrediction(
+                    text = "logos",
+                    probabilities = mapOf("logos" to 1.0),
+                    box = PredictionBox(10.0, 20.0, 30.0, 40.0),
+                    line = 0,
+                    gloss = PredictionGloss(lemma = "", translation = " ", definition = ""),
+                ),
+            ),
+            modelVersion = "v1",
+        )
+
+        val ui = mapPredictionToUiModel(domain)
+        val word = ui.predictions.single()
+
+        assertEquals("logos", word.text)
+        assertEquals("", word.gloss.lemma)
+        assertEquals(" ", word.gloss.translation)
+        assertEquals("", word.gloss.definition)
+    }
 }
 

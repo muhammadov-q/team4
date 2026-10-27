@@ -69,18 +69,17 @@ class PhotoUploadApiTest {
     }
 
     @Test
-    fun uploadUsesDetectedImageMimeTypeAndFilenameExtension() = runTest {
+    fun uploadUsesJpegMimeTypeAndFilename() = runTest {
         var body = ""
         val api = api { request ->
             body = request.body.toByteArray().decodeToString()
             respond("""{"predictions":[],"model_version":"v1"}""", HttpStatusCode.OK, jsonHeaders)
         }
 
-        // PNG signature
-        api.upload(byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A))
+        api.upload(byteArrayOf(1, 2, 3))
 
-        assertTrue(body.contains("image/png"), body)
-        assertTrue(body.contains("filename=\"photo.png\""), body)
+        assertTrue(body.contains("image/jpeg"), body)
+        assertTrue(body.contains("filename=\"photo.jpg\""), body)
     }
 
     @Test
@@ -97,6 +96,25 @@ class PhotoUploadApiTest {
 
         assertEquals("λόγος", result.predictions.single().text)
         assertEquals(null, result.predictions.single().gloss)
+    }
+
+    @Test
+    fun successfulUploadAllowsNullGlossFields() = runTest {
+        val api = api {
+            respond(
+                """{"predictions":[{"text":"λόγος","probabilities":{"λόγος":1.0},"box":{"x":1,"y":2,"w":3,"h":4},"line":0,"gloss":{"lemma":null,"translation":null,"definition":null}}],"model_version":"v1"}""",
+                HttpStatusCode.OK,
+                jsonHeaders,
+            )
+        }
+
+        val result = api.upload(byteArrayOf(1, 2, 3))
+        val gloss = result.predictions.single().gloss
+
+        assertEquals("λόγος", result.predictions.single().text)
+        assertEquals(null, gloss?.lemma)
+        assertEquals(null, gloss?.translation)
+        assertEquals(null, gloss?.definition)
     }
 
     @Test

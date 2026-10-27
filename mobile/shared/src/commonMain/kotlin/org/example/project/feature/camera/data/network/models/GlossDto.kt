@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GlossDto(
-    val lemma: String,
-    val translation: String,
-    val definition: String,
+    val lemma: String? = null,
+    val translation: String? = null,
+    val definition: String? = null,
 )
 

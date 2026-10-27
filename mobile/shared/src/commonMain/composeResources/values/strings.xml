@@ -25,6 +25,7 @@
     <string name="prediction_recognized_text_label">Recognized text</string>
     <string name="prediction_lemma_label">Lemma</string>
     <string name="prediction_definition_label">Definition</string>
+    <string name="prediction_gloss_unavailable">Glossary information unavailable for this word.</string>
 
     <!-- Upload errors -->
     <string name="error_service_offline_title">Recognition service offline</string>

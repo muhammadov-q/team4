@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -40,29 +39,14 @@ fun PredictionOverlay(
             .pointerInput(predictions, zoomScale, panOffset, containerSize) {
                 detectTapGestures { tap ->
                     if (containerSize.width == 0 || containerSize.height == 0 || predictions.isEmpty()) return@detectTapGestures
-
-                    val center = Offset(containerSize.width / 2f, containerSize.height / 2f)
-                    val untransformedTap = Offset(
-                        x = ((tap.x - center.x - panOffset.x) / zoomScale) + center.x,
-                        y = ((tap.y - center.y - panOffset.y) / zoomScale) + center.y,
-                    )
-
-                    val scaleX = containerSize.width.toFloat() / image.width
-                    val scaleY = containerSize.height.toFloat() / image.height
-                    val imageTapX = untransformedTap.x / scaleX
-                    val imageTapY = untransformedTap.y / scaleY
-
-                    val selected = predictions.withIndex()
-                        .filter { (_, word) -> isValidBox(word.box.x, word.box.y, word.box.w, word.box.h) }
-                        .filter { (_, word) ->
-                            imageTapX >= word.box.x &&
-                                imageTapX <= word.box.x + word.box.w &&
-                                imageTapY >= word.box.y &&
-                                imageTapY <= word.box.y + word.box.h
-                        }
-                        .minByOrNull { (_, word) -> word.box.w * word.box.h }
-
-                    selected?.let { onPredictionSelected(it.index) }
+                    selectPredictionIndexForTap(
+                        tap = tap,
+                        predictions = predictions,
+                        imageSize = IntSize(image.width, image.height),
+                        containerSize = containerSize,
+                        zoomScale = zoomScale,
+                        panOffset = panOffset,
+                    )?.let(onPredictionSelected)
                 }
             },
     ) {
@@ -70,29 +54,24 @@ fun PredictionOverlay(
             ?.takeIf { it in predictions.indices }
             ?.let { predictions[it] }
 
-        selectedWord?.takeIf { isValidBox(it.box.x, it.box.y, it.box.w, it.box.h) }?.let { word ->
-            val scaleX = size.width / image.width
-            val scaleY = size.height / image.height
-
-            val topLeft = Offset(
-                (word.box.x * scaleX).toFloat(),
-                (word.box.y * scaleY).toFloat(),
-            )
-            val boxSize = Size(
-                (word.box.w * scaleX).toFloat(),
-                (word.box.h * scaleY).toFloat(),
-            )
+        selectedWord?.let { word ->
+            val rect = overlayRectForImageBox(
+                x = word.box.x,
+                y = word.box.y,
+                w = word.box.w,
+                h = word.box.h,
+                imageSize = IntSize(image.width, image.height),
+                containerSize = IntSize(size.width.toInt(), size.height.toInt()),
+                zoomScale = zoomScale,
+                panOffset = panOffset,
+            ) ?: return@let
 
             drawRect(
                 color = ScriptLensColors.Accent,
-                topLeft = topLeft,
-                size = boxSize,
+                topLeft = rect.topLeft,
+                size = rect.size,
                 style = Stroke(width = 1.5.dp.toPx()),
             )
         }
     }
 }
-
-private fun isValidBox(x: Double, y: Double, w: Double, h: Double): Boolean =
-    x >= 0.0 && y >= 0.0 && w > 0.0 && h > 0.0
-

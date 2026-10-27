@@ -3,6 +3,7 @@ package org.example.project.feature.camera.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,8 @@ class CameraViewModel(
     val state = _state.asStateFlow()
     private val effectChannel = Channel<CameraEffect>(Channel.BUFFERED)
     val effects = effectChannel.receiveAsFlow()
+    private var uploadJob: Job? = null
+    private var latestUploadRequestId: Long = 0
 
     fun onEvent(event: CameraEvent) {
         when (event) {
@@ -85,6 +88,7 @@ class CameraViewModel(
     }
 
     private fun onPhotoPicked(photoBytes: ByteArray?) {
+        uploadJob?.cancel()
         setLoading(true)
         photoBytes?.takeIf { it.isNotEmpty() }?.let { bytes ->
             _state.setState {
@@ -108,10 +112,13 @@ class CameraViewModel(
     }
 
     private fun upload(photo: ByteArray) {
+        uploadJob?.cancel()
+        val uploadRequestId = ++latestUploadRequestId
         setLoading(true)
-        viewModelScope.launch {
+        uploadJob = viewModelScope.launch {
             try {
                 val prediction = uploadPhoto(photo)
+                if (uploadRequestId != latestUploadRequestId) return@launch
                 val predictionModel = mapPredictionToUiModel(prediction)
                 _state.setState {
                     it.copy(
@@ -121,10 +128,11 @@ class CameraViewModel(
                         cameraScreenState = CameraScreenState.PhotoCaptured,
                     )
                 }
-                println("$TAG: prediction received: $prediction")
+                println("$TAG: upload succeeded")
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (exception: Exception) {
+                if (uploadRequestId != latestUploadRequestId) return@launch
                 _state.setState {
                     it.copy(
                         isLoading = false,
